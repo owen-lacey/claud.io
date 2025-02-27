@@ -1,5 +1,5 @@
 using Audacia.Random.Extensions;
-using FplTeamPicker.Models;
+using FplTeamPicker.Optimisation.Models;
 
 namespace FplTeamPicker.Tests.Builders;
 
