@@ -1,17 +1,23 @@
 using System.Globalization;
 using System.Text;
 using CsvHelper;
-using FplTeamPicker;
-using FplTeamPicker.Models;
+using FplTeamPicker.Api.IoC;
+using FplTeamPicker.Api.Providers;
+using FplTeamPicker.Domain.Contracts;
+using FplTeamPicker.Optimisation;
+using FplTeamPicker.Optimisation.Models;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAntiforgery();
+builder.Services
+    .AddEndpointsApiExplorer()
+    .AddSwaggerGen()
+    .AddAntiforgery()
+    .AddHttpContextAccessor()
+    .AddFplApi()
+    .AddScoped<IFplUserProvider, FplUserProvider>()
+    .AddMemoryCache();
 
 var app = builder.Build();
 
@@ -105,5 +111,19 @@ app.MapPost("/transfers", (IFormFile file, int numberTransfers, decimal remainin
         return solver.Solve();
     })
     .DisableAntiforgery();
+
+app.MapGet("/me", async ([FromServices]IFplRepository repository, CancellationToken cancellationToken) =>
+    {
+        var result = await repository.GetUserDetails(cancellationToken);
+
+        return Results.Ok(result);
+    });
+
+app.MapGet("/team", async ([FromServices]IFplRepository repository, CancellationToken cancellationToken) =>
+    {
+        var result = await repository.GetTeam(cancellationToken);
+
+        return Results.Ok(result);
+    });
 
 app.Run();
