@@ -2,9 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Api", "FplTeamPicker.Api\FplTeamPicker.Api.csproj", "{5DF480F6-01EA-442E-817E-098700D9AD89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker", "FplTeamPicker\FplTeamPicker.csproj", "{411D572C-5C42-475D-9009-D95534343B8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Optimisation", "FplTeamPicker.Optimisation\FplTeamPicker.Optimisation.csproj", "{411D572C-5C42-475D-9009-D95534343B8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Tests", "FplTeamPicker.Tests\FplTeamPicker.Tests.csproj", "{1B15E6B8-09E6-41C3-8792-5452B493C5BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Services", "FplTeamPicker.Services\FplTeamPicker.Services.csproj", "{B78A942B-8631-46D1-B606-ACB09409BD02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Domain", "FplTeamPicker.Domain\FplTeamPicker.Domain.csproj", "{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +28,13 @@ Global
 		{1B15E6B8-09E6-41C3-8792-5452B493C5BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B15E6B8-09E6-41C3-8792-5452B493C5BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B15E6B8-09E6-41C3-8792-5452B493C5BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B78A942B-8631-46D1-B606-ACB09409BD02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B78A942B-8631-46D1-B606-ACB09409BD02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B78A942B-8631-46D1-B606-ACB09409BD02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B78A942B-8631-46D1-B606-ACB09409BD02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

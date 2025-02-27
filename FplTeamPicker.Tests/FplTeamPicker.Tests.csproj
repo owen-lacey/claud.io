@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FplTeamPicker\FplTeamPicker.csproj" />
+      <ProjectReference Include="..\FplTeamPicker.Optimisation\FplTeamPicker.Optimisation.csproj" />
     </ItemGroup>
 
 </Project>

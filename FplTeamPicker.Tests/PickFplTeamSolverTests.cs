@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
-using FplTeamPicker.Models;
+using FplTeamPicker.Optimisation;
+using FplTeamPicker.Optimisation.Models;
 using FplTeamPicker.Tests.Builders;
 
 namespace FplTeamPicker.Tests;
