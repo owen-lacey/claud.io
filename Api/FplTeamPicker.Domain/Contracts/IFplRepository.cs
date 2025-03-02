@@ -4,7 +4,9 @@ namespace FplTeamPicker.Domain.Contracts;
 
 public interface IFplRepository
 {
-    Task<User> GetUserDetails(CancellationToken cancellationToken);
+    Task<User> GetUserDetailsAsync(CancellationToken cancellationToken);
 
-    Task<Team> GetTeam(CancellationToken cancellationToken);
+    Task<Team> GetTeamAsync(CancellationToken cancellationToken);
+
+    Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken);
 }

@@ -16,7 +16,7 @@ public class FplRepository(
     ILogger<FplRepository> logger,
     IMemoryCache memoryCache) : IFplRepository, IDisposable
 {
-    public async Task<User> GetUserDetails(CancellationToken cancellationToken)
+    public async Task<User> GetUserDetailsAsync(CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
         var result = await MakeRequestAsync<ApiUserDetails>(request, cancellationToken);
@@ -31,34 +31,55 @@ public class FplRepository(
         };
     }
 
-    public async Task<Team> GetTeam(CancellationToken cancellationToken)
+    public async Task<Team> GetTeamAsync(CancellationToken cancellationToken)
     {
         var userId = await GetManagerIdAsync(cancellationToken);
         var request = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
         var result = await MakeRequestAsync<ApiTeam>(request, cancellationToken);
-
-        var collection = result.Picks.Select(async p =>
+        var team = new Team
         {
-            var playerDetails = await LookupPlayerAsync(p.Id, cancellationToken);
-            return new Player
-            {
-                Position = p.Position,
-                Id = p.Id,
-                IsCaptain = p.IsCaptain,
-                IsViceCaptain = p.IsViceCaptain,
-                InitialPurchasePrice = p.PurchasePrice,
-                SellingPrice = p.SellingPrice,
-                FirstName = playerDetails.FirstName,
-                SecondName = playerDetails.SecondName,
-                XpNext = playerDetails.XpNext,
-                XpThis = playerDetails.XpThis,
-                PurchasePrice = playerDetails.Cost,
-            };
-        }).ToList();
-        return new Team
-        {
-            Players = await Task.WhenAll(collection),
+            Bank = result.Transfers.Bank,
+            FreeTransfers = result.Transfers.Limit - result.Transfers.Made
         };
+
+        foreach (var pick in result.Picks)
+        {
+            var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
+            var selectedPlayer = new SelectedPlayer
+            {
+                IsCaptain = pick.IsCaptain,
+                IsViceCaptain = pick.IsViceCaptain,
+                Player = playerDetails,
+                SellingPrice = pick.SellingPrice
+            };
+
+            if (pick.SquadNumber <= 11)
+            {
+                team.StartingXi.Add(selectedPlayer);
+            }
+            else
+            {
+                team.Bench.Add(selectedPlayer);
+            }
+        }
+        return team;
+    }
+
+    public async Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken)
+    {
+        var players = new List<Player>();
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
+        var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
+        foreach (var player in result.Players
+                     .Where(p => p.Position != ApiPosition.Manager)
+                     .Select(p => p.ToPlayer())
+                     .OrderBy(p => p.Id))
+        {
+            memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
+            players.Add(player);
+        }
+
+        return players;
     }
 
     private async Task<int> GetManagerIdAsync(CancellationToken cancellationToken)
@@ -75,17 +96,12 @@ public class FplRepository(
         return managerId;
     }
 
-    private async Task<ApiPlayerDetails> LookupPlayerAsync(int playerId, CancellationToken cancellationToken)
+    private async Task<Player> LookupPlayerAsync(int playerId, CancellationToken cancellationToken)
     {
         var cacheKey = CacheKeys.PlayerLookup(playerId);
-        if (!memoryCache.TryGetValue(cacheKey, out ApiPlayerDetails? playerDetails))
+        if (!memoryCache.TryGetValue(cacheKey, out Player? playerDetails))
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
-            var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
-            foreach (var player in result.Players)
-            {
-                memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
-            }
+            await GetPlayersAsync(cancellationToken);
         }
 
         return memoryCache.TryGetValue(cacheKey, out playerDetails)

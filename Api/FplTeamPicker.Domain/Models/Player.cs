@@ -2,34 +2,25 @@ namespace FplTeamPicker.Domain.Models;
 
 public record Player
 {
-    public bool IsViceCaptain { get; set; }
-
-    public bool IsCaptain { get; set; }
-
     public int Id { get; set; }
 
-    public int Position { get; set; }
+    public Position Position { get; set; }
 
-    /// <summary>
-    /// How much the player was bought for
-    /// </summary>
-    public int InitialPurchasePrice { get; set; }
+    public int Cost { get; set; }
 
-    /// <summary>
-    /// How much we can sell the player for
-    /// </summary>
-    public int SellingPrice { get; set; }
-
-    /// <summary>
-    /// How much the player costs now
-    /// </summary>
-    public int PurchasePrice { get; set; }
+    public int? ChanceOfPlayingNextRound { get; set; }
 
     public string FirstName { get; set; } = null!;
 
     public string SecondName { get; set; } = null!;
 
-    public string XpNext { get; set; }
+    public decimal XpNext { get; set; }
 
-    public string XpThis { get; set; }
+    public decimal XpThis { get; set; }
+
+    public int Team { get; set; }
+
+    public string Name => $"{FirstName} {SecondName}";
+
+    public bool IsAvailable => ChanceOfPlayingNextRound == null || ChanceOfPlayingNextRound == 100;
 }

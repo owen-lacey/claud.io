@@ -1,4 +1,4 @@
-namespace FplTeamPicker.Optimisation.Models;
+namespace FplTeamPicker.Services.Optimisation.Models;
 
 public enum Team
 {

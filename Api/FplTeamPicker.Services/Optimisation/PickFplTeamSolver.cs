@@ -1,8 +1,12 @@
-using FplTeamPicker.Optimisation.Exceptions;
-using FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation.Exceptions;
+using FplTeamPicker.Services.Optimisation.Models;
+using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
+using LinearExpr = Google.OrTools.Sat.LinearExpr;
+using SumArray = Google.OrTools.Sat.SumArray;
 
-namespace FplTeamPicker.Optimisation;
+namespace FplTeamPicker.Services.Optimisation;
 
 public class PickFplTeamSolver
 {
@@ -36,39 +40,51 @@ public class PickFplTeamSolver
         }
 
         var output = new FplTeamSelection();
-        var index = 0;
-        foreach (var fplPlayer in _request.Players)
+
+        foreach (var playerSelectionVar in model.Selections)
         {
-            var squadSelected = cpSolver.BooleanValue(model.Selections[index].SquadSelected);
-            var teamSelected = cpSolver.BooleanValue(model.Selections[index].TeamSelected);
-            if (squadSelected)
+            if (!cpSolver.BooleanValue(playerSelectionVar.SquadSelected))
             {
-                output.Squad.Add(fplPlayer);
+                continue;
             }
+            var player = _request.Players.Single(p => p.Id == playerSelectionVar.Id);
+            var selectedPlayer = new SelectedPlayer
+            {
+                Player = player,
+                SellingPrice = player.Cost
+            };
+
+            var teamSelected = cpSolver.BooleanValue(playerSelectionVar.TeamSelected);
             if (teamSelected)
             {
-                output.Team.Add(fplPlayer);
+                output.StartingXi.Add(selectedPlayer);
             }
-
-            index++;
+            else
+            {
+                output.Bench.Add(selectedPlayer);
+            }
         }
+
+        var bestPlayers = output.StartingXi.OrderByDescending(p => p.Player.XpNext).Take(2).ToList();
+        bestPlayers[0].IsCaptain = true;
+        bestPlayers[1].IsViceCaptain = true;
 
         return output;
     }
 
     private void InitialiseVars(PickFplTeamCpModel model)
     {
-        foreach (var fplPlayer in _request.Players)
+        foreach (var player in _request.Players)
         {
-            var squadSelection = GetSelectionVar(model, fplPlayer);
+            var squadSelection = GetSelectionVar(model, player);
 
-            if (model.TeamSelectionCounts.ContainsKey(fplPlayer.Team))
+            if (model.TeamSelectionCounts.ContainsKey(player.Team))
             {
-                model.TeamSelectionCounts[fplPlayer.Team].Add(squadSelection.SquadSelected);
+                model.TeamSelectionCounts[player.Team].Add(squadSelection.SquadSelected);
             }
             else
             {
-                model.TeamSelectionCounts.Add(fplPlayer.Team, [squadSelection.SquadSelected]);
+                model.TeamSelectionCounts.Add(player.Team, [squadSelection.SquadSelected]);
             }
         }
     }
@@ -77,8 +93,8 @@ public class PickFplTeamSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         var allPlayerPredictedPoints =
-            _request.Players.Select(p => (int)Math.Round(p.PredictedPoints * 100)).ToList();
-        var teamPredictedPoints = LinearExpr.ScalProd(model.Selections.Select(s => s.SquadSelected), allPlayerPredictedPoints);
+            _request.Players.Select(p => (int)Math.Round(p.XpNext * 100)).ToList();
+        var teamPredictedPoints = LinearExpr.ScalProd(model.Selections.Select(s => s.TeamSelected), allPlayerPredictedPoints);
         model.Maximize(teamPredictedPoints);
     }
 
@@ -101,11 +117,8 @@ public class PickFplTeamSolver
         var teamForwards = new SumArray(model.SelectedFwds.Select(p => p.TeamSelected));
         model.Add(teamGoalkeepers == 1);
         model.Add(teamDefenders >= _request.Options.MinTeamDefenders);
-        model.Add(teamDefenders <= _request.Options.SquadDefenderCount);
         model.Add(teamMidfielders >= _request.Options.MinTeamMidfielders);
-        model.Add(teamMidfielders <= _request.Options.SquadMidfielderCount);
         model.Add(teamForwards >= _request.Options.MinTeamForwards);
-        model.Add(teamForwards <= _request.Options.SquadForwardCount);
 
         model.Add(
             teamGoalkeepers + teamDefenders + teamMidfielders + teamForwards == _request.Options.UsefulPlayers);
@@ -142,22 +155,22 @@ public class PickFplTeamSolver
         model.Add(allPlayerSelections <= _request.Budget);
     }
 
-    private static FplPlayerSelectionVar GetSelectionVar(PickFplTeamCpModel model, FplPlayer fplPlayer)
+    private static FplPlayerSelectionVar GetSelectionVar(PickFplTeamCpModel model, Player player)
     {
-        var selection = new FplPlayerSelectionVar(model, fplPlayer);
+        var selection = new FplPlayerSelectionVar(model, player);
 
-        switch (fplPlayer.Position)
+        switch (player.Position)
         {
-            case PlayerPosition.GK:
+            case Position.Goalkeeper:
                 model.SelectedGks.Add(selection);
                 break;
-            case PlayerPosition.DEF:
+            case Position.Defender:
                 model.SelectedDefs.Add(selection);
                 break;
-            case PlayerPosition.MID:
+            case Position.Midfielder:
                 model.SelectedMids.Add(selection);
                 break;
-            case PlayerPosition.FWD:
+            case Position.Forward:
                 model.SelectedFwds.Add(selection);
                 break;
         }

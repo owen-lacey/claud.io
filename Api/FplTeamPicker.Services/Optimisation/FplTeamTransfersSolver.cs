@@ -1,8 +1,12 @@
-using FplTeamPicker.Optimisation.Exceptions;
-using FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation.Exceptions;
+using FplTeamPicker.Services.Optimisation.Models;
+using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
+using LinearExpr = Google.OrTools.Sat.LinearExpr;
+using SumArray = Google.OrTools.Sat.SumArray;
 
-namespace FplTeamPicker.Optimisation;
+namespace FplTeamPicker.Services.Optimisation;
 
 public class FplTeamTransfersSolver
 {
@@ -36,45 +40,28 @@ public class FplTeamTransfersSolver
         }
 
         var output = new FplTransfersSelection();
-        var index = 0;
-        foreach (var fplPlayer in _request.ExistingPlayers)
+        foreach (var playerSelectionVar in model.Selections)
         {
-            var squadSelected = cpSolver.BooleanValue(model.Selections[index].SquadSelected);
-            var teamSelected = cpSolver.BooleanValue(model.Selections[index].TeamSelected);
-            if (squadSelected)
+            if (!cpSolver.BooleanValue(playerSelectionVar.SquadSelected))
             {
-                output.PlayersKept.Add(fplPlayer);
+                continue;
+            }
+            var player = _request.AllPlayers.Single(p => p.Id == playerSelectionVar.Id);
+            var selectedPlayer = new SelectedPlayer
+            {
+                Player = player,
+                SellingPrice = player.Cost
+            };
+
+            var teamSelected = cpSolver.BooleanValue(playerSelectionVar.TeamSelected);
+            if (teamSelected)
+            {
+                output.StartingXi.Add(selectedPlayer);
             }
             else
             {
-                output.PlayersOut.Add(fplPlayer);
+                output.Bench.Add(selectedPlayer);
             }
-
-            if (teamSelected)
-            {
-                output.Team.Add(fplPlayer);
-            }
-
-            index++;
-        }
-
-        index = 0;
-        foreach (var fplPlayer in _request.OtherPlayers)
-        {
-            var squadSelected = cpSolver.BooleanValue(model.TransferSelections[index].SquadSelected);
-            var teamSelected = cpSolver.BooleanValue(model.TransferSelections[index].TeamSelected);
-            if (squadSelected)
-            {
-                output.Squad.Add(fplPlayer);
-                output.PlayersIn.Add(fplPlayer);
-            }
-
-            if (teamSelected)
-            {
-                output.Team.Add(fplPlayer);
-            }
-
-            index++;
         }
 
         return output;
@@ -97,7 +84,7 @@ public class FplTeamTransfersSolver
         }
     }
 
-    private static void InitTeamSelectionCount(FplTeamTransfersCpModel model, FplPlayer existingPlayer,
+    private static void InitTeamSelectionCount(FplTeamTransfersCpModel model, Player existingPlayer,
         IntVar squadSelected)
     {
         if (model.TeamSelectionCounts.ContainsKey(existingPlayer.Team))
@@ -113,7 +100,7 @@ public class FplTeamTransfersSolver
     private void AddObjective(FplTeamTransfersCpModel model)
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
-        var allPlayerPredictedPoints = _request.AllPlayers.Select(p => (int)Math.Round(p.PredictedPoints * 100)).ToList();
+        var allPlayerPredictedPoints = _request.AllPlayers.Select(p => (int)Math.Round(p.XpNext * 100)).ToList();
         var predictedPointsForTeam = LinearExpr.ScalProd(model.Selections.Select(p => p.TeamSelected), allPlayerPredictedPoints);
         model.Maximize(predictedPointsForTeam);
     }
@@ -147,11 +134,8 @@ public class FplTeamTransfersSolver
         var teamForwards = new SumArray(model.SelectedFwds.Select(p => p.TeamSelected));
         model.Add(teamGoalkeepers == 1);
         model.Add(teamDefenders >= _request.Options.MinTeamDefenders);
-        model.Add(teamDefenders <= _request.Options.SquadDefenderCount);
         model.Add(teamMidfielders >= _request.Options.MinTeamMidfielders);
-        model.Add(teamMidfielders <= _request.Options.SquadMidfielderCount);
         model.Add(teamForwards >= _request.Options.MinTeamForwards);
-        model.Add(teamForwards <= _request.Options.SquadForwardCount);
 
         model.Add(
             teamGoalkeepers + teamDefenders + teamMidfielders + teamForwards == _request.Options.UsefulPlayers);
@@ -189,20 +173,20 @@ public class FplTeamTransfersSolver
         model.Add(allPlayerCost <= _request.Budget);
     }
 
-    private FplPlayerSelectionVar GetSelectionVar(FplTeamTransfersCpModel model, FplPlayer fplPlayer, bool isExisting)
+    private FplPlayerSelectionVar GetSelectionVar(FplTeamTransfersCpModel model, Player player, bool isExisting)
     {
-        var selection = new FplPlayerSelectionVar(model, fplPlayer);
+        var selection = new FplPlayerSelectionVar(model, player);
 
-        List<FplPlayerSelectionVar> listOfPlayersToAddTo = fplPlayer.Position switch
+        List<FplPlayerSelectionVar> listOfPlayersToAddTo = player.Position switch
         {
-            PlayerPosition.GK => isExisting ? model.ExistingSelectedGks : model.TransferSelectedGks,
-            PlayerPosition.DEF => isExisting ? model.ExistingSelectedDefs : model.TransferSelectedDefs,
-            PlayerPosition.MID => isExisting ? model.ExistingSelectedMids : model.TransferSelectedMids,
-            PlayerPosition.FWD => isExisting ? model.ExistingSelectedFwds : model.TransferSelectedFwds,
+            Position.Goalkeeper => isExisting ? model.ExistingSelectedGks : model.TransferSelectedGks,
+            Position.Defender => isExisting ? model.ExistingSelectedDefs : model.TransferSelectedDefs,
+            Position.Midfielder => isExisting ? model.ExistingSelectedMids : model.TransferSelectedMids,
+            Position.Forward => isExisting ? model.ExistingSelectedFwds : model.TransferSelectedFwds,
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        if (_request.Options.GetRidOf != null && fplPlayer.Name == _request.Options.GetRidOf.Name)
+        if (_request.Options.GetRidOf != null && player.Name == _request.Options.GetRidOf.Name)
         {
             model.Add(selection.SquadSelected == 0);
         }

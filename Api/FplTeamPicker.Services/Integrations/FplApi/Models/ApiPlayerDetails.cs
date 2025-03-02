@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Integrations.FplApi.Extensions;
 
 namespace FplTeamPicker.Services.Integrations.FplApi.Models;
 
@@ -20,4 +22,24 @@ public record ApiPlayerDetails
 
     [JsonPropertyName("now_cost")]
     public int Cost { get; set; }
+
+    [JsonPropertyName("element_type")]
+    public ApiPosition Position { get; set; }
+
+    public int Team { get; set; }
+
+    public Player ToPlayer()
+    {
+        return new Player
+        {
+            Position = Position.ToPosition(),
+            SecondName = SecondName,
+            FirstName = FirstName,
+            XpNext = decimal.Parse(XpNext),
+            XpThis = decimal.Parse(XpThis),
+            Cost = Cost,
+            Id = Id,
+            Team = Team
+        };
+    }
 }

@@ -1,7 +1,8 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
-using FplTeamPicker.Optimisation;
-using FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation;
+using FplTeamPicker.Services.Optimisation.Models;
 using FplTeamPicker.Tests.Builders;
 
 namespace FplTeamPicker.Tests;
@@ -11,14 +12,17 @@ public class FplTeamTransfersSolverTests
     [Fact]
     public void BetterPlayerIsTooExpensive_NotTransferredIn()
     {
-        var existingTeam = new List<FplPlayer>
+        const int teamOne = 1;
+        var existingTeam = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithCost(25).Build()
-        };
-        var expensivePlayer = new FplPlayerBuilder("LIV", PlayerPosition.DEF)
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithCost(25).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var expensivePlayer = new FplPlayerBuilder(teamOne, Position.Defender)
             .WithPredictedPoints(100)
             .WithCost(26)
             .Build();
@@ -34,21 +38,25 @@ public class FplTeamTransfersSolverTests
 
         using (new AssertionScope())
         {
-            output.PlayersOut.Should().BeEmpty();
+            output.StartingXi.Select(r => r.Player.Id).Should().BeEquivalentTo(existingTeam.Select(t => t.Id));
         }
     }
 
     [Fact]
     public void BetterPlayerWouldExceedMaxPerTeamRule_NotTransferredIn()
     {
-        var existingTeam = new List<FplPlayer>
+        const int teamOne = 1;
+        const int teamTwo = 2;
+        var existingTeam = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).Build(),
-            new FplPlayerBuilder("MNU", PlayerPosition.FWD).Build()
-        };
-        var expensivePlayer = new FplPlayerBuilder("LIV", PlayerPosition.FWD)
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).Build(),
+            new FplPlayerBuilder(teamTwo, Position.Forward).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var expensivePlayer = new FplPlayerBuilder(teamOne, Position.Forward)
             .WithPredictedPoints(100)
             .Build();
         var options = new FplOptions
@@ -63,23 +71,25 @@ public class FplTeamTransfersSolverTests
 
         using (new AssertionScope())
         {
-            output.PlayersOut.Should().BeEmpty();
-            output.PlayersIn.Should().BeEmpty();
-            output.Squad.Should().HaveCount(existingTeam.Count);
+            output.StartingXi.Select(r => r.Player.Id).Should().BeEquivalentTo(existingTeam.Select(t => t.Id));
+            output.StartingXi.Should().HaveCount(existingTeam.Count);
         }
     }
 
     [Fact]
     public void BetterPlayerPlaysInDifferentPosition_NotTransferredIn()
     {
-        var existingTeam = new List<FplPlayer>
+        const int teamOne = 1;
+        var existingTeam = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithPredictedPoints(98).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(100).Build()
-        };
-        var expensivePlayer = new FplPlayerBuilder("LIV", PlayerPosition.FWD)
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(98).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(100).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var expensivePlayer = new FplPlayerBuilder(teamOne, Position.Forward)
             .WithPredictedPoints(99)
             .Build();
         var options = new FplOptions
@@ -94,29 +104,33 @@ public class FplTeamTransfersSolverTests
 
         using (new AssertionScope())
         {
-            output.PlayersOut.Should().BeEmpty();
-            output.PlayersIn.Should().BeEmpty();
-            output.Squad.Should().HaveCount(existingTeam.Count);
+            output.StartingXi.Select(r => r.Player.Id).Should().BeEquivalentTo(existingTeam.Select(t => t.Id));
+            output.StartingXi.Should().HaveCount(existingTeam.Count);
         }
     }
 
     [Fact]
     public void NoBetterPlayersAvailable_NotTransferredIn()
     {
-        var existingTeam = new List<FplPlayer>
+        const int teamOne = 1;
+        var existingTeam = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(100).Build()
-        };
-        var existingPlayers = new List<FplPlayer>
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(100).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var existingPlayers = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithPredictedPoints(99).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithPredictedPoints(99).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithPredictedPoints(99).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(99).Build()
-        };
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(99).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(99).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(99).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(99).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
         var options = new FplOptions
         {
             MaxPlayersPerTeam = 100,
@@ -129,9 +143,8 @@ public class FplTeamTransfersSolverTests
 
         using (new AssertionScope())
         {
-            output.PlayersOut.Should().BeEmpty();
-            output.PlayersIn.Should().BeEmpty();
-            output.Squad.Should().HaveCount(existingTeam.Count);
+            output.StartingXi.Select(r => r.Player.Id).Should().BeEquivalentTo(existingTeam.Select(t => t.Id));
+            output.StartingXi.Should().HaveCount(existingTeam.Count);
         }
     }
 
@@ -142,20 +155,25 @@ public class FplTeamTransfersSolverTests
     [InlineData(4)]
     public void BetterPlayersAvailable_TransferredIn(int freeTransfers)
     {
-        var existingTeam = new List<FplPlayer>
+        const int teamOne = 1;
+        var existingTeam = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(100).Build()
-        };
-        var existingPlayers = new List<FplPlayer>
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(100).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var existingPlayers = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithPredictedPoints(101).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithPredictedPoints(101).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithPredictedPoints(101).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(101).Build()
-        };
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(101).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(101).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(101).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(101).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
         var options = new FplOptions
         {
             MaxPlayersPerTeam = 100,
@@ -166,11 +184,12 @@ public class FplTeamTransfersSolverTests
 
         var output = solver.Solve();
 
+        var playersIn = output.StartingXi.Where(r => existingTeam.All(p => p.Id != r.Player.Id)).ToList();
+        var playersOut = existingTeam.Where(r => output.StartingXi.All(p => p.Player.Id != r.Id)).ToList();
         using (new AssertionScope())
         {
-            output.PlayersIn.Should().HaveCount(freeTransfers);
-            output.PlayersOut.Should().HaveCount(freeTransfers);
-            output.Squad.Should().HaveCount(existingTeam.Count);
+            playersIn.Should().HaveCount(freeTransfers);
+            playersOut.Should().HaveCount(freeTransfers);
         }
     }
 }

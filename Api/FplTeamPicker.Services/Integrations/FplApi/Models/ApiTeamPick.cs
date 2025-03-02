@@ -17,4 +17,6 @@ public record ApiTeamPick
     public int SellingPrice { get; set; }
 
     public int PurchasePrice { get; set; }
+
+    public int SquadNumber { get; set; }
 }

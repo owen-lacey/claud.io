@@ -5,4 +5,6 @@ public record ApiTeam
     public DateTimeOffset PicksLastUpdated { get; set; }
 
     public ICollection<ApiTeamPick> Picks { get; set; } = [];
+
+    public ApiTransfersDetails Transfers { get; set; } = null!;
 }

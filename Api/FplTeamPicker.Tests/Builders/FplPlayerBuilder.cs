@@ -1,12 +1,13 @@
 using Audacia.Random.Extensions;
-using FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation.Models;
 
 namespace FplTeamPicker.Tests.Builders;
 
-public class FplPlayerBuilder(string team, PlayerPosition position)
+public class FplPlayerBuilder(int team, Position position)
 {
     private int _cost;
-    private decimal _predictedPoints;
+    private decimal _xpNext;
 
     public FplPlayerBuilder WithCost(int cost)
     {
@@ -16,19 +17,21 @@ public class FplPlayerBuilder(string team, PlayerPosition position)
 
     public FplPlayerBuilder WithPredictedPoints(decimal predictedPoints)
     {
-        _predictedPoints = predictedPoints;
+        _xpNext = predictedPoints;
         return this;
     }
 
-    public FplPlayer Build()
+    public Player Build()
     {
-        return new FplPlayer
+        return new Player
         {
-            Name = new Random().Surname(),
+            Id = new Random().Next(),
+            FirstName = new Random().Forename(),
+            SecondName = new Random().Surname(),
             Cost = _cost,
             Team = team,
             Position = position,
-            PredictedPoints = _predictedPoints
+            XpNext = _xpNext
         };
     }
 }

@@ -1,5 +1,7 @@
 
-namespace FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+
+namespace FplTeamPicker.Services.Optimisation.Models;
 
 public class FplOptions
 {
@@ -41,5 +43,5 @@ public class FplOptions
         StartingTeamCount = 11
     };
 
-    public FplPlayer? GetRidOf { get; set; }
+    public Player? GetRidOf { get; set; }
 }

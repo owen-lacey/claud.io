@@ -1,6 +1,6 @@
 ﻿using Google.OrTools.Sat;
 
-namespace FplTeamPicker.Optimisation.Exceptions;
+namespace FplTeamPicker.Services.Optimisation.Exceptions;
 
 /// <summary>
 /// Exception to be thrown for handles optimisation-related exceptions

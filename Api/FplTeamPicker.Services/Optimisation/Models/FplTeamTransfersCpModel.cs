@@ -1,6 +1,6 @@
 using Google.OrTools.Sat;
 
-namespace FplTeamPicker.Optimisation.Models;
+namespace FplTeamPicker.Services.Optimisation.Models;
 
 public class FplTeamTransfersCpModel : CpModel
 {
@@ -8,7 +8,7 @@ public class FplTeamTransfersCpModel : CpModel
     /// A dictionary of TeamId to a list of variables representing player selections.
     /// This is used to ensure we don't pick too many players from a single team.
     /// </summary>
-    public Dictionary<string, List<IntVar>> TeamSelectionCounts { get; set; }= new();
+    public Dictionary<int, List<IntVar>> TeamSelectionCounts { get; set; }= new();
 
     /// <summary>
     /// A list of player selection vars for the current team, as we might choose to transfer them out.
@@ -30,7 +30,9 @@ public class FplTeamTransfersCpModel : CpModel
     public List<FplPlayerSelectionVar> SelectedMids => TransferSelectedMids.Union(ExistingSelectedMids).ToList();
     public List<FplPlayerSelectionVar> SelectedFwds => TransferSelectedFwds.Union(ExistingSelectedFwds).ToList();
 
-    public List<FplPlayerSelectionVar> Selections => ExistingSelections.Union(TransferSelections).ToList();
+    public List<FplPlayerSelectionVar> Selections => ExistingSelections.Union(TransferSelections)
+        .OrderBy(s => s.Id)
+        .ToList();
 
     public List<FplPlayerSelectionVar> TransferSelectedGks { get; set; } = new();
     public List<FplPlayerSelectionVar> TransferSelectedDefs { get; set; } = new();

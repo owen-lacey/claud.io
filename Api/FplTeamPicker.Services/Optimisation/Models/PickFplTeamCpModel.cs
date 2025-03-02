@@ -1,6 +1,6 @@
 using Google.OrTools.Sat;
 
-namespace FplTeamPicker.Optimisation.Models;
+namespace FplTeamPicker.Services.Optimisation.Models;
 
 public class PickFplTeamCpModel : CpModel
 {
@@ -13,11 +13,12 @@ public class PickFplTeamCpModel : CpModel
         .Union(SelectedDefs)
         .Union(SelectedMids)
         .Union(SelectedFwds)
+        .OrderBy(s => s.Id)
         .ToList();
 
     /// <summary>
     /// A dictionary of TeamId to a list of variables representing player selections.
     /// This is used to ensure we don't pick too many players from a single team.
     /// </summary>
-    public Dictionary<string, List<IntVar>> TeamSelectionCounts { get; set; } = new();
+    public Dictionary<int, List<IntVar>> TeamSelectionCounts { get; set; } = new();
 }

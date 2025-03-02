@@ -1,7 +1,8 @@
 using FluentAssertions;
 using FluentAssertions.Execution;
-using FplTeamPicker.Optimisation;
-using FplTeamPicker.Optimisation.Models;
+using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation;
+using FplTeamPicker.Services.Optimisation.Models;
 using FplTeamPicker.Tests.Builders;
 
 namespace FplTeamPicker.Tests;
@@ -11,17 +12,20 @@ public class PickFplTeamSolverTests
     [Fact]
     public void LotsOfGoodPlayersPlayForTeam_PicksWorsePlayersToNotExceedMaxPlayersRule()
     {
+        const int teamOne = 1;
+        const int teamTwo = 2;
         var goodPlayers = Enumerable.Range(0, 3)
-            .Select(_ => new FplPlayerBuilder("LIV", PlayerPosition.DEF)
+            .Select(_ => new FplPlayerBuilder(teamOne, Position.Defender)
                 .WithPredictedPoints(100)
                 .Build())
             .ToList();
         var badPlayers = Enumerable.Range(0, 3)
-            .Select(_ => new FplPlayerBuilder("MNU", PlayerPosition.DEF).Build())
+            .Select(_ => new FplPlayerBuilder(teamTwo, Position.Defender).Build())
             .ToList();
         var players = goodPlayers
             .Concat(badPlayers)
-            .Concat([new FplPlayerBuilder("MCI", PlayerPosition.GK).Build()])
+            .Concat([new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build()])
+            .OrderBy(r => r.Id)
             .ToList();
         var options = new FplOptions
         {
@@ -36,21 +40,25 @@ public class PickFplTeamSolverTests
 
         var output = solver.Solve();
 
-        output.Squad.Should().Contain(
-            p => p.Team == "MNU",
+        output.StartingXi.Should().Contain(
+            p => p.Player.Team == teamTwo,
             $"we can only have {options.MaxPlayersPerTeam} max players per team");
     }
 
     [Fact]
     public void LotsOfGoodPlayersForSpecificPosition_PicksWorsePlayersToFillQuota()
     {
-        var players = new List<FplPlayer>
+        var players = new List<Player>
         {
-            new FplPlayerBuilder(Guid.NewGuid().ToString(), PlayerPosition.GK).Build(),
-            new FplPlayerBuilder(Guid.NewGuid().ToString(), PlayerPosition.DEF).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(Guid.NewGuid().ToString(), PlayerPosition.DEF).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(Guid.NewGuid().ToString(), PlayerPosition.MID).WithPredictedPoints(99).Build()
-        };
+            new FplPlayerBuilder(1, Position.Goalkeeper).Build(),
+            new FplPlayerBuilder(2, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(3, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(4, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(5, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(6, Position.Midfielder).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
         var options = new FplOptions
         {
             SquadGoalkeeperCount = 1,
@@ -64,26 +72,29 @@ public class PickFplTeamSolverTests
 
         var output = solver.Solve();
 
-        output.Squad.Should().Contain(
-            p => p.Position == PlayerPosition.MID,
+        output.StartingXi.Count(p => p.Player.Position == Position.Defender).Should().Be(
+            1,
             $"we can only have {options.SquadDefenderCount} defenders in our team");
     }
 
     [Fact]
     public void GoodPlayerIsTooExpensive_PicksWorsePlayersToNotExceedBudget()
     {
-        var expensivePlayer = new FplPlayerBuilder("LIV", PlayerPosition.FWD)
+        const int teamOne = 1;
+        var expensivePlayer = new FplPlayerBuilder(teamOne, Position.Forward)
             .WithCost(26)
             .WithPredictedPoints(100)
             .Build();
-        var players = new List<FplPlayer>
+        var players = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
             expensivePlayer,
-            new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithCost(25).Build()
-        };
+            new FplPlayerBuilder(teamOne, Position.Forward).WithCost(25).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
         const int budget = 100;
         var options = new FplOptions
         {
@@ -101,9 +112,8 @@ public class PickFplTeamSolverTests
 
         using (new AssertionScope())
         {
-            output.Squad.Should().HaveCountGreaterThan(0, "we should have at least one player");
-            output.Squad.Should().NotContain(
-                expensivePlayer,
+            output.StartingXi.Should().HaveCountGreaterThan(0, "we should have at least one player");
+            output.StartingXi.Any(p => p.Player.Id == expensivePlayer.Id).Should().BeFalse(
                 $"we cannot afford to have the better player as it would exceed the budget of {budget}");
         }
     }
@@ -111,16 +121,19 @@ public class PickFplTeamSolverTests
     [Fact]
     public void PlayersAreWithinBudget_MaximisesPlayerSelection()
     {
-        var badForward = new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(49).WithCost(25).Build();
-        var goodForward = new FplPlayerBuilder("LIV", PlayerPosition.FWD).WithPredictedPoints(51).WithCost(25).Build();
-        var players = new List<FplPlayer>
+        const int teamOne = 1;
+        var badForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(49).WithCost(25).Build();
+        var goodForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(51).WithCost(25).Build();
+        var players = new List<Player>
         {
-            new FplPlayerBuilder("LIV", PlayerPosition.GK).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.DEF).WithCost(25).Build(),
-            new FplPlayerBuilder("LIV", PlayerPosition.MID).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
             goodForward,
             badForward
-        };
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
         const int budget = 100;
         var options = new FplOptions
         {
@@ -138,12 +151,10 @@ public class PickFplTeamSolverTests
 
         using (new AssertionScope())
         {
-            output.Squad.Should().HaveCountGreaterThan(0, "we should have at least one player");
-            output.Squad.Should().NotContain(
-                badForward,
+            output.StartingXi.Should().HaveCountGreaterThan(0, "we should have at least one player");
+            output.StartingXi.Any(p => p.Player.Id == badForward.Id).Should().BeFalse(
                 "we should not select the player with the lower selection percentage");
-            output.Squad.Should().Contain(
-                goodForward,
+            output.StartingXi.Any(p => p.Player.Id == goodForward.Id).Should().BeTrue(
                 "we should select the player that has a higher selection percentage");
         }
     }
