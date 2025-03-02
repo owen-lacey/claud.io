@@ -54,7 +54,7 @@ public class CalculateTransfersHandler(IFplRepository repository)
                 .OrderBy(p => p.Player.Position)
                 .ThenByDescending(p => p.Player.XpNext)
                 .ToList(),
-            FreeTransfers = currentTeam.FreeTransfers,
+            FreeTransfers = currentTeam.FreeTransfers - playersIn.Count,
             Bank = currentTeam.Bank + currentTeam.SquadCost - transfers.SquadCost
         };
     }
