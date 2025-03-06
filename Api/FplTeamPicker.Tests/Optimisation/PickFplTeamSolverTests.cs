@@ -3,9 +3,9 @@ using FluentAssertions.Execution;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
-using FplTeamPicker.Tests.Builders;
+using FplTeamPicker.Tests.Optimisation.Builders;
 
-namespace FplTeamPicker.Tests;
+namespace FplTeamPicker.Tests.Optimisation;
 
 public class PickFplTeamSolverTests
 {

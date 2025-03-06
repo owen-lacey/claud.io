@@ -100,9 +100,20 @@ public class FplTeamTransfersSolver
     private void AddObjective(FplTeamTransfersCpModel model)
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
-        var allPlayerPredictedPoints = _request.AllPlayers.Select(p => (int)Math.Round(p.XpNext * 100)).ToList();
+        const int multiplier = 100;
+        var allPlayerPredictedPoints = _request.AllPlayers.Select(p => (int)Math.Round(p.XpNext * multiplier)).ToList();
         var predictedPointsForTeam = LinearExpr.ScalProd(model.Selections.Select(p => p.TeamSelected), allPlayerPredictedPoints);
-        model.Maximize(predictedPointsForTeam);
+
+        // (# transfers - free transfers) * op
+        var transferSum = LinearExpr.Sum(model.TransferSelections.Select(p => p.SquadSelected));
+
+        var penaliseTransfers = model.NewBoolVar("penaliseTransfers");
+        model.Add(transferSum > _request.NumberTransfers).OnlyEnforceIf(penaliseTransfers);
+        model.Add(transferSum <= _request.NumberTransfers).OnlyEnforceIf(penaliseTransfers.Not());
+        var penalisedTransferCount = model.NewIntVar(0, _request.Options.SquadCount, "penalisedTransferCount");
+        model.Add(penalisedTransferCount == transferSum - _request.NumberTransfers).OnlyEnforceIf(penaliseTransfers);
+        var transferPenalty = penalisedTransferCount * _request.Options.TransferPointsPenalty * multiplier;
+        model.Maximize(predictedPointsForTeam - transferPenalty);
     }
 
     private void AddConstraints(FplTeamTransfersCpModel model)
@@ -114,16 +125,6 @@ public class FplTeamTransfersSolver
         AddCostConstraint(model);
 
         AddStartingTeamConstraints(model);
-
-        AddTransferConstraints(model);
-    }
-
-    private void AddTransferConstraints(FplTeamTransfersCpModel model)
-    {
-        var transferredPlayers = new SumArray(model.TransferSelections.Select(s => s.SquadSelected));
-
-        // Can't transfer more players than free transfers allowed.
-        model.Add(transferredPlayers <= _request.NumberTransfers);
     }
 
     private void AddStartingTeamConstraints(FplTeamTransfersCpModel model)

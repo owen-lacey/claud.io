@@ -15,6 +15,8 @@ public class FplOptions
 
     public int SquadForwardCount { get; set; }
 
+    public int SquadCount => SquadGoalkeeperCount + SquadDefenderCount + SquadMidfielderCount + SquadForwardCount;
+
     public int MinTeamDefenders { get; set; }
 
     public int MinTeamMidfielders { get; set; }
@@ -28,9 +30,11 @@ public class FplOptions
 
     public int StartingTeamCount { get; set; }
 
+    public int TransferPointsPenalty { get; set; }
+
     public int UsefulPlayers => StartingTeamCount + UsefulBenchPlayers;
 
-    public static FplOptions RealWorld => new FplOptions
+    public static FplOptions RealWorld => new()
     {
         MaxPlayersPerTeam = 3,
         SquadGoalkeeperCount = 2,
@@ -40,7 +44,8 @@ public class FplOptions
         MinTeamDefenders = 3,
         MinTeamMidfielders = 2,
         MinTeamForwards = 1,
-        StartingTeamCount = 11
+        StartingTeamCount = 11,
+        TransferPointsPenalty = 4
     };
 
     public Player? GetRidOf { get; set; }

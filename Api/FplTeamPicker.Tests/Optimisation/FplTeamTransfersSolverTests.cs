@@ -3,9 +3,9 @@ using FluentAssertions.Execution;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
-using FplTeamPicker.Tests.Builders;
+using FplTeamPicker.Tests.Optimisation.Builders;
 
-namespace FplTeamPicker.Tests;
+namespace FplTeamPicker.Tests.Optimisation;
 
 public class FplTeamTransfersSolverTests
 {
@@ -177,7 +177,8 @@ public class FplTeamTransfersSolverTests
         var options = new FplOptions
         {
             MaxPlayersPerTeam = 100,
-            StartingTeamCount = 4
+            StartingTeamCount = 4,
+            TransferPointsPenalty = 4
         };
         var model = new FplTeamTransfersRequest(existingTeam, existingPlayers, options, freeTransfers, 0);
         var solver = new FplTeamTransfersSolver(model);
@@ -190,6 +191,52 @@ public class FplTeamTransfersSolverTests
         {
             playersIn.Should().HaveCount(freeTransfers);
             playersOut.Should().HaveCount(freeTransfers);
+        }
+    }
+
+    [Theory]
+    [InlineData(104, true)]
+    [InlineData(103, false)]
+    public void BetterPlayerWouldExceedFreeTransfers_OnlyTransfersIfSignificantlyBetter(decimal expectedPoints, bool shouldTransfer)
+    {
+        const int teamOne = 1;
+        var existingTeam = new List<Player>
+        {
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).WithPredictedPoints(100).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(100).Build()
+        }
+        .OrderBy(r => r.Id)
+        .ToList();
+        var betterPlayer = new FplPlayerBuilder(teamOne, Position.Forward)
+            .WithPredictedPoints(expectedPoints)
+            .Build();
+        var options = new FplOptions
+        {
+            MaxPlayersPerTeam = 100,
+            StartingTeamCount = 4,
+            TransferPointsPenalty = 4
+        };
+        var model = new FplTeamTransfersRequest(existingTeam, [betterPlayer], options, 0, 0);
+        var solver = new FplTeamTransfersSolver(model);
+
+        var output = solver.Solve();
+
+        var playersIn = output.StartingXi.Where(r => existingTeam.All(p => p.Id != r.Player.Id)).ToList();
+        var playersOut = existingTeam.Where(r => output.StartingXi.All(p => p.Player.Id != r.Id)).ToList();
+        using (new AssertionScope())
+        {
+            if (shouldTransfer)
+            {
+                playersIn.Should().HaveCount(1);
+                playersOut.Should().HaveCount(1);
+            }
+            else
+            {
+                playersIn.Should().BeEmpty();
+                playersOut.Should().BeEmpty();
+            }
         }
     }
 }

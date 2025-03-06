@@ -1,8 +1,7 @@
 using Audacia.Random.Extensions;
 using FplTeamPicker.Domain.Models;
-using FplTeamPicker.Services.Optimisation.Models;
 
-namespace FplTeamPicker.Tests.Builders;
+namespace FplTeamPicker.Tests.Optimisation.Builders;
 
 public class FplPlayerBuilder(int team, Position position)
 {
