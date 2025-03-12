@@ -23,19 +23,20 @@ public class FplUserProvider(IHttpContextAccessor httpContextAccessor) : IFplUse
     public int GetUserId()
     {
         int? userId;
-        if (httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue(
-                FplApiConstants.CookieName,
-                out var cookieStr) == true)
+        if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(
+                FplApiConstants.HeaderName,
+                out var headerStr) == true)
         {
-            var decodedCookieString = Convert.FromBase64String(cookieStr);
+            var s = headerStr.ToString();
+            var decodedCookieString = Convert.FromBase64String(s);
             var cookieJson = Encoding.UTF8.GetString(decodedCookieString);
             var cookieBytes = JsonSerializer.Deserialize<FplCookie>(cookieJson);
 
             userId = cookieBytes?.User.Id;
             return userId ?? throw new SecurityException(
-                $"Invalid cookie provided. Raw cookie length: {cookieStr}. Decoded cookie length: {decodedCookieString}");
+                $"Invalid cookie provided. Raw cookie length: {headerStr}. Decoded cookie length: {decodedCookieString}");
         }
 
-        throw new SecurityException($"No cookie with the name {FplApiConstants.CookieName} was provided");
+        throw new SecurityException($"No header with the name {FplApiConstants.HeaderName} was provided");
     }
 }

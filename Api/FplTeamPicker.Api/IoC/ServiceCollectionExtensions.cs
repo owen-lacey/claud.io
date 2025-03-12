@@ -13,9 +13,9 @@ public static class ServiceCollectionExtensions
         {
             // pass through the cookie from the client to the FPL API
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
-            if (httpContextAccessor.HttpContext?.Request.Cookies.TryGetValue(FplApiConstants.CookieName, out var cookie) == true)
+            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(FplApiConstants.HeaderName, out var cookie) == true)
             {
-                client.DefaultRequestHeaders.Add("Cookie", $"{FplApiConstants.CookieName}={cookie}");
+                client.DefaultRequestHeaders.Add("Cookie", $"{FplApiConstants.HeaderName}={cookie}");
             }
 
             const string fplTeamApiUrl = "https://fantasy.premierleague.com";
