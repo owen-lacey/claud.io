@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@theme {
+    --font-sans: InterVariable, sans-serif;
+}
+
 @layer base {
     input {
         @apply border border-gray-300 rounded-md focus:border-gray-500 p-2.5;

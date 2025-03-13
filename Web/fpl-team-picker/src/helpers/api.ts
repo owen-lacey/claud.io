@@ -9,6 +9,81 @@
  * ---------------------------------------------------------------
  */
 
+export interface Player {
+  /** @format int32 */
+  id?: number;
+  position?: Position;
+  /** @format int32 */
+  cost?: number;
+  /** @format int32 */
+  chanceOfPlayingNextRound?: number | null;
+  firstName?: string | null;
+  secondName?: string | null;
+  /** @format double */
+  xpNext?: number;
+  /** @format double */
+  xpThis?: number;
+  /** @format int32 */
+  team?: number;
+  name?: string | null;
+  isAvailable?: boolean;
+}
+
+/** @format int32 */
+export enum Position {
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+}
+
+export interface SelectedPlayer {
+  isViceCaptain?: boolean;
+  isCaptain?: boolean;
+  player?: Player;
+  /** @format int32 */
+  sellingPrice?: number;
+}
+
+export interface Team {
+  startingXi?: SelectedPlayer[] | null;
+  bench?: SelectedPlayer[] | null;
+  /** @format int32 */
+  freeTransfers?: number;
+  /** @format int32 */
+  bank?: number;
+  /** @format int32 */
+  squadCost?: number;
+  /** @format int32 */
+  budget?: number;
+  /** @format double */
+  predictedPoints?: number;
+}
+
+export interface Transfers {
+  playersOut?: SelectedPlayer[] | null;
+  playersIn?: SelectedPlayer[] | null;
+  startingXi?: SelectedPlayer[] | null;
+  bench?: SelectedPlayer[] | null;
+  /** @format int32 */
+  freeTransfers?: number;
+  /** @format int32 */
+  bank?: number;
+  /** @format int32 */
+  squadCost?: number;
+  /** @format int32 */
+  budget?: number;
+  /** @format double */
+  predictedPoints?: number;
+}
+
+export interface User {
+  firstName?: string | null;
+  lastName?: string | null;
+  /** @format int32 */
+  id?: number;
+}
+
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
 import axios from "axios";
 
@@ -157,9 +232,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/transfers
      */
     transfersList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Transfers, any>({
         path: `/transfers`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };
@@ -172,9 +248,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/me
      */
     getMe: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<User, any>({
         path: `/me`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };
@@ -187,9 +264,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/team
      */
     teamList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Team, any>({
         path: `/team`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };
@@ -202,9 +280,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/players
      */
     playersList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Player[], any>({
         path: `/players`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };
@@ -217,9 +296,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/wildcard
      */
     wildcardList: (params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Team, any>({
         path: `/wildcard`,
         method: "GET",
+        format: "json",
         ...params,
       }),
   };

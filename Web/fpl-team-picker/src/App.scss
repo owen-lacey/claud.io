@@ -1,0 +1,31 @@
+.app-container {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+  grid-template-rows: auto;
+  grid-template-areas: "header header" "my-team my-team" "players players" "leagues leagues";
+  @media (min-width: 48rem) {
+    grid-template-areas: "header header" "my-team players" "leagues leagues";
+  }
+
+  > div {
+    min-height: 30px;
+  }
+
+  .header {
+    grid-area: header;
+  }
+  .my-team {
+    grid-area: my-team;
+    background: blue;
+  }
+  .players {
+    grid-area: players;
+    background: yellow;
+  }
+  .leagues {
+    grid-area: leagues;
+    background: green;
+  }
+}
