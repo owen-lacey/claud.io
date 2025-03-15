@@ -4,6 +4,7 @@ import AuthGuard from "./components/AuthGuard.tsx";
 import Header from "./components/Header.tsx";
 import {memo} from "react";
 import MyTeam from './components/MyTeam.tsx';
+import Players from './components/Players.tsx';
 
 const App = memo(function App() {
     const [plProfile, savePlProfile] = useLocalStorage<string | null>("pl_profile", null);
@@ -20,7 +21,9 @@ const App = memo(function App() {
             <div className="my-team">
                 <MyTeam/>
             </div>
-            <div className="players"></div>
+            <div className="players">
+                <Players/>
+            </div>
             <div className="leagues"></div>
         </div>
     )
