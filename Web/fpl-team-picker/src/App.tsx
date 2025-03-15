@@ -3,6 +3,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import AuthGuard from "./components/AuthGuard.tsx";
 import Header from "./components/Header.tsx";
 import {memo} from "react";
+import MyTeam from './components/MyTeam.tsx';
 
 const App = memo(function App() {
     const [plProfile, savePlProfile] = useLocalStorage<string | null>("pl_profile", null);
@@ -16,7 +17,9 @@ const App = memo(function App() {
             <div className="header">
                 <Header/>
             </div>
-            <div className="my-team"></div>
+            <div className="my-team">
+                <MyTeam/>
+            </div>
             <div className="players"></div>
             <div className="leagues"></div>
         </div>
