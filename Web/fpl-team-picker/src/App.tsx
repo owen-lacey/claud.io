@@ -7,6 +7,7 @@ import MyTeam from './components/MyTeam.tsx';
 import Players from './components/Players.tsx';
 import { FplApi } from './helpers/fpl-api.ts';
 import { AllData } from './models/all-data.ts';
+import Leagues from './components/Leagues.tsx';
 export const DataContext = createContext<AllData | null>(null);
 
 const App = memo(function App() {
@@ -14,10 +15,13 @@ const App = memo(function App() {
     const [data, setData] = useState<AllData | null>(null);
 
     const loadData = async () => {
-        const myTeam = await new FplApi().myTeam.myTeamList();
-        const players = await new FplApi().players.playersList();
-        const teams = await new FplApi().teams.teamsList();
-        const dataToSet = new AllData(myTeam.data, players.data, teams.data);
+        const [myTeam, players, teams, leagues] = await Promise.all([
+            new FplApi().myTeam.myTeamList(),
+            new FplApi().players.playersList(),
+            new FplApi().teams.teamsList(),
+            new FplApi().myLeagues.myLeaguesList(),
+        ]);
+        const dataToSet = new AllData(myTeam.data, players.data, teams.data, leagues.data);
         setData(dataToSet);
     }
 
@@ -41,7 +45,9 @@ const App = memo(function App() {
                 <div className="players">
                     <Players />
                 </div>
-                <div className="leagues"></div>
+                <div className="leagues">
+                    <Leagues />
+                </div>
             </div>
         </DataContext.Provider>
     )

@@ -6,7 +6,7 @@ const Header = memo(function Header() {
     const [me, setMe] = useState<User | null>(null);
 
     const loadMyDetails = async () => {
-        const result = await new FplApi().me.getMe();
+        const result = await new FplApi().myDetails.myDetailsList();
         setMe(result.data);
     }
 
