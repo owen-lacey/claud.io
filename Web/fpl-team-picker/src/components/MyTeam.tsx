@@ -1,47 +1,40 @@
-import { useEffect, useState } from "react";
-import { FplApi } from "../helpers/fpl-api";
-import { Team } from "../helpers/api";
+import { useContext } from "react";
+import { DataContext } from "../App";
+import { lookupTeam } from "../helpers/lookups";
+import { Position } from "../models/position";
 
 function MyTeam() {
-    const [team, setTeam] = useState<Team | null>(null);
+    const allData = useContext(DataContext);
 
-    const loadDetails = async () => {
-        const result = await new FplApi().team.teamList();
-        setTeam(result.data);
-    }
-
-    useEffect(() => {
-        loadDetails();
-    }, []);
-
-    if (!team) {
+    if (!allData) {
         return <></>;
     }
+    const { myTeam, teams } = allData;
 
     return <div>
         <div className="flex gap-1">
-            <div>{team.bank}</div>
-            <div>{team.budget}</div>
-            <div>{team.freeTransfers}</div>
+            <div>{myTeam.bank}</div>
+            <div>{myTeam.budget}</div>
+            <div>{myTeam.freeTransfers}</div>
         </div>
         <div>
-            {team.startingXi?.map((player, i) => {
+            {myTeam.startingXi!.map((player, i) => {
                 return <div className="flex gap-1" key={`${i}-xi`}>
-                    <div>{player.player?.name}</div>
-                    <div>{player.player?.position}</div>
-                    <div>{player.player?.team}</div>
-                    <div>{player.player?.cost}</div>
-                    <div>{player.player?.xpNext}</div>
+                    <div>{player.player!.name}</div>
+                    <div>{Position[player.player!.position!]}</div>
+                    <div>{lookupTeam(player.player!.team!, teams).shortName}</div>
+                    <div>{player.player!.cost}</div>
+                    <div>{player.player!.xpNext}</div>
                 </div>
             })}
         </div>
         <div>
-            {team.bench?.map((player, i) => {
+            {myTeam.bench!.map((player, i) => {
                 return <div className="flex" key={`${i}-bench`}>
-                    <div>{player.player?.name}</div>
-                    <div>{player.player?.position}</div>
-                    <div>{player.player?.team}</div>
-                    <div>{player.player?.cost}</div>
+                    <div>{player.player!.name}</div>
+                    <div>{Position[player.player!.position!]}</div>
+                    <div>{lookupTeam(player.player!.team!, teams).shortName}</div>
+                    <div>{player.player!.cost}</div>
                 </div>
             })}
         </div>

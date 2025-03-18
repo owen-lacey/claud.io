@@ -8,6 +8,7 @@ using FplTeamPicker.Services.UseCases.CalculateWildcard;
 using FplTeamPicker.Services.UseCases.GetMe;
 using FplTeamPicker.Services.UseCases.GetPlayers;
 using FplTeamPicker.Services.UseCases.GetTeam;
+using FplTeamPicker.Services.UseCases.GetTeams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,6 +55,12 @@ app.MapGet("/transfers", async ([FromServices] IMediator mediator, CancellationT
     return TypedResults.Ok(result);
 });
 
+app.MapGet("/wildcard", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+{
+    var team = await mediator.Send(new CalculateWildcardRequest(), cancellationToken);
+    return TypedResults.Ok(team);
+});
+
 app.MapGet("/me", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetMeRequest(), cancellationToken);
@@ -61,9 +68,16 @@ app.MapGet("/me", async ([FromServices] IMediator mediator, CancellationToken ca
     return TypedResults.Ok(result);
 });
 
-app.MapGet("/team", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+app.MapGet("/my-team", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
-    var result = await mediator.Send(new GetTeamRequest(), cancellationToken);
+    var result = await mediator.Send(new GetSelectedTeamRequest(), cancellationToken);
+
+    return TypedResults.Ok(result);
+});
+
+app.MapGet("/teams", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+{
+    var result = await mediator.Send(new GetTeamsRequest(), cancellationToken);
 
     return TypedResults.Ok(result);
 });
@@ -73,12 +87,6 @@ app.MapGet("/players", async ([FromServices] IMediator mediator, CancellationTok
     var result = await mediator.Send(new GetPlayersRequest(), cancellationToken);
 
     return TypedResults.Ok(result);
-});
-
-app.MapGet("/wildcard", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
-{
-    var team = await mediator.Send(new CalculateWildcardRequest(), cancellationToken);
-    return TypedResults.Ok(team);
 });
 
 app.Run();

@@ -45,7 +45,7 @@ export interface SelectedPlayer {
   sellingPrice?: number;
 }
 
-export interface Team {
+export interface SelectedTeam {
   startingXi?: SelectedPlayer[] | null;
   bench?: SelectedPlayer[] | null;
   /** @format int32 */
@@ -58,6 +58,15 @@ export interface Team {
   budget?: number;
   /** @format double */
   predictedPoints?: number;
+}
+
+export interface Team {
+  shortName?: string | null;
+  name?: string | null;
+  /** @format int32 */
+  code?: number;
+  /** @format int32 */
+  id?: number;
 }
 
 export interface Transfers {
@@ -239,6 +248,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  wildcard = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name WildcardList
+     * @request GET:/wildcard
+     */
+    wildcardList: (params: RequestParams = {}) =>
+      this.request<SelectedTeam, any>({
+        path: `/wildcard`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
   me = {
     /**
      * No description
@@ -255,17 +280,33 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
-  team = {
+  myTeam = {
     /**
      * No description
      *
      * @tags FplTeamPicker.Api
-     * @name TeamList
-     * @request GET:/team
+     * @name MyTeamList
+     * @request GET:/my-team
      */
-    teamList: (params: RequestParams = {}) =>
-      this.request<Team, any>({
-        path: `/team`,
+    myTeamList: (params: RequestParams = {}) =>
+      this.request<SelectedTeam, any>({
+        path: `/my-team`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  teams = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name TeamsList
+     * @request GET:/teams
+     */
+    teamsList: (params: RequestParams = {}) =>
+      this.request<Team[], any>({
+        path: `/teams`,
         method: "GET",
         format: "json",
         ...params,
@@ -282,22 +323,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     playersList: (params: RequestParams = {}) =>
       this.request<Player[], any>({
         path: `/players`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-  };
-  wildcard = {
-    /**
-     * No description
-     *
-     * @tags FplTeamPicker.Api
-     * @name WildcardList
-     * @request GET:/wildcard
-     */
-    wildcardList: (params: RequestParams = {}) =>
-      this.request<Team, any>({
-        path: `/wildcard`,
         method: "GET",
         format: "json",
         ...params,

@@ -1,19 +1,19 @@
 using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Domain.Extensions;
+using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
 using MediatR;
-using Team = FplTeamPicker.Domain.Models.Team;
 
 namespace FplTeamPicker.Services.UseCases.CalculateWildcard;
 
-public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandler<CalculateWildcardRequest, Team>
+public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandler<CalculateWildcardRequest, SelectedTeam>
 {
     private readonly IFplRepository _repository = repository;
 
-    public async Task<Team> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
+    public async Task<SelectedTeam> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetTeamAsync(cancellationToken);
+        var currentTeam = await _repository.GetSelectedTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);
@@ -22,7 +22,7 @@ public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandl
 
         var team = solver.Solve();
 
-        return new Team
+        return new SelectedTeam
         {
             StartingXi = team.StartingXi
                 .OrderBy(p => p.Player.Position)

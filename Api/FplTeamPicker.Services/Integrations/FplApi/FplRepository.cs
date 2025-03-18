@@ -31,12 +31,12 @@ public class FplRepository(
         };
     }
 
-    public async Task<Team> GetTeamAsync(CancellationToken cancellationToken)
+    public async Task<SelectedTeam> GetSelectedTeamAsync(CancellationToken cancellationToken)
     {
         var userId = await GetManagerIdAsync(cancellationToken);
         var request = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
         var result = await MakeRequestAsync<ApiTeam>(request, cancellationToken);
-        var team = new Team
+        var team = new SelectedTeam
         {
             Bank = result.Transfers.Bank,
             FreeTransfers = result.Transfers.Limit - result.Transfers.Made
@@ -80,6 +80,23 @@ public class FplRepository(
         }
 
         return players;
+    }
+
+    public async Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken)
+    {
+        var teams = new List<Team>();
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
+        var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
+        
+        foreach (var team in result.Teams
+                     .Select(p => p.ToTeam())
+                     .OrderBy(p => p.ShortName))
+        {
+            memoryCache.Set(CacheKeys.PlayerLookup(team.Code), team);
+            teams.Add(team);
+        }
+
+        return teams;
     }
 
     private async Task<int> GetManagerIdAsync(CancellationToken cancellationToken)
