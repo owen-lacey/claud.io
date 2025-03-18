@@ -62,7 +62,45 @@ public class FplRepository(
                 team.Bench.Add(selectedPlayer);
             }
         }
+
         return team;
+    }
+
+    public async Task<List<League>> GetLeaguesAsync(CancellationToken cancellationToken)
+    {
+        var userId = await GetManagerIdAsync(cancellationToken);
+        var request = new HttpRequestMessage(HttpMethod.Get, $"api/entry/{userId}");
+        var result = await MakeRequestAsync<ApiEntry>(request, cancellationToken);
+        var leagues = new List<League>();
+        foreach (var classicLeague in result.Leagues.Classic.Where(c => c.LeagueType == "x"))
+        {
+            var leagueRequest =
+                new HttpRequestMessage(HttpMethod.Get, $"api/leagues-classic/{classicLeague.Id}/standings");
+            var leagueResult = await MakeRequestAsync<ApiLeagueDetails>(leagueRequest, cancellationToken);
+            if (leagueResult.Standings.HasNext)
+            {
+                throw new Exception("Lots of players!");
+            }
+
+            var league = new League
+            {
+                Id = classicLeague.Id,
+                Name = classicLeague.Name,
+                CurrentPosition = classicLeague.EntryRank,
+                Participants = leagueResult.Standings.Results
+                    .Select(r => new LeagueParticipant
+                    {
+                        UserId = r.Entry,
+                        PlayerNam = r.PlayerName,
+                        TeamName = r.TeamName,
+                        Position = r.Rank
+                    })
+                    .ToList()
+            };
+            leagues.Add(league);
+        }
+
+        return leagues;
     }
 
     public async Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken)
@@ -87,7 +125,7 @@ public class FplRepository(
         var teams = new List<Team>();
         var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
         var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
-        
+
         foreach (var team in result.Teams
                      .Select(p => p.ToTeam())
                      .OrderBy(p => p.ShortName))

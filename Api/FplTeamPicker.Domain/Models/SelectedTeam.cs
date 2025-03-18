@@ -16,3 +16,7 @@ public record SelectedTeam
 
     public decimal PredictedPoints => StartingXi.Sum(p => p.Player.XpNext);
 }
+
+// FROM ENTRY endpoint, get all leagues with a type of "x"
+// Then get the standings using /leagues-classic/{leagueId}/standings
+// Then, look up the team of competitors using the `entry` of the results
