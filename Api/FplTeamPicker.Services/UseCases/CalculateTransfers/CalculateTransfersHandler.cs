@@ -14,7 +14,7 @@ public class CalculateTransfersHandler(IFplRepository repository)
 
     public async Task<Transfers> Handle(CalculateTransfersRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetTeamAsync(cancellationToken);
+        var currentTeam = await _repository.GetSelectedTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);

@@ -6,7 +6,11 @@ public interface IFplRepository
 {
     Task<User> GetUserDetailsAsync(CancellationToken cancellationToken);
 
-    Task<Team> GetTeamAsync(CancellationToken cancellationToken);
+    Task<SelectedTeam> GetSelectedTeamAsync(CancellationToken cancellationToken);
+    
+    Task<List<League>> GetLeaguesAsync(CancellationToken cancellationToken);
 
     Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken);
+    
+    Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken);
 }

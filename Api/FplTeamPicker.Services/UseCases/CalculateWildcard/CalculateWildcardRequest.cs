@@ -3,4 +3,4 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateWildcard;
 
-public record CalculateWildcardRequest : IRequest<Team>;
+public record CalculateWildcardRequest : IRequest<SelectedTeam>;

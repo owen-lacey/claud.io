@@ -3,6 +3,6 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetTeam;
 
-public record GetTeamRequest : IRequest<Team>
+public record GetSelectedTeamRequest : IRequest<SelectedTeam>
 {
 }
