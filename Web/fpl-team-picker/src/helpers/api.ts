@@ -78,6 +78,8 @@ export interface SelectedTeam {
   budget?: number;
   /** @format double */
   predictedPoints?: number;
+  /** @format double */
+  benchBoostPredictedPoints?: number;
 }
 
 export interface Team {

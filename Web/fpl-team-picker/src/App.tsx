@@ -42,11 +42,11 @@ const App = memo(function App() {
                 <div className="my-team">
                     <MyTeam />
                 </div>
-                <div className="players">
-                    <Players />
-                </div>
                 <div className="leagues">
                     <Leagues />
+                </div>
+                <div className="players">
+                    <Players />
                 </div>
             </div>
         </DataContext.Provider>

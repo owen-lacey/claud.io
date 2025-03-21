@@ -4,9 +4,9 @@
   grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
   grid-template-rows: auto;
-  grid-template-areas: "header header" "my-team my-team" "players players" "leagues leagues";
+  grid-template-areas: "header header" "my-team my-team" "leagues leagues" "players players";
   @media (min-width: 48rem) {
-    grid-template-areas: "header header" "my-team players" "leagues leagues";
+    grid-template-areas: "header header" "my-team leagues" "players players";
   }
 
   > div {

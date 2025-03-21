@@ -30,7 +30,7 @@ function MyTeam() {
             <tbody className="">
                 <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>XI</td></tr>
                 {myTeam.startingXi!.map((player, index) => (
-                    <tr key={index} className={'h-8 ' + playerBg(player.player!)}>
+                    <tr key={index} className={playerBg(player.player!)}>
                         <td className="font-medium">{player.player!.name}</td>
                         <td className="text-gray-500 text-sm">{lookupTeam(player.player!.team!, teams).shortName}</td>
                         <td className="text-gray-500 text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
@@ -39,7 +39,7 @@ function MyTeam() {
                 ))}
                 <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>bench</td></tr>
                 {myTeam.bench!.map((player, index) => (
-                    <tr key={index} className={'h-8 ' + playerBg(player.player!)}>
+                    <tr key={index} className={playerBg(player.player!)}>
                         <td className="font-medium">{player.player!.name}</td>
                         <td className="text-gray-500 text-sm">{lookupTeam(player.player!.team!, teams).shortName}</td>
                         <td className="text-gray-500 text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
@@ -48,6 +48,10 @@ function MyTeam() {
                 ))}
             </tbody>
         </table>
+        <div className="flex justify-end py-4 text-blue-500 text-sm">
+            <div>XP (bench boost):&nbsp;</div>
+            <div>{myTeam.predictedPoints?.toFixed(1)} ({myTeam.benchBoostPredictedPoints?.toFixed(1)})</div>
+        </div>
     </div>
 }
 

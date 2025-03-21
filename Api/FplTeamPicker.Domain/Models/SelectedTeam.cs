@@ -15,4 +15,6 @@ public record SelectedTeam
     public int Budget => Bank + SquadCost;
 
     public decimal PredictedPoints => StartingXi.Sum(p => p.Player.XpNext);
+
+    public decimal BenchBoostPredictedPoints => PredictedPoints + Bench.Sum(p => p.Player.XpNext);
 }
