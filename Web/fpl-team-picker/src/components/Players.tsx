@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { DataContext } from "../App";
-import PlayerRow from "./players/PlayerRow";
+import { playerBg } from "../helpers/styles";
+import { lookupTeam } from "../helpers/lookups";
 
 function Players() {
     const allData = useContext(DataContext);
@@ -16,7 +17,12 @@ function Players() {
         <table>
             <tbody>
                 {players.slice(0, 19).map((player, index) => (
-                    <PlayerRow key={index} player={player} teams={teams} />
+                    <tr key={index} className={'h-8 ' + playerBg(player)}>
+                        <td className="font-medium">{player.name}</td>
+                        <td className="text-gray-500 text-sm">{lookupTeam(player.team!, teams).shortName}</td>
+                        <td className="text-gray-500 text-sm text-right">£{(player.cost! / 10).toFixed(1)}</td>
+                        <td className="text-blue-500 text-sm text-right">XP: {player.xpNext!.toFixed(1)}</td>
+                    </tr>
                 ))}
             </tbody>
         </table>
