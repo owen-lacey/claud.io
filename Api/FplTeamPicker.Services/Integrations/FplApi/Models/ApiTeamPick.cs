@@ -18,5 +18,6 @@ public record ApiTeamPick
 
     public int PurchasePrice { get; set; }
 
+    [JsonPropertyName("position")]
     public int SquadNumber { get; set; }
 }

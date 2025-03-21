@@ -18,12 +18,11 @@ const Header = memo(function Header() {
         return <></>
     }
 
-    return <header className="bg-white">
-        <nav className="flex">
-            <div className="text-xl font-semibold">Welcome, {me.firstName}</div>
-            <div className="text-sm blue-500 ml-4 italic">#{me.id}</div>
-        </nav>
-    </header>
+    return <header className="bg-white border border-gray-300 shadow-lg rounded-lg py-4 px-6 flex justify-between items-center">
+    <h1 className="text-2xl font-semibold">Welcome, <span>{me.firstName}</span>!</h1>
+    <p className="text-sm">User ID: <span className="font-mono bg-gray-100 px-2 py-1 rounded-md">{me.id}</span></p>
+</header>
+
 });
 
 export default Header;
