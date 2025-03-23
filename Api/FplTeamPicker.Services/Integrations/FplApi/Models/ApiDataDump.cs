@@ -8,4 +8,6 @@ public record ApiDataDump
     public List<ApiPlayerDetails> Players { get; set; }
     
     public List<ApiTeamDetails> Teams { get; set; }
+    
+    public List<ApiEvent> Events { get; set; }
 }

@@ -6,6 +6,8 @@ public class ApiLeaguePosition
 
     public string TeamName { get; set; } = null!;
     
+    public int Id { get; set; }
+    
     public int Entry { get; set; }
 
     public int Rank { get; set; }

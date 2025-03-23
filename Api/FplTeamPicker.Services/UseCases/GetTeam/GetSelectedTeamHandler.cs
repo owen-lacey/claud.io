@@ -10,7 +10,7 @@ public class GetSelectedTeamHandler(IFplRepository repository) : IRequestHandler
 
     public Task<SelectedTeam> Handle(GetSelectedTeamRequest request, CancellationToken cancellationToken)
     {
-        var team = _repository.GetSelectedTeamAsync(cancellationToken);
+        var team = _repository.GetCurrentSelectedTeamAsync(cancellationToken);
         return team;
     }
 }

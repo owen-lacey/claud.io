@@ -6,6 +6,7 @@
 
 @theme {
     --font-sans: InterVariable, sans-serif;
+    --color-sexy: linear-gradient(to right, red , yellow);
 }
 
 @layer base {

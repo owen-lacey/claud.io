@@ -31,7 +31,7 @@ public class FplRepository(
         };
     }
 
-    public async Task<SelectedTeam> GetSelectedTeamAsync(CancellationToken cancellationToken)
+    public async Task<SelectedTeam> GetCurrentSelectedTeamAsync(CancellationToken cancellationToken)
     {
         var userId = await GetManagerIdAsync(cancellationToken);
         var request = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
@@ -42,6 +42,36 @@ public class FplRepository(
             FreeTransfers = result.Transfers.Limit - result.Transfers.Made
         };
 
+        foreach (var pick in result.Picks)
+        {
+            var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
+            var selectedPlayer = new SelectedPlayer
+            {
+                IsCaptain = pick.IsCaptain,
+                IsViceCaptain = pick.IsViceCaptain,
+                Player = playerDetails,
+                SellingPrice = pick.SellingPrice
+            };
+
+            if (pick.SquadNumber <= 11)
+            {
+                team.StartingXi.Add(selectedPlayer);
+            }
+            else
+            {
+                team.Bench.Add(selectedPlayer);
+            }
+        }
+
+        return team;
+    }
+
+    public async Task<SelectedTeam> GetPreviousSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"api/entry/{userId}/event/{gameweek}/picks");
+        var result = await MakeRequestAsync<ApiEntryPicks>(request, cancellationToken);
+
+        var team = new SelectedTeam();
         foreach (var pick in result.Picks)
         {
             var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
@@ -79,7 +109,7 @@ public class FplRepository(
             var leagueResult = await MakeRequestAsync<ApiLeagueDetails>(leagueRequest, cancellationToken);
             if (leagueResult.Standings.HasNext)
             {
-                throw new Exception("Lots of players!");
+                throw new Exception("Lots of players in this league, help!");
             }
 
             var league = new League
@@ -91,7 +121,7 @@ public class FplRepository(
                     .Select(r => new LeagueParticipant
                     {
                         UserId = r.Entry,
-                        PlayerNam = r.PlayerName,
+                        PlayerName = r.PlayerName,
                         TeamName = r.TeamName,
                         Position = r.Rank
                     })
@@ -105,36 +135,32 @@ public class FplRepository(
 
     public async Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken)
     {
-        var players = new List<Player>();
-        var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
-        var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
-        foreach (var player in result.Players
-                     .Where(p => p.Position != ApiPosition.Manager)
-                     .Select(p => p.ToPlayer())
-                     .OrderBy(p => p.Id))
+        if (memoryCache.TryGetValue(CacheKeys.Players, out _))
         {
-            memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
-            players.Add(player);
+            await DoBulkDataLoadAsync(cancellationToken);
         }
-
-        return players;
+        
+        return memoryCache.Get<List<Player>>(CacheKeys.Players)!;
     }
 
     public async Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken)
     {
-        var teams = new List<Team>();
-        var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
-        var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
-
-        foreach (var team in result.Teams
-                     .Select(p => p.ToTeam())
-                     .OrderBy(p => p.ShortName))
+        if (memoryCache.TryGetValue(CacheKeys.Teams, out _))
         {
-            memoryCache.Set(CacheKeys.PlayerLookup(team.Code), team);
-            teams.Add(team);
+            await DoBulkDataLoadAsync(cancellationToken);
+        }
+        
+        return memoryCache.Get<List<Team>>(CacheKeys.Teams)!;
+    }
+
+    public async Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken)
+    {
+        if (!memoryCache.TryGetValue(CacheKeys.CurrentGameweek, out _))
+        {
+            await DoBulkDataLoadAsync(cancellationToken);
         }
 
-        return teams;
+        return memoryCache.Get<int>(CacheKeys.CurrentGameweek);
     }
 
     private async Task<int> GetManagerIdAsync(CancellationToken cancellationToken)
@@ -156,7 +182,7 @@ public class FplRepository(
         var cacheKey = CacheKeys.PlayerLookup(playerId);
         if (!memoryCache.TryGetValue(cacheKey, out Player? playerDetails))
         {
-            await GetPlayersAsync(cancellationToken);
+            await DoBulkDataLoadAsync(cancellationToken);
         }
 
         return memoryCache.TryGetValue(cacheKey, out playerDetails)
@@ -179,6 +205,45 @@ public class FplRepository(
 
         var result = await response.Content.ReadFromJsonAsync<TApiModel>(serializerOptions, cancellationToken);
         return result!;
+    }
+
+    private async Task DoBulkDataLoadAsync(CancellationToken cancellationToken)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
+        var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
+
+        CacheTeams(result);
+        CachePlayers(result);
+
+        var currentGameweek = result.Events.Single(e => e.IsCurrent);
+        memoryCache.Set(CacheKeys.CurrentGameweek, currentGameweek.Id);
+    }
+
+    private void CachePlayers(ApiDataDump result)
+    {
+        var players = new List<Player>();
+        foreach (var player in result.Players
+                     .Where(p => p.Position != ApiPosition.Manager)
+                     .Select(p => p.ToPlayer())
+                     .OrderBy(p => p.Id))
+        {
+            memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
+            players.Add(player);
+        }
+        memoryCache.Set(CacheKeys.Players, players);
+    }
+
+    private void CacheTeams(ApiDataDump result)
+    {
+        var teams = new List<Team>();
+        foreach (var team in result.Teams
+                     .Select(p => p.ToTeam())
+                     .OrderBy(p => p.ShortName))
+        {
+            memoryCache.Set(CacheKeys.TeamLookup(team.Code), team);
+            teams.Add(team);
+        }
+        memoryCache.Set(CacheKeys.Teams, teams);
     }
 
     public void Dispose()

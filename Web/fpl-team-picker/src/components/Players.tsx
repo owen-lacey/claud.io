@@ -17,15 +17,15 @@ function Players() {
         <h2 className="text-xl font-semibold mb-4">Players</h2>
         <table>
             <tbody>
-                {players.slice(0, 19).map((player, index) => (
+                {players.slice(0, 50).map((player, index) => (
                     <tr key={index} className={playerBg(player)}>
                         <td className="font-medium flex items-center">
                             <div>{player.name} </div>
                             <SelectionIcon player={player} team={myTeam}/>
                         </td>
-                        <td className="text-gray-500 text-sm">{lookupTeam(player.team!, teams).shortName}</td>
-                        <td className="text-gray-500 text-sm text-right">£{(player.cost! / 10).toFixed(1)}</td>
-                        <td className="text-blue-500 text-sm text-right">XP: {player.xpNext!.toFixed(1)}</td>
+                        <td className="text-sm">{lookupTeam(player.team!, teams).shortName}</td>
+                        <td className="text-gray-500 font-mono text-sm text-right">£{(player.cost! / 10).toFixed(1)}</td>
+                        <td className="text-blue-500 font-mono text-sm text-right">{player.xpNext!.toFixed(1)}</td>
                     </tr>
                 ))}
             </tbody>

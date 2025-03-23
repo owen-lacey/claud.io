@@ -13,7 +13,7 @@ public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandl
 
     public async Task<SelectedTeam> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetSelectedTeamAsync(cancellationToken);
+        var currentTeam = await _repository.GetCurrentSelectedTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);

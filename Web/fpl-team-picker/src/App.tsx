@@ -9,10 +9,12 @@ import { FplApi } from './helpers/fpl-api.ts';
 import { AllData } from './models/all-data.ts';
 import Leagues from './components/Leagues.tsx';
 export const DataContext = createContext<AllData | null>(null);
+export const SelectedLeagueContext = createContext<number | null>(null);
 
 const App = memo(function App() {
     const [plProfile, savePlProfile] = useLocalStorage<string | null>("pl_profile", null);
     const [data, setData] = useState<AllData | null>(null);
+    const [leagueId, setLeagueId] = useState<number | null>(null);
 
     const loadData = async () => {
         const [myTeam, players, teams, leagues] = await Promise.all([
@@ -35,20 +37,22 @@ const App = memo(function App() {
 
     return (
         <DataContext.Provider value={data}>
-            <div className="app-container">
-                <div className="header">
-                    <Header />
+            <SelectedLeagueContext.Provider value={leagueId}>
+                <div className="app-container">
+                    <div className="header">
+                        <Header />
+                    </div>
+                    <div className="my-team">
+                        <MyTeam />
+                    </div>
+                    <div className="leagues">
+                        <Leagues leagueId={leagueId} setLeagueId={setLeagueId} />
+                    </div>
+                    <div className="players">
+                        <Players />
+                    </div>
                 </div>
-                <div className="my-team">
-                    <MyTeam />
-                </div>
-                <div className="leagues">
-                    <Leagues />
-                </div>
-                <div className="players">
-                    <Players />
-                </div>
-            </div>
+            </SelectedLeagueContext.Provider>
         </DataContext.Provider>
     )
 });

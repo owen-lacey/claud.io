@@ -23,10 +23,12 @@ export interface League {
 export interface LeagueParticipant {
   /** @format int32 */
   userId?: number;
-  playerNam?: string | null;
+  playerName?: string | null;
   teamName?: string | null;
   /** @format int32 */
   position?: number;
+  startingXi?: number[] | null;
+  bench?: number[] | null;
 }
 
 export interface Player {
