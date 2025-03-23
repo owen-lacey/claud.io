@@ -3,21 +3,45 @@ import { DataContext, SelectedLeagueContext } from "../App";
 import { playerBg } from "../helpers/styles";
 import { lookupTeam } from "../helpers/lookups";
 import { PlayerSelection } from "../models/player-selection";
+import RivalSelectionCount from "./players/RivalSelectionCount";
 
 function MyTeam() {
     const allData = useContext(DataContext);
     const selectedLeague = useContext(SelectedLeagueContext);
     const [playerSelections, setPlayerSelections] = useState<{ [id: number]: PlayerSelection[] }>({});
+    const [totalRivals, setTotalRivals] = useState<number | null>(null);
 
     useEffect(() => {
-        let toSet = {};
-        if (!!selectedLeague && !!allData?.myTeam && !!allData.leagues) {
-            const { myTeam, leagues } = allData!;
+        let toSet: { [id: number]: PlayerSelection[] } = {};
+        if (!!selectedLeague && !!allData?.myTeam && !!allData.leagues && !!allData.myDetails) {
+            const { myTeam, leagues, myDetails } = allData!;
+            const league = leagues.find(l => l.id == selectedLeague)!;
+            setTotalRivals(league.participants ? league.participants.length - 1 : null);
             myTeam.startingXi!.forEach(player => {
-                const league = leagues.find(l => l.id == selectedLeague)!;
-                league.participants?.forEach(participant => {
-                    //todo return the players for it as well
-                })
+                const selectionsForPlayer: PlayerSelection[] = [];
+                league.participants
+                    ?.filter(p => p.userId != myDetails.id)
+                    .forEach(participant => {
+                        const isSelectedByOtherPlayer = participant.startingXi?.some(p => p === player.player!.id)
+                            || participant.bench?.some(p => p === player.player!.id);
+                        if (isSelectedByOtherPlayer) {
+                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!))
+                        }
+                    });
+                toSet[player.player!.id!] = selectionsForPlayer;
+            });
+            myTeam.bench!.forEach(player => {
+                const selectionsForPlayer: PlayerSelection[] = [];
+                league.participants
+                    ?.filter(p => p.userId != myDetails.id)
+                    .forEach(participant => {
+                        const isSelectedByOtherPlayer = participant.startingXi?.some(p => p === player.player!.id)
+                            || participant.bench?.some(p => p === player.player!.id);
+                        if (isSelectedByOtherPlayer) {
+                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!))
+                        }
+                    });
+                toSet[player.player!.id!] = selectionsForPlayer;
             });
         }
         setPlayerSelections(toSet);
@@ -27,6 +51,8 @@ function MyTeam() {
         return <></>;
     }
     const { myTeam, teams } = allData;
+
+    const showRivalSelectionCount = Object.keys(playerSelections).length > 0 && totalRivals != null;
 
     return <div className="bg-white border border-gray-300 shadow-lg rounded-lg p-4 flex flex-col">
         <div className="flex gap-1 justify-around mb-4">
@@ -48,7 +74,10 @@ function MyTeam() {
                 <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>XI</td></tr>
                 {myTeam.startingXi!.map((player, index) => (
                     <tr key={index} className={playerBg(player.player!)}>
-                        <td className="font-medium">{player.player!.name}</td>
+                        <td className="font-medium flex justify-between items-center px-2">
+                            <div>{player.player!.name}</div>
+                            {showRivalSelectionCount ? <RivalSelectionCount totalRivals={totalRivals} selections={playerSelections[player.player!.id!]} /> : <></>}
+                        </td>
                         <td className="text-sm">{lookupTeam(player.player!.team!, teams).shortName}</td>
                         <td className="text-gray-500 font-mono text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
                         <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xpNext!.toFixed(1)}</td>
@@ -57,7 +86,10 @@ function MyTeam() {
                 <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>bench</td></tr>
                 {myTeam.bench!.map((player, index) => (
                     <tr key={index} className={playerBg(player.player!)}>
-                        <td className="font-medium">{player.player!.name}</td>
+                        <td className="font-medium flex justify-between items-center px-2">
+                            <div>{player.player!.name}</div>
+                            {showRivalSelectionCount ? <RivalSelectionCount totalRivals={totalRivals} selections={playerSelections[player.player!.id!]} /> : <></>}
+                        </td>
                         <td className="text-sm">{lookupTeam(player.player!.team!, teams).shortName}</td>
                         <td className="text-gray-500 font-mono text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
                         <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xpNext!.toFixed(1)}</td>

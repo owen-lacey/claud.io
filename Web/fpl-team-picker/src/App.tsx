@@ -17,13 +17,14 @@ const App = memo(function App() {
     const [leagueId, setLeagueId] = useState<number | null>(null);
 
     const loadData = async () => {
-        const [myTeam, players, teams, leagues] = await Promise.all([
+        const [myTeam, players, teams, leagues, myDetails] = await Promise.all([
             new FplApi().myTeam.myTeamList(),
             new FplApi().players.playersList(),
             new FplApi().teams.teamsList(),
             new FplApi().myLeagues.myLeaguesList(),
+            new FplApi().myDetails.myDetailsList(),
         ]);
-        const dataToSet = new AllData(myTeam.data, players.data, teams.data, leagues.data);
+        const dataToSet = new AllData(myTeam.data, players.data, teams.data, leagues.data, myDetails.data);
         setData(dataToSet);
     }
 

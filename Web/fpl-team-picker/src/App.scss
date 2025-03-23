@@ -1,7 +1,7 @@
 .app-container {
   padding: 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 13fr 8fr;
   grid-gap: 1rem;
   grid-template-rows: auto;
   grid-template-areas: "header header" "my-team my-team" "leagues leagues" "players players";

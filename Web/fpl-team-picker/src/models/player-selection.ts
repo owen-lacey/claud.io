@@ -1,3 +1,3 @@
 export class PlayerSelection {
-    // selectedBy: selectedBy: 
+    constructor(public selectedBy: string, public userId: number) {}
 }

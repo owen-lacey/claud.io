@@ -1,10 +1,11 @@
-import { League, Player, SelectedTeam, Team } from "../helpers/api";
+import { League, Player, SelectedTeam, Team, User } from "../helpers/api";
 
 export class AllData {
     constructor(
         public myTeam: SelectedTeam, 
         public players: Player[], 
         public teams: Team[],
-        public leagues: League[]) {
+        public leagues: League[],
+        public myDetails: User) {
     }
 }
