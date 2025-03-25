@@ -49,8 +49,10 @@ function Players() {
                 {players.slice(0, 50).map((player, index) => (
                     <tr key={index} className={playerBg(player)}>
                         <td className="font-medium flex justify-between items-center px-2">
-                            <div>{player.name} </div>
-                            <SelectionIcon player={player} team={myTeam} />
+                            <div className="flex items-center px-2">
+                                {player.name}
+                                <SelectionIcon player={player} team={myTeam} />
+                            </div>
                             {showRivalSelectionCount ? <RivalSelectionCount totalRivals={totalRivals} selections={playerSelections[player!.id!]} /> : <></>}
                         </td>
                         <td className="text-sm">{lookupTeam(player.team!, teams).shortName}</td>
