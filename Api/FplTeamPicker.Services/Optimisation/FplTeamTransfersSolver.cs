@@ -4,7 +4,6 @@ using FplTeamPicker.Services.Optimisation.Models;
 using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
 using LinearExpr = Google.OrTools.Sat.LinearExpr;
-using SumArray = Google.OrTools.Sat.SumArray;
 
 namespace FplTeamPicker.Services.Optimisation;
 
@@ -42,7 +41,7 @@ public class FplTeamTransfersSolver
         var output = new FplTransfersSelection();
         foreach (var playerSelectionVar in model.Selections)
         {
-            if (!cpSolver.BooleanValue(playerSelectionVar.SquadSelected))
+            if (!cpSolver.BooleanValue((BoolVar)playerSelectionVar.SquadSelected))
             {
                 continue;
             }
@@ -53,7 +52,7 @@ public class FplTeamTransfersSolver
                 SellingPrice = player.Cost
             };
 
-            var teamSelected = cpSolver.BooleanValue(playerSelectionVar.TeamSelected);
+            var teamSelected = cpSolver.BooleanValue((BoolVar)playerSelectionVar.TeamSelected);
             if (teamSelected)
             {
                 output.StartingXi.Add(selectedPlayer);
@@ -102,7 +101,7 @@ public class FplTeamTransfersSolver
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         const int multiplier = 100;
         var allPlayerPredictedPoints = _request.AllPlayers.Select(p => (int)Math.Round(p.XpNext * multiplier)).ToList();
-        var predictedPointsForTeam = LinearExpr.ScalProd(model.Selections.Select(p => p.TeamSelected), allPlayerPredictedPoints);
+        var predictedPointsForTeam = LinearExpr.WeightedSum(model.Selections.Select(p => p.TeamSelected), allPlayerPredictedPoints);
 
         // (# transfers - free transfers) * op
         var transferSum = LinearExpr.Sum(model.TransferSelections.Select(p => p.SquadSelected));
@@ -129,10 +128,10 @@ public class FplTeamTransfersSolver
 
     private void AddStartingTeamConstraints(FplTeamTransfersCpModel model)
     {
-        var teamGoalkeepers = new SumArray(model.SelectedGks.Select(p => p.TeamSelected));
-        var teamDefenders = new SumArray(model.SelectedDefs.Select(p => p.TeamSelected));
-        var teamMidfielders = new SumArray(model.SelectedMids.Select(p => p.TeamSelected));
-        var teamForwards = new SumArray(model.SelectedFwds.Select(p => p.TeamSelected));
+        var teamGoalkeepers = LinearExpr.Sum(model.SelectedGks.Select(p => p.TeamSelected));
+        var teamDefenders = LinearExpr.Sum(model.SelectedDefs.Select(p => p.TeamSelected));
+        var teamMidfielders = LinearExpr.Sum(model.SelectedMids.Select(p => p.TeamSelected));
+        var teamForwards = LinearExpr.Sum(model.SelectedFwds.Select(p => p.TeamSelected));
         model.Add(teamGoalkeepers == 1);
         model.Add(teamDefenders >= _request.Options.MinTeamDefenders);
         model.Add(teamMidfielders >= _request.Options.MinTeamMidfielders);
@@ -150,10 +149,10 @@ public class FplTeamTransfersSolver
     private void AddPositionConstraints(FplTeamTransfersCpModel model)
     {
         // Sum up the selections for each position, and ensure it matches the number of players required per position.
-        model.Add(new SumArray(model.SelectedGks.Select(p => p.SquadSelected)) == _request.Options.SquadGoalkeeperCount);
-        model.Add(new SumArray(model.SelectedDefs.Select(p => p.SquadSelected)) == _request.Options.SquadDefenderCount);
-        model.Add(new SumArray(model.SelectedMids.Select(p => p.SquadSelected)) == _request.Options.SquadMidfielderCount);
-        model.Add(new SumArray(model.SelectedFwds.Select(p => p.SquadSelected)) == _request.Options.SquadForwardCount);
+        model.Add(LinearExpr.Sum(model.SelectedGks.Select(p => p.SquadSelected)) == _request.Options.SquadGoalkeeperCount);
+        model.Add(LinearExpr.Sum(model.SelectedDefs.Select(p => p.SquadSelected)) == _request.Options.SquadDefenderCount);
+        model.Add(LinearExpr.Sum(model.SelectedMids.Select(p => p.SquadSelected)) == _request.Options.SquadMidfielderCount);
+        model.Add(LinearExpr.Sum(model.SelectedFwds.Select(p => p.SquadSelected)) == _request.Options.SquadForwardCount);
     }
 
     private void AddMaxPerTeamConstraint(FplTeamTransfersCpModel model)
@@ -161,7 +160,7 @@ public class FplTeamTransfersSolver
         // Sum up the selections for each team, and ensure it doesn't exceed the maximum number of players per team.
         foreach (var (_, selections) in model.TeamSelectionCounts)
         {
-            model.Add(new SumArray(selections) <= _request.Options.MaxPlayersPerTeam);
+            model.Add(LinearExpr.Sum(selections) <= _request.Options.MaxPlayersPerTeam);
         }
     }
 
@@ -169,7 +168,7 @@ public class FplTeamTransfersSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's cost.
         var allPlayerCosts = _request.AllPlayers.Select(p => p.Cost).ToList();
-        var allPlayerCost = LinearExpr.ScalProd(model.Selections.Select(s => s.SquadSelected), allPlayerCosts);
+        var allPlayerCost = LinearExpr.WeightedSum(model.Selections.Select(s => s.SquadSelected), allPlayerCosts);
 
         model.Add(allPlayerCost <= _request.Budget);
     }

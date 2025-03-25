@@ -1,11 +1,8 @@
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation.Exceptions;
 using FplTeamPicker.Services.Optimisation.Models;
-using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
 using LinearExpr = Google.OrTools.Sat.LinearExpr;
-using SumArray = Google.OrTools.Sat.SumArray;
-
 namespace FplTeamPicker.Services.Optimisation;
 
 public class PickFplTeamSolver
@@ -43,7 +40,7 @@ public class PickFplTeamSolver
 
         foreach (var playerSelectionVar in model.Selections)
         {
-            if (!cpSolver.BooleanValue(playerSelectionVar.SquadSelected))
+            if (!cpSolver.BooleanValue((BoolVar)playerSelectionVar.SquadSelected))
             {
                 continue;
             }
@@ -54,7 +51,7 @@ public class PickFplTeamSolver
                 SellingPrice = player.Cost
             };
 
-            var teamSelected = cpSolver.BooleanValue(playerSelectionVar.TeamSelected);
+            var teamSelected = cpSolver.BooleanValue((BoolVar)playerSelectionVar.TeamSelected);
             if (teamSelected)
             {
                 output.StartingXi.Add(selectedPlayer);
@@ -94,7 +91,7 @@ public class PickFplTeamSolver
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         var allPlayerPredictedPoints =
             _request.Players.Select(p => (int)Math.Round(p.XpNext * 100)).ToList();
-        var teamPredictedPoints = LinearExpr.ScalProd(model.Selections.Select(s => s.TeamSelected), allPlayerPredictedPoints);
+        var teamPredictedPoints = LinearExpr.WeightedSum(model.Selections.Select(s => s.TeamSelected), allPlayerPredictedPoints);
         model.Maximize(teamPredictedPoints);
     }
 
@@ -111,10 +108,10 @@ public class PickFplTeamSolver
 
     private void AddStartingTeamConstraints(PickFplTeamCpModel model)
     {
-        var teamGoalkeepers = new SumArray(model.SelectedGks.Select(p => p.TeamSelected));
-        var teamDefenders = new SumArray(model.SelectedDefs.Select(p => p.TeamSelected));
-        var teamMidfielders = new SumArray(model.SelectedMids.Select(p => p.TeamSelected));
-        var teamForwards = new SumArray(model.SelectedFwds.Select(p => p.TeamSelected));
+        var teamGoalkeepers = LinearExpr.Sum(model.SelectedGks.Select(p => p.TeamSelected));
+        var teamDefenders = LinearExpr.Sum(model.SelectedDefs.Select(p => p.TeamSelected));
+        var teamMidfielders = LinearExpr.Sum(model.SelectedMids.Select(p => p.TeamSelected));
+        var teamForwards = LinearExpr.Sum(model.SelectedFwds.Select(p => p.TeamSelected));
         model.Add(teamGoalkeepers == 1);
         model.Add(teamDefenders >= _request.Options.MinTeamDefenders);
         model.Add(teamMidfielders >= _request.Options.MinTeamMidfielders);
@@ -132,10 +129,10 @@ public class PickFplTeamSolver
     private void AddPositionConstraints(PickFplTeamCpModel model)
     {
         // Sum up the selections for each position, and ensure it matches the number of players required per position.
-        model.Add(new SumArray(model.SelectedGks.Select(p => p.SquadSelected)) == _request.Options.SquadGoalkeeperCount);
-        model.Add(new SumArray(model.SelectedDefs.Select(p => p.SquadSelected)) == _request.Options.SquadDefenderCount);
-        model.Add(new SumArray(model.SelectedMids.Select(p => p.SquadSelected)) == _request.Options.SquadMidfielderCount);
-        model.Add(new SumArray(model.SelectedFwds.Select(p => p.SquadSelected)) == _request.Options.SquadForwardCount);
+        model.Add(LinearExpr.Sum(model.SelectedGks.Select(p => p.SquadSelected)) == _request.Options.SquadGoalkeeperCount);
+        model.Add(LinearExpr.Sum(model.SelectedDefs.Select(p => p.SquadSelected)) == _request.Options.SquadDefenderCount);
+        model.Add(LinearExpr.Sum(model.SelectedMids.Select(p => p.SquadSelected)) == _request.Options.SquadMidfielderCount);
+        model.Add(LinearExpr.Sum(model.SelectedFwds.Select(p => p.SquadSelected)) == _request.Options.SquadForwardCount);
     }
 
     private void AddMaxPerTeamConstraint(PickFplTeamCpModel model)
@@ -143,7 +140,7 @@ public class PickFplTeamSolver
         // Sum up the selections for each team, and ensure it doesn't exceed the maximum number of players per team.
         foreach (var (_, selections) in model.TeamSelectionCounts)
         {
-            model.Add(new SumArray(selections) <= _request.Options.MaxPlayersPerTeam);
+            model.Add(LinearExpr.Sum(selections) <= _request.Options.MaxPlayersPerTeam);
         }
     }
 
@@ -151,7 +148,7 @@ public class PickFplTeamSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's cost.
         var allPlayerCosts = _request.Players.Select(p => p.Cost).ToList();
-        var allPlayerSelections = LinearExpr.ScalProd(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
+        var allPlayerSelections = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
         model.Add(allPlayerSelections <= _request.Budget);
     }
 
