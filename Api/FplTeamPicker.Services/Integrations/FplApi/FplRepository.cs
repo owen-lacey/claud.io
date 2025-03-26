@@ -123,7 +123,8 @@ public class FplRepository(
                         UserId = r.Entry,
                         PlayerName = r.PlayerName,
                         TeamName = r.TeamName,
-                        Position = r.Rank
+                        Position = r.Rank,
+                        Total = r.Total
                     })
                     .ToList()
             };

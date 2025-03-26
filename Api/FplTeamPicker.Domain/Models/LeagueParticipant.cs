@@ -13,4 +13,6 @@ public class LeagueParticipant
     public List<int> StartingXi { get; set; }
 
     public List<int> Bench { get; set; }
+    
+    public int Total { get; set; }
 }

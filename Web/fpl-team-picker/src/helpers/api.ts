@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -29,6 +30,8 @@ export interface LeagueParticipant {
   position?: number;
   startingXi?: number[] | null;
   bench?: number[] | null;
+  /** @format int32 */
+  total?: number;
 }
 
 export interface Player {

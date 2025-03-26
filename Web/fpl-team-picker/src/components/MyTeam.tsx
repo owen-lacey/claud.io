@@ -70,7 +70,7 @@ function MyTeam() {
             </div>
         </div>
         <table>
-            <tbody className="">
+            <tbody>
                 <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>XI</td></tr>
                 {myTeam.startingXi!.map((player, index) => (
                     <tr key={index} className={playerBg(player.player!)}>
