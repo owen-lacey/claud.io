@@ -25,7 +25,7 @@ function MyTeam() {
                         const isSelectedByOtherPlayer = participant.startingXi?.some(p => p === player.player!.id)
                             || participant.bench?.some(p => p === player.player!.id);
                         if (isSelectedByOtherPlayer) {
-                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!))
+                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!, participant.position!))
                         }
                     });
                 toSet[player.player!.id!] = selectionsForPlayer;
@@ -38,7 +38,7 @@ function MyTeam() {
                         const isSelectedByOtherPlayer = participant.startingXi?.some(p => p === player.player!.id)
                             || participant.bench?.some(p => p === player.player!.id);
                         if (isSelectedByOtherPlayer) {
-                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!))
+                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!, participant.position!))
                         }
                     });
                 toSet[player.player!.id!] = selectionsForPlayer;

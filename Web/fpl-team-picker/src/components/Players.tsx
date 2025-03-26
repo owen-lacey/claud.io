@@ -26,7 +26,7 @@ function Players() {
                         const isSelectedByOtherPlayer = participant.startingXi?.some(p => p === player!.id)
                             || participant.bench?.some(p => p === player!.id);
                         if (isSelectedByOtherPlayer) {
-                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!))
+                            selectionsForPlayer.push(new PlayerSelection(participant.playerName!, participant.userId!, participant.position!))
                         }
                     });
                 toSet[player!.id!] = selectionsForPlayer;
