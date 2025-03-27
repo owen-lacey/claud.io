@@ -5,13 +5,15 @@ using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Services.Integrations.FplApi.Constants;
 using FplTeamPicker.Services.UseCases.CalculateTransfers;
 using FplTeamPicker.Services.UseCases.CalculateWildcard;
+using FplTeamPicker.Services.UseCases.GetCurrentTeam;
 using FplTeamPicker.Services.UseCases.GetLeagues;
 using FplTeamPicker.Services.UseCases.GetMe;
+using FplTeamPicker.Services.UseCases.GetMyTeam;
 using FplTeamPicker.Services.UseCases.GetPlayers;
-using FplTeamPicker.Services.UseCases.GetTeam;
 using FplTeamPicker.Services.UseCases.GetTeams;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -71,7 +73,7 @@ app.MapGet("/my-details", async ([FromServices] IMediator mediator, Cancellation
 
 app.MapGet("/my-team", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
-    var result = await mediator.Send(new GetSelectedTeamRequest(), cancellationToken);
+    var result = await mediator.Send(new GetMyTeamRequest(), cancellationToken);
 
     return TypedResults.Ok(result);
 });
@@ -93,6 +95,13 @@ app.MapGet("/teams", async ([FromServices] IMediator mediator, CancellationToken
 app.MapGet("/players", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetPlayersRequest(), cancellationToken);
+
+    return TypedResults.Ok(result);
+});
+
+app.MapGet("/users/{userId}/current-team", async ([FromRoute]int userId, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+{
+    var result = await mediator.Send(new GetCurrentTeamRequest(userId), cancellationToken);
 
     return TypedResults.Ok(result);
 });

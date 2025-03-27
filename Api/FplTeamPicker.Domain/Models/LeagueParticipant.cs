@@ -9,10 +9,6 @@ public class LeagueParticipant
     public string TeamName { get; set; } = null!;
 
     public int Position { get; set; }
-
-    public List<int> StartingXi { get; set; }
-
-    public List<int> Bench { get; set; }
     
     public int Total { get; set; }
 }

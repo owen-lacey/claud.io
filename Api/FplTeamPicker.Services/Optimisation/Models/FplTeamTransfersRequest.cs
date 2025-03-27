@@ -9,7 +9,7 @@ public record FplTeamTransfersRequest
         List<Player> otherPlayers,
         FplOptions options,
         int numberTransfers,
-        decimal remainingBudget)
+        int remainingBudget)
     {
         Options = options;
         NumberTransfers = numberTransfers;
@@ -37,5 +37,5 @@ public record FplTeamTransfersRequest
         .OrderBy(r => r.Id)
         .ToList();
 
-    public int Budget => ExistingPlayers.Sum(e => e.Cost) + (int)Math.Round(RemainingBudget * 10);
+    public int Budget => ExistingPlayers.Sum(e => e.Cost) + (int)Math.Round(RemainingBudget);
 }

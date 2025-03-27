@@ -14,13 +14,13 @@ public class CalculateTransfersHandler(IFplRepository repository)
 
     public async Task<Transfers> Handle(CalculateTransfersRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetCurrentSelectedTeamAsync(cancellationToken);
+        var currentTeam = await _repository.GetMyTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);
 
-        var existingPlayers = currentTeam.StartingXi
-            .Concat(currentTeam.Bench)
+        var existingPlayers = currentTeam.SelectedTeam.StartingXi
+            .Concat(currentTeam.SelectedTeam.Bench)
             .OrderBy(r => r.Player.Id)
             .ToList();
         var otherPlayers = players.Where(p => existingPlayers.All(ep => ep.Player.Id != p.Id)).ToList();
@@ -55,7 +55,7 @@ public class CalculateTransfersHandler(IFplRepository repository)
                 .ThenByDescending(p => p.Player.XpNext)
                 .ToList(),
             FreeTransfers = currentTeam.FreeTransfers - playersIn.Count,
-            Bank = currentTeam.Bank + currentTeam.SquadCost - transfers.SquadCost
+            Bank = currentTeam.Bank + currentTeam.SelectedTeam.SquadCost - transfers.SquadCost
         };
     }
 }

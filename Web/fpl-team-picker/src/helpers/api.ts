@@ -28,10 +28,18 @@ export interface LeagueParticipant {
   teamName?: string | null;
   /** @format int32 */
   position?: number;
-  startingXi?: number[] | null;
-  bench?: number[] | null;
   /** @format int32 */
   total?: number;
+}
+
+export interface MyTeam {
+  /** @format int32 */
+  freeTransfers?: number;
+  /** @format int32 */
+  bank?: number;
+  selectedTeam?: SelectedTeam;
+  /** @format int32 */
+  budget?: number;
 }
 
 export interface Player {
@@ -74,13 +82,7 @@ export interface SelectedTeam {
   startingXi?: SelectedPlayer[] | null;
   bench?: SelectedPlayer[] | null;
   /** @format int32 */
-  freeTransfers?: number;
-  /** @format int32 */
-  bank?: number;
-  /** @format int32 */
   squadCost?: number;
-  /** @format int32 */
-  budget?: number;
   /** @format double */
   predictedPoints?: number;
   /** @format double */
@@ -284,7 +286,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request POST:/wildcard
      */
     wildcardCreate: (params: RequestParams = {}) =>
-      this.request<SelectedTeam, any>({
+      this.request<MyTeam, any>({
         path: `/wildcard`,
         method: "POST",
         format: "json",
@@ -316,7 +318,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/my-team
      */
     myTeamList: (params: RequestParams = {}) =>
-      this.request<SelectedTeam, any>({
+      this.request<MyTeam, any>({
         path: `/my-team`,
         method: "GET",
         format: "json",
@@ -366,6 +368,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     playersList: (params: RequestParams = {}) =>
       this.request<Player[], any>({
         path: `/players`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  users = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name CurrentTeamList
+     * @request GET:/users/{userId}/current-team
+     */
+    currentTeamList: (userId: number, params: RequestParams = {}) =>
+      this.request<SelectedTeam, any>({
+        path: `/users/${userId}/current-team`,
         method: "GET",
         format: "json",
         ...params,

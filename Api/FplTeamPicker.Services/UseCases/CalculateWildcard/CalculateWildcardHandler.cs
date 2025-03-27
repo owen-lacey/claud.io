@@ -7,13 +7,13 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateWildcard;
 
-public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandler<CalculateWildcardRequest, SelectedTeam>
+public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandler<CalculateWildcardRequest, MyTeam>
 {
     private readonly IFplRepository _repository = repository;
 
-    public async Task<SelectedTeam> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
+    public async Task<MyTeam> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetCurrentSelectedTeamAsync(cancellationToken);
+        var currentTeam = await _repository.GetMyTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);
@@ -22,18 +22,21 @@ public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandl
 
         var team = solver.Solve();
 
-        return new SelectedTeam
+        return new MyTeam
         {
-            StartingXi = team.StartingXi
-                .OrderBy(p => p.Player.Position)
-                .ThenByDescending(p => p.Player.XpNext)
-                .ToList(),
-            Bench = team.Bench
-                .OrderBy(p => p.Player.Position)
-                .ThenByDescending(p => p.Player.XpNext)
-                .ToList(),
+            SelectedTeam = new SelectedTeam
+            {
+                StartingXi = team.StartingXi
+                    .OrderBy(p => p.Player.Position)
+                    .ThenByDescending(p => p.Player.XpNext)
+                    .ToList(),
+                Bench = team.Bench
+                    .OrderBy(p => p.Player.Position)
+                    .ThenByDescending(p => p.Player.XpNext)
+                    .ToList()
+            },
             FreeTransfers = currentTeam.FreeTransfers,
-            Bank = currentTeam.Bank + currentTeam.SquadCost - team.SquadCost
+            Bank = currentTeam.Bank + currentTeam.SelectedTeam.SquadCost - team.SquadCost
         };
     }
 }

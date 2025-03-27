@@ -31,18 +31,20 @@ public class FplRepository(
         };
     }
 
-    public async Task<SelectedTeam> GetCurrentSelectedTeamAsync(CancellationToken cancellationToken)
+    public async Task<MyTeam> GetMyTeamAsync(CancellationToken cancellationToken)
     {
         var userId = await GetManagerIdAsync(cancellationToken);
-        var request = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
-        var result = await MakeRequestAsync<ApiTeam>(request, cancellationToken);
-        var team = new SelectedTeam
+        var teamRequest = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
+        var teamResult = await MakeRequestAsync<ApiTeam>(teamRequest, cancellationToken);
+        var selectedTeam = new SelectedTeam();
+        var team = new MyTeam
         {
-            Bank = result.Transfers.Bank,
-            FreeTransfers = result.Transfers.Limit - result.Transfers.Made
+            Bank = teamResult.Transfers.Bank,
+            FreeTransfers = teamResult.Transfers.Limit - teamResult.Transfers.Made,
+            SelectedTeam = selectedTeam
         };
 
-        foreach (var pick in result.Picks)
+        foreach (var pick in teamResult.Picks)
         {
             var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
             var selectedPlayer = new SelectedPlayer
@@ -55,18 +57,18 @@ public class FplRepository(
 
             if (pick.SquadNumber <= 11)
             {
-                team.StartingXi.Add(selectedPlayer);
+                selectedTeam.StartingXi.Add(selectedPlayer);
             }
             else
             {
-                team.Bench.Add(selectedPlayer);
+                selectedTeam.Bench.Add(selectedPlayer);
             }
         }
 
         return team;
     }
 
-    public async Task<SelectedTeam> GetPreviousSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken)
+    public async Task<SelectedTeam> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"api/entry/{userId}/event/{gameweek}/picks");
         var result = await MakeRequestAsync<ApiEntryPicks>(request, cancellationToken);

@@ -6,9 +6,9 @@ public interface IFplRepository
 {
     Task<User> GetUserDetailsAsync(CancellationToken cancellationToken);
 
-    Task<SelectedTeam> GetCurrentSelectedTeamAsync(CancellationToken cancellationToken);
+    Task<MyTeam> GetMyTeamAsync(CancellationToken cancellationToken);
     
-    Task<SelectedTeam> GetPreviousSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken);
+    Task<SelectedTeam> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken);
     
     Task<List<League>> GetLeaguesAsync(CancellationToken cancellationToken);
 
