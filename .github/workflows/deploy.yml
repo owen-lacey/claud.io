@@ -27,7 +27,7 @@ jobs:
         with:
           files: 'Api/FplTeamPicker.Api/appsettings.json'
         env:
-          EndpointConfig__UiUrl: ${{ secrets.UI_URL }} # Example of another setting
+          EndpointConfig__UiUrl: ${{ vars.UI_URL }} # Example of another setting
 
       - name: Build API
         run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
@@ -56,7 +56,7 @@ jobs:
           cd Web/fpl-team-picker
           npm run build
         env:
-          VITE_API_URL: ${{ secrets.API_URL }} #example of passing an env variable.
+          VITE_API_URL: ${{ vars.API_URL }} #example of passing an env variable.
 
       - name: Deploy Web to Azure App Service
         uses: azure/webapps-deploy@v2
