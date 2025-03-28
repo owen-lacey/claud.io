@@ -31,7 +31,7 @@ jobs:
           EndpointConfig.UiUrl: ${{ vars.UI_URL }}
 
       - name: Build API
-        run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
+        run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }} -r win-x64
 
 
       - uses: azure/login@v2
