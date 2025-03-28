@@ -1,0 +1,63 @@
+name: Deploy FplTeamPicker Apps
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Build and Deploy API
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore API dependencies
+        run: dotnet restore Api/FplTeamPicker.Api.csproj
+
+      - name: Build API
+        run: dotnet publish Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
+
+      - name: Deploy API to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: auto-fpl-api
+          resource-group: auto-fpl
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_API }}
+          package: ${{ env.API_DEPLOY_PATH }}
+
+      # Build and Deploy Web
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Or your desired node version.
+
+      - name: Install Web dependencies
+        run: |
+          cd Web/fpl-team-picker
+          npm install
+
+      - name: Build Web
+        run: |
+          cd Web/fpl-team-picker
+          npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }} #example of passing an env variable.
+
+      - name: Deploy Web to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: auto-fpl
+          resource-group: auto-fpl
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_WEB }}
+          package: Web/fpl-team-picker/dist
+
+env:
+  API_DEPLOY_PATH: './Api/deploy'
