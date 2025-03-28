@@ -20,7 +20,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore API dependencies
-        run: dotnet restore Api/FplTeamPicker.Api.csproj
+        run: dotnet restore Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj
 
       - name: Substitute appsettings.json variables
         uses: microsoft/variable-substitution@v1
@@ -30,7 +30,7 @@ jobs:
           EndpointConfig__UiUrl: ${{ secrets.UI_URL }} # Example of another setting
 
       - name: Build API
-        run: dotnet publish Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
+        run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
 
       - name: Deploy API to Azure App Service
         uses: azure/webapps-deploy@v2
