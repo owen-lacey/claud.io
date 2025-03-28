@@ -27,7 +27,7 @@ jobs:
         with:
           files: 'Api/FplTeamPicker.Api/appsettings.json'
         env:
-          EndpointConfig__UiUrl: ${{ vars.UI_URL }} # Example of another setting
+          EndpointConfig.UiUrl: ${{ vars.UI_URL }}
 
       - name: Build API
         run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
