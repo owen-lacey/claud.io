@@ -25,7 +25,7 @@ jobs:
       - name: Substitute appsettings.json variables
         uses: microsoft/variable-substitution@v1
         with:
-          files: 'Api/appsettings.json'
+          files: 'Api/FplTeamPicker.Api/appsettings.json'
         env:
           EndpointConfig__UiUrl: ${{ secrets.UI_URL }} # Example of another setting
 
