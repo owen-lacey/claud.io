@@ -7,9 +7,14 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateWildcard;
 
-public class CalculateWildcardHandler(IFplRepository repository) : IRequestHandler<CalculateWildcardRequest, MyTeam>
+public class CalculateWildcardHandler : IRequestHandler<CalculateWildcardRequest, MyTeam>
 {
-    private readonly IFplRepository _repository = repository;
+    private readonly IFplRepository _repository;
+
+    public CalculateWildcardHandler(IFplRepository repository)
+    {
+        _repository = repository;
+    }
 
     public async Task<MyTeam> Handle(CalculateWildcardRequest request, CancellationToken cancellationToken)
     {

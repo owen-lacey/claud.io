@@ -4,9 +4,14 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetCurrentTeam;
 
-public class GetCurrentTeamHandler(IFplRepository repository) : IRequestHandler<GetCurrentTeamRequest, SelectedTeam>
+public class GetCurrentTeamHandler : IRequestHandler<GetCurrentTeamRequest, SelectedTeam>
 {
-    private readonly IFplRepository _repository = repository;
+    private readonly IFplRepository _repository;
+
+    public GetCurrentTeamHandler(IFplRepository repository)
+    {
+        _repository = repository;
+    }
 
     public async Task<SelectedTeam> Handle(GetCurrentTeamRequest request, CancellationToken cancellationToken)
     {

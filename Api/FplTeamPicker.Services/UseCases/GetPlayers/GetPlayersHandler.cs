@@ -5,9 +5,14 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetPlayers;
 
-public class GetPlayersHandler(IFplRepository fplRepository) : IRequestHandler<GetPlayersRequest, List<Player>>
+public class GetPlayersHandler : IRequestHandler<GetPlayersRequest, List<Player>>
 {
-    private readonly IFplRepository _fplRepository = fplRepository;
+    private readonly IFplRepository _fplRepository;
+
+    public GetPlayersHandler(IFplRepository fplRepository)
+    {
+        _fplRepository = fplRepository;
+    }
 
     public async Task<List<Player>> Handle(GetPlayersRequest request, CancellationToken cancellationToken)
     {

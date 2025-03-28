@@ -92,7 +92,7 @@ public class FplTeamTransfersSolver
         }
         else
         {
-            model.TeamSelectionCounts.Add(existingPlayer.Team, [squadSelected]);
+            model.TeamSelectionCounts.Add(existingPlayer.Team, new List<IntVar> { squadSelected});
         }
     }
 

@@ -10,7 +10,6 @@ namespace FplTeamPicker.Services.Optimisation.Models;
 /// </summary>
 public class FplPlayerSelectionVar
 {
-    [SetsRequiredMembers]
     public FplPlayerSelectionVar(CpModel model, Player player)
     {
         Id = player.Id;
@@ -22,7 +21,7 @@ public class FplPlayerSelectionVar
         PredictedPoints = player.XpNext;
     }
 
-    public required int Id { get; init; }
+    public int Id { get; init; }
 
     public IntVar SquadSelected { get; init; }
 
@@ -30,7 +29,7 @@ public class FplPlayerSelectionVar
 
     public Position Position { get; init; }
 
-    public required int Team { get; init; }
+    public int Team { get; init; }
 
     public decimal Cost { get; init; }
 

@@ -2,9 +2,9 @@ namespace FplTeamPicker.Domain.Models;
 
 public record SelectedTeam
 {
-    public ICollection<SelectedPlayer> StartingXi { get; set; } = [];
+    public ICollection<SelectedPlayer> StartingXi { get; set; } = new List<SelectedPlayer>();
 
-    public ICollection<SelectedPlayer> Bench { get; set; } = [];
+    public ICollection<SelectedPlayer> Bench { get; set; } = new List<SelectedPlayer>();
 
     public int SquadCost => StartingXi.Sum(p => p.SellingPrice) + Bench.Sum(p => p.SellingPrice);
 
