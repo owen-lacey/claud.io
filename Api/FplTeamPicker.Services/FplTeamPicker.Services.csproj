@@ -13,6 +13,7 @@
     <ItemGroup>
       <PackageReference Include="Google.OrTools" Version="9.12.4544" />
       <PackageReference Include="Google.OrTools.runtime.osx-x64" Version="9.12.4544" />
+      <PackageReference Include="Google.OrTools.runtime.win-x64" Version="9.12.4544" />
       <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
