@@ -7,8 +7,15 @@ using FplTeamPicker.Services.Integrations.FplApi.Constants;
 
 namespace FplTeamPicker.Api.Providers;
 
-public class FplUserProvider(IHttpContextAccessor httpContextAccessor) : IFplUserProvider
+public class FplUserProvider : IFplUserProvider
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public FplUserProvider(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+    
     public record FplCookie
     {
         [JsonPropertyName("u")]
@@ -23,7 +30,7 @@ public class FplUserProvider(IHttpContextAccessor httpContextAccessor) : IFplUse
     public int GetUserId()
     {
         int? userId;
-        if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(
+        if (_httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(
                 FplApiConstants.HeaderName,
                 out var headerStr) == true)
         {

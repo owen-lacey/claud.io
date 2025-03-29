@@ -28,11 +28,11 @@ builder.Services
     .AddMediatR(r => r.RegisterServicesFromAssemblyContaining<GetMeRequest>())
     .AddCors(options => options.AddDefaultPolicy(corsBuilder =>
     {
-        var uiUrl = builder.Configuration.GetValue<string>("EndpointConfig:UiUrl");
-        corsBuilder.WithOrigins(uiUrl!)
+        corsBuilder.AllowAnyOrigin()
             .WithMethods(HttpMethods.Get, HttpMethods.Post)
             .WithHeaders(FplApiConstants.HeaderName);
-    }));
+    }))
+    ;
 
 var app = builder.Build();
 

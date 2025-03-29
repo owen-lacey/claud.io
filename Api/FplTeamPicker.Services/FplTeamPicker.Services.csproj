@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Google.OrTools" Version="9.5.2237" />
+      <PackageReference Include="Google.OrTools" Version="9.4.1874" />
       <PackageReference Include="MediatR" Version="12.4.1" />
       <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.1" />

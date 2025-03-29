@@ -1,3 +1,9 @@
 namespace FplTeamPicker.Api.Providers.Exceptions;
 
-public class SecurityException(string message) : Exception(message);
+public class SecurityException : Exception
+{
+    public SecurityException(string message): base(message)
+    {
+        
+    }
+}
