@@ -6,10 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <LangVersion>default</LangVersion>
     </PropertyGroup>
-    
-    <PropertyGroup Condition="$(Configuration) == 'Release'">
-        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />

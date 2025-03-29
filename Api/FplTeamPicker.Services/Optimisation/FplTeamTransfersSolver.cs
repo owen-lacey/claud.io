@@ -1,7 +1,6 @@
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation.Exceptions;
 using FplTeamPicker.Services.Optimisation.Models;
-using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
 using LinearExpr = Google.OrTools.Sat.LinearExpr;
 

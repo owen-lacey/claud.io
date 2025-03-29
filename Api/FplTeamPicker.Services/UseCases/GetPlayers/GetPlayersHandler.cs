@@ -1,6 +1,5 @@
 using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Domain.Models;
-using FplTeamPicker.Services.Integrations.FplApi.Models;
 using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetPlayers;

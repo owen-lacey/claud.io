@@ -24,7 +24,7 @@ public class PickFplTeamSolverTests
             .ToList();
         var players = goodPlayers
             .Concat(badPlayers)
-            .Concat([new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build()])
+            .Concat(new List<Player> {new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build()})
             .OrderBy(r => r.Id)
             .ToList();
         var options = new FplOptions

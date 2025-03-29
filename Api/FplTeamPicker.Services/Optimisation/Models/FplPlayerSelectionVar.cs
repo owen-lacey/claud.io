@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using FplTeamPicker.Domain.Models;
 using Google.OrTools.Sat;
 
