@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -12,11 +12,9 @@
 
     <ItemGroup>
       <PackageReference Include="Google.OrTools" Version="9.12.4544" />
-      <PackageReference Include="Google.OrTools.runtime.osx-x64" Version="9.12.4544" />
-      <PackageReference Include="Google.OrTools.runtime.win-x64" Version="9.12.4544" />
       <PackageReference Include="MediatR" Version="12.4.1" />
-      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.1" />
     </ItemGroup>
 
 </Project>

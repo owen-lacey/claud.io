@@ -6,9 +6,9 @@ public record Transfers
 
     public List<SelectedPlayer> PlayersIn { get; set; }
 
-    public ICollection<SelectedPlayer> StartingXi { get; set; } = [];
+    public ICollection<SelectedPlayer> StartingXi { get; set; } = new List<SelectedPlayer>();
 
-    public ICollection<SelectedPlayer> Bench { get; set; } = [];
+    public ICollection<SelectedPlayer> Bench { get; set; } = new List<SelectedPlayer>();
 
     public int FreeTransfers { get; set; }
 

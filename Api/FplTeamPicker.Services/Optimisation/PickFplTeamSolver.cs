@@ -81,7 +81,7 @@ public class PickFplTeamSolver
             }
             else
             {
-                model.TeamSelectionCounts.Add(player.Team, [squadSelection.SquadSelected]);
+                model.TeamSelectionCounts.Add(player.Team, new List<IntVar> {squadSelection.SquadSelected});
             }
         }
     }

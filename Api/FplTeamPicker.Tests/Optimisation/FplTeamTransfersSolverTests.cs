@@ -31,7 +31,7 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 100,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, [expensivePlayer], options, 1, 0);
+        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {expensivePlayer}, options, 1, 0);
         var solver = new FplTeamTransfersSolver(model);
 
         var output = solver.Solve();
@@ -64,7 +64,7 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 3,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, [expensivePlayer], options, 1, 0);
+        var model = new FplTeamTransfersRequest(existingTeam, new List<Player>{expensivePlayer}, options, 1, 0);
         var solver = new FplTeamTransfersSolver(model);
 
         var output = solver.Solve();
@@ -97,7 +97,7 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 100,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, [expensivePlayer], options, 1, 0);
+        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {expensivePlayer}, options, 1, 0);
         var solver = new FplTeamTransfersSolver(model);
 
         var output = solver.Solve();
@@ -218,7 +218,7 @@ public class FplTeamTransfersSolverTests
             StartingTeamCount = 4,
             TransferPointsPenalty = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, [betterPlayer], options, 0, 0);
+        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {betterPlayer}, options, 0, 0);
         var solver = new FplTeamTransfersSolver(model);
 
         var output = solver.Solve();

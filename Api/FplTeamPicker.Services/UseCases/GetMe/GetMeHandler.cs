@@ -4,9 +4,14 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetMe;
 
-public class GetMeHandler(IFplRepository repository) : IRequestHandler<GetMeRequest, User>
+public class GetMeHandler : IRequestHandler<GetMeRequest, User>
 {
-    private readonly IFplRepository _repository = repository;
+    private readonly IFplRepository _repository;
+
+    public GetMeHandler(IFplRepository repository)
+    {
+        _repository = repository;
+    }
 
     public Task<User> Handle(GetMeRequest request, CancellationToken cancellationToken)
     {
