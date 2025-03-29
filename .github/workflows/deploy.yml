@@ -12,7 +12,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3      
+      
+      - name: Substitute appsettings.json variables
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'Api/FplTeamPicker.Api/appsettings.json'
+        env:
+          EndpointConfig.UiUrl: ${{ vars.UI_URL }}
+
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build and deploy Container App
         uses: azure/container-apps-deploy-action@v1
