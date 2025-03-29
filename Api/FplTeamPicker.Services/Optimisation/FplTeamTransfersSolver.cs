@@ -1,7 +1,6 @@
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation.Exceptions;
 using FplTeamPicker.Services.Optimisation.Models;
-using Google.OrTools.LinearSolver;
 using Google.OrTools.Sat;
 using LinearExpr = Google.OrTools.Sat.LinearExpr;
 
@@ -92,7 +91,7 @@ public class FplTeamTransfersSolver
         }
         else
         {
-            model.TeamSelectionCounts.Add(existingPlayer.Team, [squadSelected]);
+            model.TeamSelectionCounts.Add(existingPlayer.Team, new List<IntVar> { squadSelected});
         }
     }
 

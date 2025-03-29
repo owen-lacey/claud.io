@@ -3,10 +3,18 @@ using FplTeamPicker.Domain.Models;
 
 namespace FplTeamPicker.Tests.Optimisation.Builders;
 
-public class FplPlayerBuilder(int team, Position position)
+public class FplPlayerBuilder
 {
+    private readonly int _team;
+    private readonly Position _position;
     private int _cost;
     private decimal _xpNext;
+
+    public FplPlayerBuilder(int team, Position position)
+    {
+        _team = team;
+        _position = position;
+    }
 
     public FplPlayerBuilder WithCost(int cost)
     {
@@ -28,8 +36,8 @@ public class FplPlayerBuilder(int team, Position position)
             FirstName = new Random().Forename(),
             SecondName = new Random().Surname(),
             Cost = _cost,
-            Team = team,
-            Position = position,
+            Team = _team,
+            Position = _position,
             XpNext = _xpNext
         };
     }

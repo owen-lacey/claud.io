@@ -7,10 +7,14 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateTransfers;
 
-public class CalculateTransfersHandler(IFplRepository repository)
+public class CalculateTransfersHandler
     : IRequestHandler<CalculateTransfersRequest, Transfers>
 {
-    private readonly IFplRepository _repository = repository;
+    public CalculateTransfersHandler(IFplRepository repository)
+    {
+        _repository = repository;
+    }
+    private readonly IFplRepository _repository;
 
     public async Task<Transfers> Handle(CalculateTransfersRequest request, CancellationToken cancellationToken)
     {
