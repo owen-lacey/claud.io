@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrls("http://+:90"); 
+
 builder.Services
     .AddEndpointsApiExplorer()
     .AddSwaggerGen()
