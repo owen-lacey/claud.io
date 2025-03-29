@@ -7,44 +7,21 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     environment: Production
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Build and Deploy API
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v3
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
         with:
-          dotnet-version: '8.0.x'
-
-      - name: Restore API dependencies
-        run: dotnet restore Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj
-
-      - name: Substitute appsettings.json variables
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: 'Api/FplTeamPicker.Api/appsettings.json'
-        env:
-          EndpointConfig.UiUrl: ${{ vars.UI_URL }}
-
-      - name: Build API
-        run: dotnet publish Api/FplTeamPicker.Api/FplTeamPicker.Api.csproj -c Release -o ${{ env.API_DEPLOY_PATH }}
-
-      - uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      # TODO: for some reason deploying with github breaks the app?
-      - name: Deploy API to Azure App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: auto-fpl-api
-          resource-group: auto-fpl
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_API }}
-          package: ${{ env.API_DEPLOY_PATH }}
+          appSourcePath: ${{ github.workspace }}/src
+          acrName: autofpl
+          containerAppName: auto-fpl-api
+          resourceGroup: auto-fpl
+    
 
       # Build and Deploy Web
       - name: Setup Node.js
