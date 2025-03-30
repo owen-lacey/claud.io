@@ -39,13 +39,17 @@ jobs:
           file: Api/FplTeamPicker.Api/Dockerfile
           push: true
           tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-  
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+          cache-from: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          cache-to: type=registry,ref=${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest,mode=max
+
+      - name: Deploy to Azure Container App
+        uses: azure/cli@v1
         with:
-          app-name: auto-fpl-api
-          images: ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          resource-group-name: ${{ env.RESOURCE_GROUP }}
+          inlineScript: |
+            az containerapp update \
+              --name auto-fpl-api \
+              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --image ${{ env.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
     
 
       # Build and Deploy Web
