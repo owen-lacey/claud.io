@@ -1,3 +1,4 @@
+using FplTeamPicker.Api.Exceptions;
 using FplTeamPicker.Api.IoC;
 using FplTeamPicker.Api.Providers;
 using FplTeamPicker.Domain.Contracts;
@@ -32,7 +33,7 @@ builder.Services
             .WithMethods(HttpMethods.Get, HttpMethods.Post)
             .WithHeaders(FplApiConstants.HeaderName);
     }))
-    ;
+    .AddExceptionHandler<ExceptionHandler>();
 
 var app = builder.Build();
 
