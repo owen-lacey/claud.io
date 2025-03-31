@@ -90,9 +90,13 @@ public class PickFplTeamSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         var allPlayerPredictedPoints =
-            _request.Players.Select(p => (int)Math.Round(p.XpNext * 100)).ToList();
+            _request.Players.Select(p => (int)Math.Round(p.XpNext * 1000)).ToList();
+        var allPlayerCosts = _request.Players.Select(p => p.Cost).ToList();
+        var teamCost = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
+        var budgetRemaining = _request.Budget - teamCost;
+        
         var teamPredictedPoints = LinearExpr.WeightedSum(model.Selections.Select(s => s.TeamSelected), allPlayerPredictedPoints);
-        model.Maximize(teamPredictedPoints);
+        model.Maximize(teamPredictedPoints + budgetRemaining);
     }
 
     private void AddConstraints(PickFplTeamCpModel model)

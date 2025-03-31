@@ -24,7 +24,7 @@ public class PickFplTeamSolverTests
             .ToList();
         var players = goodPlayers
             .Concat(badPlayers)
-            .Concat(new List<Player> {new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build()})
+            .Concat(new List<Player> { new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build() })
             .OrderBy(r => r.Id)
             .ToList();
         var options = new FplOptions
@@ -49,16 +49,16 @@ public class PickFplTeamSolverTests
     public void LotsOfGoodPlayersForSpecificPosition_PicksWorsePlayersToFillQuota()
     {
         var players = new List<Player>
-        {
-            new FplPlayerBuilder(1, Position.Goalkeeper).Build(),
-            new FplPlayerBuilder(2, Position.Defender).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(3, Position.Defender).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(4, Position.Defender).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(5, Position.Defender).WithPredictedPoints(100).Build(),
-            new FplPlayerBuilder(6, Position.Midfielder).Build()
-        }
-        .OrderBy(r => r.Id)
-        .ToList();
+            {
+                new FplPlayerBuilder(1, Position.Goalkeeper).Build(),
+                new FplPlayerBuilder(2, Position.Defender).WithPredictedPoints(100).Build(),
+                new FplPlayerBuilder(3, Position.Defender).WithPredictedPoints(100).Build(),
+                new FplPlayerBuilder(4, Position.Defender).WithPredictedPoints(100).Build(),
+                new FplPlayerBuilder(5, Position.Defender).WithPredictedPoints(100).Build(),
+                new FplPlayerBuilder(6, Position.Midfielder).Build()
+            }
+            .OrderBy(r => r.Id)
+            .ToList();
         var options = new FplOptions
         {
             SquadGoalkeeperCount = 1,
@@ -86,15 +86,15 @@ public class PickFplTeamSolverTests
             .WithPredictedPoints(100)
             .Build();
         var players = new List<Player>
-        {
-            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
-            new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
-            new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
-            expensivePlayer,
-            new FplPlayerBuilder(teamOne, Position.Forward).WithCost(25).Build()
-        }
-        .OrderBy(r => r.Id)
-        .ToList();
+            {
+                new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
+                new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
+                new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
+                expensivePlayer,
+                new FplPlayerBuilder(teamOne, Position.Forward).WithCost(25).Build()
+            }
+            .OrderBy(r => r.Id)
+            .ToList();
         const int budget = 100;
         var options = new FplOptions
         {
@@ -125,15 +125,15 @@ public class PickFplTeamSolverTests
         var badForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(49).WithCost(25).Build();
         var goodForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(51).WithCost(25).Build();
         var players = new List<Player>
-        {
-            new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
-            new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
-            new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
-            goodForward,
-            badForward
-        }
-        .OrderBy(r => r.Id)
-        .ToList();
+            {
+                new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
+                new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
+                new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
+                goodForward,
+                badForward
+            }
+            .OrderBy(r => r.Id)
+            .ToList();
         const int budget = 100;
         var options = new FplOptions
         {
@@ -156,6 +156,52 @@ public class PickFplTeamSolverTests
                 "we should not select the player with the lower selection percentage");
             output.StartingXi.Any(p => p.Player.Id == goodForward.Id).Should().BeTrue(
                 "we should select the player that has a higher selection percentage");
+        }
+    }
+
+    [Fact]
+    public void PlayerThatWouldBeOnBenchIsCheaper_PicksCheaperPlayer()
+    {
+        const int teamOne = 1;
+        var cheaperBenchPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(0).WithCost(2).Build();
+        var expensiveBenchPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(0).WithCost(3).Build();
+        var teamPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(1).Build();
+        var players = new List<Player>
+            {
+                new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build(),
+                expensiveBenchPlayer,
+                cheaperBenchPlayer,
+                teamPlayer,
+                new FplPlayerBuilder(teamOne, Position.Midfielder).Build(),
+                new FplPlayerBuilder(teamOne, Position.Forward).Build()
+            }
+            .OrderBy(r => r.Id)
+            .ToList();
+        const int budget = 1000;
+        var options = new FplOptions
+        {
+            SquadGoalkeeperCount = 1,
+            SquadDefenderCount = 2,
+            SquadMidfielderCount = 1,
+            SquadForwardCount = 1,
+            MinTeamDefenders = 1,
+            MinTeamForwards = 1,
+            MinTeamMidfielders = 1,
+            MaxPlayersPerTeam = players.Count,
+            StartingTeamCount = 4
+        };
+        var model = new PickFplTeamModel(players, options, budget);
+        var solver = new PickFplTeamSolver(model);
+
+        var output = solver.Solve();
+
+        using (new AssertionScope())
+        {
+            var teamDefender = output.StartingXi.Single(p => p.Player.Position == Position.Defender);
+            var benchDefender = output.Bench.Single(p => p.Player.Position == Position.Defender);
+            teamDefender.Player.Id.Should().Be(teamPlayer.Id, "we should pick the defender with some predicted points");
+            benchDefender.Player.Id.Should().Be(cheaperBenchPlayer.Id, "the benched defender should be the cheapest");
+            benchDefender.Player.Id.Should().NotBe(expensiveBenchPlayer.Id, "we should not pick expensive subs for the sake of it");
         }
     }
 }

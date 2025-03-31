@@ -111,7 +111,11 @@ public class FplTeamTransfersSolver
         var penalisedTransferCount = model.NewIntVar(0, _request.Options.SquadCount, "penalisedTransferCount");
         model.Add(penalisedTransferCount == transferSum - _request.NumberTransfers).OnlyEnforceIf(penaliseTransfers);
         var transferPenalty = penalisedTransferCount * _request.Options.TransferPointsPenalty * multiplier;
-        model.Maximize(predictedPointsForTeam - transferPenalty);
+        
+        var allPlayerCosts = _request.AllPlayers.Select(p => p.Cost).ToList();
+        var teamCost = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
+        var budgetRemaining = _request.Budget - teamCost;
+        model.Maximize(predictedPointsForTeam - transferPenalty + budgetRemaining);
     }
 
     private void AddConstraints(FplTeamTransfersCpModel model)

@@ -12,8 +12,8 @@ public class FplPlayerSelectionVar
     public FplPlayerSelectionVar(CpModel model, Player player)
     {
         Id = player.Id;
-        SquadSelected = model.NewBoolVar($"{player}_squad_selected");
-        TeamSelected = model.NewBoolVar($"{player}_team_selected");
+        SquadSelected = model.NewBoolVar($"{player.Id}_squad_selected");
+        TeamSelected = model.NewBoolVar($"{player.Id}_team_selected");
         Position = player.Position;
         Team = player.Team;
         Cost = player.Cost;

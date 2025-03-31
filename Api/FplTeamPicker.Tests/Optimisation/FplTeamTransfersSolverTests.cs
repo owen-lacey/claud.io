@@ -239,4 +239,50 @@ public class FplTeamTransfersSolverTests
             }
         }
     }
+
+    [Fact]
+    public void PlayerThatWouldBeOnBenchIsCheaper_PicksCheaperPlayer()
+    {
+        const int teamOne = 1;
+        var cheaperBenchPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(0).WithCost(2).Build();
+        var expensiveBenchPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(0).WithCost(3).Build();
+        var teamPlayer = new FplPlayerBuilder(teamOne, Position.Defender).WithPredictedPoints(1).Build();
+        var players = new List<Player>
+            {
+                new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build(),
+                expensiveBenchPlayer,
+                cheaperBenchPlayer,
+                teamPlayer,
+                new FplPlayerBuilder(teamOne, Position.Midfielder).Build(),
+                new FplPlayerBuilder(teamOne, Position.Forward).Build()
+            }
+            .OrderBy(r => r.Id)
+            .ToList();
+        const int budget = 1000;
+        var options = new FplOptions
+        {
+            SquadGoalkeeperCount = 1,
+            SquadDefenderCount = 2,
+            SquadMidfielderCount = 1,
+            SquadForwardCount = 1,
+            MinTeamDefenders = 1,
+            MinTeamForwards = 1,
+            MinTeamMidfielders = 1,
+            MaxPlayersPerTeam = players.Count,
+            StartingTeamCount = 4
+        };
+        var model = new PickFplTeamModel(players, options, budget);
+        var solver = new PickFplTeamSolver(model);
+
+        var output = solver.Solve();
+
+        using (new AssertionScope())
+        {
+            var teamDefender = output.StartingXi.Single(p => p.Player.Position == Position.Defender);
+            var benchDefender = output.Bench.Single(p => p.Player.Position == Position.Defender);
+            teamDefender.Player.Id.Should().Be(teamPlayer.Id, "we should pick the defender with some predicted points");
+            benchDefender.Player.Id.Should().Be(cheaperBenchPlayer.Id, "the benched defender should be the cheapest");
+            benchDefender.Player.Id.Should().NotBe(expensiveBenchPlayer.Id, "we should not pick expensive subs for the sake of it");
+        }
+    }
 }
