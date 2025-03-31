@@ -9,6 +9,7 @@ import { FplApi } from './helpers/fpl-api.ts';
 import { AllData } from './models/all-data.ts';
 import Leagues from './components/Leagues.tsx';
 import { RivalTeam } from './models/rival-league.ts';
+import SmallScreen from './components/utils/SmallScreen.tsx';
 export const DataContext = createContext<AllData | null>(null);
 export const RivalTeamsContext = createContext<RivalTeam[]>([]);
 
@@ -30,29 +31,39 @@ const App = memo(function App() {
   }
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (plProfile != null) {
+      loadData();
+    }
+  }, [plProfile]);
 
+  let content;
   if (!plProfile) {
-    return <AuthGuard onDone={(cookie) => savePlProfile(cookie)} />
+    content = <AuthGuard onDone={(cookie) => savePlProfile(cookie)} />;
+  } else {
+    content = <div className="app-container">
+      <div className="header">
+        <Header />
+      </div>
+      <div className="my-team">
+        <MyTeam />
+      </div>
+      <div className="leagues">
+        <Leagues rivalTeams={rivalTeams} setRivalTeams={setRivalTeams} />
+      </div>
+      <div className="players">
+        <Players />
+      </div>
+    </div>;
   }
 
   return (
     <DataContext.Provider value={data}>
       <RivalTeamsContext.Provider value={rivalTeams}>
-        <div className="app-container">
-          <div className="header">
-            <Header />
-          </div>
-          <div className="my-team">
-            <MyTeam />
-          </div>
-          <div className="leagues">
-            <Leagues rivalTeams={rivalTeams} setRivalTeams={setRivalTeams} />
-          </div>
-          <div className="players">
-            <Players />
-          </div>
+        <div className="md:hidden">
+          <SmallScreen />
+        </div>
+        <div className="hidden md:block">
+          {content}
         </div>
       </RivalTeamsContext.Provider>
     </DataContext.Provider>
