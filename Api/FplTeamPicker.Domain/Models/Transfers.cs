@@ -2,13 +2,13 @@ namespace FplTeamPicker.Domain.Models;
 
 public record Transfers
 {
-    public List<SelectedPlayer> PlayersOut { get; set; }
+    public ICollection<SelectedPlayer> PlayersOut { get; set; } = [];
 
-    public List<SelectedPlayer> PlayersIn { get; set; }
+    public ICollection<SelectedPlayer> PlayersIn { get; set; } = [];
 
-    public ICollection<SelectedPlayer> StartingXi { get; set; } = new List<SelectedPlayer>();
+    public ICollection<SelectedPlayer> StartingXi { get; set; } = [];
 
-    public ICollection<SelectedPlayer> Bench { get; set; } = new List<SelectedPlayer>();
+    public ICollection<SelectedPlayer> Bench { get; set; } = [];
 
     public int FreeTransfers { get; set; }
 

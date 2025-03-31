@@ -19,7 +19,7 @@ public class FplUserProvider : IFplUserProvider
     public record FplCookie
     {
         [JsonPropertyName("u")]
-        public FplCookieUser User { get; set; }
+        public required FplCookieUser User { get; set; }
     }
 
     public record FplCookieUser
