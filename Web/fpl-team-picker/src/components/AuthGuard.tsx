@@ -31,7 +31,7 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
                     Welcome to Auto FPL! &#9917;
                   </DialogTitle>
                   <div>
-                    Auto FPL is a read-only view of your FPL profile.
+                    Auto FPL is a read-only view of your FPL profile. It uses optimisation algorithms to help you pick* the best FPL team.
                     <br />
                     <br />
                     Let's get started:
@@ -58,6 +58,9 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
                   </div>
                 </div>
               </div>
+              <i className="text-xs px-2 text-gray-500">
+                * probably
+              </i>
             </div>
             <div className="bg-gray-50 px-4 py-3 flex flex-row-reverse px-6">
               <button
