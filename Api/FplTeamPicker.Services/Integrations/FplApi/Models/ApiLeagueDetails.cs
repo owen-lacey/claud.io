@@ -2,5 +2,5 @@ namespace FplTeamPicker.Services.Integrations.FplApi.Models;
 
 public class ApiLeagueDetails
 {
-    public ApiLeagueStanding Standings { get; set; }
+    public required ApiLeagueStanding Standings { get; set; }
 }

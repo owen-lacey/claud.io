@@ -4,5 +4,5 @@ public class ApiLeagueStanding
 {
     public bool HasNext { get; set; }
 
-    public List<ApiLeaguePosition> Results { get; set; }
+    public required List<ApiLeaguePosition> Results { get; set; }
 }
