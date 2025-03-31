@@ -6,29 +6,35 @@
 @tailwind utilities;
 
 @theme {
-    --font-sans: InterVariable, sans-serif;
+  --font-sans: InterVariable, sans-serif;
 }
 
 @layer base {
-    input {
-        @apply border border-gray-300 rounded-md focus:border-gray-500 p-2.5;
+  input {
+    @apply border border-gray-300 rounded-md focus:border-gray-500 p-2.5;
 
-        &:focus {
-            outline: none;
-        }
+    &:focus {
+      outline: none;
     }
+  }
 
 
-    button {
-        @apply rounded-md font-semibold shadow-xs cursor-pointer;
+  button {
+    @apply rounded-md font-semibold shadow-xs cursor-pointer;
 
 
-        &.info {
-            @apply bg-blue-500 text-white;
+    &.info {
+      @apply bg-blue-500 text-white;
 
-            &:hover {
-                @apply bg-blue-600;
-            }
-        }
+      &:hover {
+        @apply bg-blue-600;
+      }
     }
+  }
+}
+
+@media only screen and (max-width: 48rem) {
+  #headlessui-portal-root {
+    display: none;
+  }
 }

@@ -31,11 +31,29 @@ const App = memo(function App() {
   }
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (plProfile != null) {
+      loadData();
+    }
+  }, [plProfile]);
 
+  let content;
   if (!plProfile) {
-    return <AuthGuard onDone={(cookie) => savePlProfile(cookie)} />
+    content = <AuthGuard onDone={(cookie) => savePlProfile(cookie)} />;
+  } else {
+    content = <div className="app-container">
+      <div className="header">
+        <Header />
+      </div>
+      <div className="my-team">
+        <MyTeam />
+      </div>
+      <div className="leagues">
+        <Leagues rivalTeams={rivalTeams} setRivalTeams={setRivalTeams} />
+      </div>
+      <div className="players">
+        <Players />
+      </div>
+    </div>;
   }
 
   return (
@@ -45,20 +63,7 @@ const App = memo(function App() {
           <SmallScreen />
         </div>
         <div className="hidden md:block">
-          <div className="app-container">
-            <div className="header">
-              <Header />
-            </div>
-            <div className="my-team">
-              <MyTeam />
-            </div>
-            <div className="leagues">
-              <Leagues rivalTeams={rivalTeams} setRivalTeams={setRivalTeams} />
-            </div>
-            <div className="players">
-              <Players />
-            </div>
-          </div>
+          {content}
         </div>
       </RivalTeamsContext.Provider>
     </DataContext.Provider>
