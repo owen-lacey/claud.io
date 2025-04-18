@@ -153,7 +153,7 @@ public class FplRepository: IFplRepository, IDisposable
 
     public async Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken)
     {
-        if (_memoryCache.TryGetValue(CacheKeys.Players, out _))
+        if (!_memoryCache.TryGetValue(CacheKeys.Players, out _))
         {
             await DoBulkDataLoadAsync(cancellationToken);
         }
@@ -161,9 +161,19 @@ public class FplRepository: IFplRepository, IDisposable
         return _memoryCache.Get<List<Player>>(CacheKeys.Players)!;
     }
 
+    public async Task<List<Manager>> GetManagersAsync(CancellationToken cancellationToken)
+    {
+        if (!_memoryCache.TryGetValue(CacheKeys.Managers, out _))
+        {
+            await DoBulkDataLoadAsync(cancellationToken);
+        }
+        
+        return _memoryCache.Get<List<Manager>>(CacheKeys.Managers)!;
+    }
+
     public async Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken)
     {
-        if (_memoryCache.TryGetValue(CacheKeys.Teams, out _))
+        if (!_memoryCache.TryGetValue(CacheKeys.Teams, out _))
         {
             await DoBulkDataLoadAsync(cancellationToken);
         }
@@ -232,15 +242,29 @@ public class FplRepository: IFplRepository, IDisposable
 
         CacheTeams(result);
         CachePlayers(result);
+        CacheManagers(result);
 
         var currentGameweek = result.Events.Single(e => e.IsCurrent);
         _memoryCache.Set(CacheKeys.CurrentGameweek, currentGameweek.Id);
     }
 
+    private void CacheManagers(ApiDataDump result)
+    {
+        var managers = new List<Manager>();
+        foreach (var player in result.Elements
+                     .Where(p => p.Position == ApiPosition.Manager)
+                     .Select(p => p.ToManager())
+                     .OrderBy(p => p.Id))
+        {
+            managers.Add(player);
+        }
+        _memoryCache.Set(CacheKeys.Managers, managers);
+    }
+
     private void CachePlayers(ApiDataDump result)
     {
         var players = new List<Player>();
-        foreach (var player in result.Players
+        foreach (var player in result.Elements
                      .Where(p => p.Position != ApiPosition.Manager)
                      .Select(p => p.ToPlayer())
                      .OrderBy(p => p.Id))

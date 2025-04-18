@@ -17,4 +17,6 @@ public interface IFplRepository
     Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken);
     
     Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken);
+    
+    Task<List<Manager>> GetManagersAsync(CancellationToken cancellationToken);
 }

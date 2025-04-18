@@ -42,4 +42,18 @@ public record ApiPlayerDetails
             Team = Team
         };
     }
+
+    public Manager ToManager()
+    {
+        return new Manager
+        {
+            SecondName = SecondName,
+            FirstName = FirstName,
+            XpNext = decimal.Parse(XpNext),
+            XpThis = decimal.Parse(XpThis),
+            Cost = Cost,
+            Id = Id,
+            Team = Team
+        };
+    }
 }
