@@ -17,7 +17,10 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://+:90"); 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.WebHost.UseUrls("http://+:90");
+}
 
 builder.Services
     .AddEndpointsApiExplorer()
@@ -40,10 +43,7 @@ var app = builder.Build();
 
 app
     .UseCors()
-    .UseExceptionHandler(exceptionHandlerApp =>
-    {
-        exceptionHandlerApp.Run(Results.Problem().ExecuteAsync);
-    });
+    .UseExceptionHandler(exceptionHandlerApp => { exceptionHandlerApp.Run(Results.Problem().ExecuteAsync); });
 ;
 
 if (app.Environment.IsDevelopment())
@@ -82,7 +82,7 @@ app.MapGet("/my-team", async ([FromServices] IMediator mediator, CancellationTok
 app.MapGet("/my-leagues", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetLeaguesRequest(), cancellationToken);
-    
+
     return Results.Ok(result);
 });
 
@@ -107,11 +107,12 @@ app.MapGet("/managers", async ([FromServices] IMediator mediator, CancellationTo
     return Results.Ok(result);
 });
 
-app.MapGet("/users/{userId}/current-team", async ([FromRoute]int userId, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
-{
-    var result = await mediator.Send(new GetCurrentTeamRequest(userId), cancellationToken);
+app.MapGet("/users/{userId}/current-team",
+    async ([FromRoute] int userId, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+    {
+        var result = await mediator.Send(new GetCurrentTeamRequest(userId), cancellationToken);
 
-    return Results.Ok(result);
-});
+        return Results.Ok(result);
+    });
 
 app.Run();

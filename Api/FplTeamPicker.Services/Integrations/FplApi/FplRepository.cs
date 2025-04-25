@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FplTeamPicker.Services.Integrations.FplApi;
 
-public class FplRepository: IFplRepository, IDisposable
+public class FplRepository : IFplRepository, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _serializerOptions;
@@ -30,7 +30,7 @@ public class FplRepository: IFplRepository, IDisposable
         _logger = logger;
         _memoryCache = memoryCache;
     }
-    
+
     public async Task<User> GetUserDetailsAsync(CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
@@ -59,7 +59,8 @@ public class FplRepository: IFplRepository, IDisposable
             SelectedTeam = selectedTeam
         };
 
-        foreach (var pick in teamResult.Picks)
+        foreach (var pick in teamResult.Picks
+                     .Where(p => p.Position != (int)Position.Manager))
         {
             var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
             var selectedPlayer = new SelectedPlayer
@@ -89,7 +90,8 @@ public class FplRepository: IFplRepository, IDisposable
         var result = await MakeRequestAsync<ApiEntryPicks>(request, cancellationToken);
 
         var team = new SelectedTeam();
-        foreach (var pick in result.Picks)
+        foreach (var pick in result.Picks
+                     .Where(p => p.Position != (int)Position.Manager))
         {
             var playerDetails = await LookupPlayerAsync(pick.Id, cancellationToken);
             var selectedPlayer = new SelectedPlayer
@@ -157,7 +159,7 @@ public class FplRepository: IFplRepository, IDisposable
         {
             await DoBulkDataLoadAsync(cancellationToken);
         }
-        
+
         return _memoryCache.Get<List<Player>>(CacheKeys.Players)!;
     }
 
@@ -167,7 +169,7 @@ public class FplRepository: IFplRepository, IDisposable
         {
             await DoBulkDataLoadAsync(cancellationToken);
         }
-        
+
         return _memoryCache.Get<List<Manager>>(CacheKeys.Managers)!;
     }
 
@@ -177,7 +179,7 @@ public class FplRepository: IFplRepository, IDisposable
         {
             await DoBulkDataLoadAsync(cancellationToken);
         }
-        
+
         return _memoryCache.Get<List<Team>>(CacheKeys.Teams)!;
     }
 
@@ -215,7 +217,7 @@ public class FplRepository: IFplRepository, IDisposable
 
         return _memoryCache.TryGetValue(cacheKey, out playerDetails)
             ? playerDetails!
-            : throw new Exception("Player not found");
+            : throw new Exception($"Player not found {playerId}");
     }
 
     private async Task<TApiModel> MakeRequestAsync<TApiModel>(HttpRequestMessage request,
@@ -258,6 +260,7 @@ public class FplRepository: IFplRepository, IDisposable
         {
             managers.Add(player);
         }
+
         _memoryCache.Set(CacheKeys.Managers, managers);
     }
 
@@ -272,6 +275,7 @@ public class FplRepository: IFplRepository, IDisposable
             _memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
             players.Add(player);
         }
+
         _memoryCache.Set(CacheKeys.Players, players);
     }
 
@@ -285,6 +289,7 @@ public class FplRepository: IFplRepository, IDisposable
             _memoryCache.Set(CacheKeys.TeamLookup(team.Code), team);
             teams.Add(team);
         }
+
         _memoryCache.Set(CacheKeys.Teams, teams);
     }
 
