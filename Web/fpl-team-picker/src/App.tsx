@@ -29,9 +29,7 @@ const App = memo(function App() {
       new FplApi().myDetails.myDetailsList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<User>(false, err)),
     ]);
     const dataToSet = new AllData(myTeam, players, teams, leagues, myDetails);
-    setTimeout(() => {
-      setData(dataToSet);
-    }, 3000);
+    setData(dataToSet);
   }
 
   useEffect(() => {

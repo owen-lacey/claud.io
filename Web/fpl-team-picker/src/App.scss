@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: 13fr 8fr;
   grid-gap: 1rem;
-  grid-template-rows: 66px 3fr 1fr;
+  grid-template-rows: 66px auto;
   grid-template-areas: "header header" "my-team my-team" "leagues leagues" "players players";
 
   @media (min-width: 48rem) {
