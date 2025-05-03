@@ -3,6 +3,7 @@ import { DataContext } from "../App";
 import "../styles/sexy.scss";
 import { FplApi } from "../helpers/fpl-api";
 import { RivalTeam } from "../models/rival-league";
+import { LoadingCard } from "./utils/Loading";
 
 function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRivalTeams: (teams: RivalTeam[]) => void }) {
   const allData = useContext(DataContext);
@@ -17,9 +18,9 @@ function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRi
 
   const loadRivalTeams = async (selectedLeague: number) => {
     setRivalTeams([]);
-    const league = allData?.leagues.find(l => l.id == selectedLeague)!;
+    const league = allData?.leagues.output?.find(l => l.id == selectedLeague);
     const api = new FplApi();
-    const results = await Promise.all(league.participants?.map(async p => {
+    const results = await Promise.all(league!.participants?.map(async p => {
       const result = await api.users.currentTeamList(p.userId!);
       return new RivalTeam(p, result.data);
     }) || []);
@@ -32,8 +33,8 @@ function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRi
     }
   }, [leagueId]);
 
-  if (!allData) {
-    return <></>;
+  if (!allData?.myDetails.output || !allData?.leagues.output) {
+    return <LoadingCard />;
   }
   const { leagues, myDetails } = allData;
 
@@ -41,7 +42,7 @@ function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRi
     <h2 className="text-xl font-semibold mb-4">My Leagues</h2>
     <div className="flex flex-col">
       <div className="text-gray-500 text-xs"> Select a league &#x1F447;</div>
-      {leagues.map((league, i) => {
+      {leagues.output!.map((league, i) => {
         const selected = leagueId === league.id;
         let cls = 'relative flex mt-2 p-4 cursor-pointer sexy-container items-end border border-gray-200 hover:bg-gray-200 z-1';
         if (selected) {
@@ -50,7 +51,7 @@ function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRi
           cls += ' rounded-md'
         }
         return <div key={i}>
-          <div onClick={_ => setLeague(league.id!)} className={cls}>
+          <div onClick={() => setLeague(league.id!)} className={cls}>
             <div className="px-2 flex-1">{league!.name} {selected ? <span>&#x2705;</span> : <></>}</div>
             <div className="px-2 text-xs text-gray-500 font-mono uppercase">Pos: {league.currentPosition}/{league.numberOfPlayers}</div>
           </div>
@@ -63,7 +64,7 @@ function Leagues({ rivalTeams, setRivalTeams }: { rivalTeams: RivalTeam[], setRi
                   const bench = rt.team.bench!.map(p => p.player!);
                   const xp = startingXi!.reduce((a, b) => a + b.xpNext!, 0);
                   const xpBenchBoost = xp + bench!.reduce((a, b) => a + b.xpNext!, 0);
-                  const isCurrentUser = rt.rival.userId == myDetails.id;
+                  const isCurrentUser = rt.rival.userId == myDetails.output!.id;
 
                   return <tr key={i}>
                     <td>
