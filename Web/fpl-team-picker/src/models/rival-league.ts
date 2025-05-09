@@ -1,5 +1,5 @@
-import { LeagueParticipant, SelectedTeam } from "../helpers/api";
+import { LeagueParticipant, SelectedSquad } from "../helpers/api";
 
 export class RivalTeam {
-  constructor(public rival: LeagueParticipant, public team: SelectedTeam) { }
+  constructor(public rival: LeagueParticipant, public team: SelectedSquad) { }
 }
