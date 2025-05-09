@@ -32,12 +32,28 @@ export interface LeagueParticipant {
   total?: number;
 }
 
+export interface Manager {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  cost?: number;
+  firstName?: string | null;
+  secondName?: string | null;
+  /** @format double */
+  xpNext?: number;
+  /** @format double */
+  xpThis?: number;
+  /** @format int32 */
+  team?: number;
+  name?: string | null;
+}
+
 export interface MyTeam {
   /** @format int32 */
   freeTransfers?: number;
   /** @format int32 */
   bank?: number;
-  selectedTeam?: SelectedTeam;
+  selectedSquad?: SelectedSquad;
   /** @format int32 */
   budget?: number;
 }
@@ -58,6 +74,8 @@ export interface Player {
   xpThis?: number;
   /** @format int32 */
   team?: number;
+  /** @format int32 */
+  seasonPoints?: number;
   name?: string | null;
   isAvailable?: boolean;
 }
@@ -68,6 +86,7 @@ export enum Position {
   Value2 = 2,
   Value3 = 3,
   Value4 = 4,
+  Value5 = 5,
 }
 
 export interface SelectedPlayer {
@@ -78,7 +97,7 @@ export interface SelectedPlayer {
   sellingPrice?: number;
 }
 
-export interface SelectedTeam {
+export interface SelectedSquad {
   startingXi?: SelectedPlayer[] | null;
   bench?: SelectedPlayer[] | null;
   /** @format int32 */
@@ -87,6 +106,14 @@ export interface SelectedTeam {
   predictedPoints?: number;
   /** @format double */
   benchBoostPredictedPoints?: number;
+}
+
+export interface SelectedTeam {
+  startingXi?: SelectedPlayer[] | null;
+  /** @format int32 */
+  squadCost?: number;
+  /** @format double */
+  score?: number;
 }
 
 export interface Team {
@@ -293,6 +320,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  tots = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name TotsCreate
+     * @request POST:/tots
+     */
+    totsCreate: (params: RequestParams = {}) =>
+      this.request<SelectedTeam, any>({
+        path: `/tots`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
+  };
   myDetails = {
     /**
      * No description
@@ -373,6 +416,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
+  managers = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name ManagersList
+     * @request GET:/managers
+     */
+    managersList: (params: RequestParams = {}) =>
+      this.request<Manager[], any>({
+        path: `/managers`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
   users = {
     /**
      * No description
@@ -382,7 +441,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/users/{userId}/current-team
      */
     currentTeamList: (userId: number, params: RequestParams = {}) =>
-      this.request<SelectedTeam, any>({
+      this.request<SelectedSquad, any>({
         path: `/users/${userId}/current-team`,
         method: "GET",
         format: "json",

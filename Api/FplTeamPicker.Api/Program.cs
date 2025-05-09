@@ -3,6 +3,7 @@ using FplTeamPicker.Api.IoC;
 using FplTeamPicker.Api.Providers;
 using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Services.Integrations.FplApi.Constants;
+using FplTeamPicker.Services.UseCases.CalculateTots;
 using FplTeamPicker.Services.UseCases.CalculateTransfers;
 using FplTeamPicker.Services.UseCases.CalculateWildcard;
 using FplTeamPicker.Services.UseCases.GetCurrentTeam;
@@ -56,55 +57,61 @@ app.MapPost("/transfers", async ([FromServices] IMediator mediator, Cancellation
 {
     var result = await mediator.Send(new CalculateTransfersRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapPost("/wildcard", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var team = await mediator.Send(new CalculateWildcardRequest(), cancellationToken);
-    return Results.Ok(team);
+    return TypedResults.Ok(team);
+});
+
+app.MapPost("/tots", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+{
+    var team = await mediator.Send(new CalculateTotsRequest(), cancellationToken);
+    return TypedResults.Ok(team);
 });
 
 app.MapGet("/my-details", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetMeRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/my-team", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetMyTeamRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/my-leagues", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetLeaguesRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/teams", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetTeamsRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/players", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetPlayersRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/managers", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetManagersRequest(), cancellationToken);
 
-    return Results.Ok(result);
+    return TypedResults.Ok(result);
 });
 
 app.MapGet("/users/{userId}/current-team",
@@ -112,7 +119,7 @@ app.MapGet("/users/{userId}/current-team",
     {
         var result = await mediator.Send(new GetCurrentTeamRequest(userId), cancellationToken);
 
-        return Results.Ok(result);
+        return TypedResults.Ok(result);
     });
 
 app.Run();

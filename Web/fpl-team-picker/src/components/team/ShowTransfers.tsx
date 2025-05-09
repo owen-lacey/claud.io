@@ -7,8 +7,8 @@ import { DataContext } from "../../App";
 
 function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { startingXi: SelectedPlayer[], bench: SelectedPlayer[], transferPenaliseCount: number, bank: number }) {
   const allData = useContext(DataContext);
-  const existingStartingXi = allData?.myTeam.selectedTeam?.startingXi!;
-  const existingBench = allData?.myTeam.selectedTeam?.bench!;
+  const existingStartingXi = allData!.myTeam!.output!.selectedSquad!.startingXi!;
+  const existingBench = allData!.myTeam!.output!.selectedSquad!.bench!;
   const playersIn = [
     ...startingXi.filter(p => existingStartingXi.every(ep => ep.player?.id != p.player?.id) && existingBench.every(ep => ep.player?.id != p.player?.id)),
     ...bench.filter(p => existingStartingXi.every(ep => ep.player?.id != p.player?.id) && existingBench.every(ep => ep.player?.id != p.player?.id))
@@ -39,7 +39,7 @@ function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { sta
               return <tr key={i} className={playerBg(playerOut)}>
                 <td><ChevronRightIcon className="text-red-500 h-6 w-6 ml-2" /></td>
                 <td className="font-medium px-2">{playerOut.name}</td>
-                <td className="px-2 text-sm">{lookupTeam(playerOut!.team!, allData!.teams).shortName}</td>
+                <td className="px-2 text-sm">{lookupTeam(playerOut!.team!, allData!.teams.output!).shortName}</td>
                 <td className="px-2 text-gray-500 font-mono text-sm text-right">
                   £{(playerOut.cost! / 10).toFixed(1)}
                 </td>
@@ -48,7 +48,7 @@ function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { sta
                 </td>
                 <td><ChevronRightIcon className="text-green-500 h-6 w-6 ml-2" /></td>
                 <td className="font-medium px-2">{playerIn.name}</td>
-                <td className="px-2 text-sm">{lookupTeam(playerIn!.team!!, allData!.teams).shortName}</td>
+                <td className="px-2 text-sm">{lookupTeam(playerIn!.team!, allData!.teams.output!).shortName}</td>
                 <td className="px-2 text-gray-500 font-mono text-sm text-right">
                   £{(playerIn.cost! / 10).toFixed(1)}
                 </td>

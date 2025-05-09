@@ -8,7 +8,7 @@ public interface IFplRepository
 
     Task<MyTeam> GetMyTeamAsync(CancellationToken cancellationToken);
     
-    Task<SelectedTeam> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken);
+    Task<SelectedSquad> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken);
     
     Task<List<League>> GetLeaguesAsync(CancellationToken cancellationToken);
 

@@ -3,11 +3,13 @@ using FluentAssertions.Execution;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
+using FplTeamPicker.Services.Optimisation.UseCases.Transfers;
+using FplTeamPicker.Services.Optimisation.UseCases.Wildcard;
 using FplTeamPicker.Tests.Optimisation.Builders;
 
 namespace FplTeamPicker.Tests.Optimisation;
 
-public class FplTeamTransfersSolverTests
+public class TransfersSolverTests
 {
     [Fact]
     public void BetterPlayerIsTooExpensive_NotTransferredIn()
@@ -31,8 +33,8 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 100,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {expensivePlayer}, options, 1, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, [expensivePlayer], options, 1, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -64,8 +66,8 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 3,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, new List<Player>{expensivePlayer}, options, 1, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, [expensivePlayer], options, 1, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -97,8 +99,8 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 100,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {expensivePlayer}, options, 1, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, [expensivePlayer], options, 1, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -136,8 +138,8 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = 100,
             StartingTeamCount = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, existingPlayers, options, 4, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, existingPlayers, options, 4, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -180,8 +182,8 @@ public class FplTeamTransfersSolverTests
             StartingTeamCount = 4,
             TransferPointsPenalty = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, existingPlayers, options, freeTransfers, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, existingPlayers, options, freeTransfers, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -218,8 +220,8 @@ public class FplTeamTransfersSolverTests
             StartingTeamCount = 4,
             TransferPointsPenalty = 4
         };
-        var model = new FplTeamTransfersRequest(existingTeam, new List<Player> {betterPlayer}, options, 0, 0);
-        var solver = new FplTeamTransfersSolver(model);
+        var model = new TransfersModelInput(existingTeam, [betterPlayer], options, 0, 0);
+        var solver = new TransfersSolver(model);
 
         var output = solver.Solve();
 
@@ -271,8 +273,8 @@ public class FplTeamTransfersSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 

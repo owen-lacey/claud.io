@@ -26,7 +26,7 @@ function Players() {
             <td className="font-medium flex justify-between items-center px-2">
               <div className="flex items-center px-2">
                 {player.name}
-                <SelectionIcon player={player} team={myTeam.output!.selectedTeam!} />
+                <SelectionIcon player={player} team={myTeam.output!.selectedSquad!} />
               </div>
               {showRivalSelectionCount ? <RivalSelectionCount rivalTeams={rivalTeams} playerId={player!.id!} /> : <></>}
             </td>

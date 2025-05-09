@@ -55,7 +55,7 @@ function CalculateModal({ open, onClose }: { open: boolean, onClose: () => void 
                   <ShowTransfers transferPenaliseCount={Math.min(transfers!.freeTransfers!, 0)} startingXi={transfers.startingXi!} bench={transfers.bench!} bank={transfers.bank!} />
                 </TabPanel>
                 <TabPanel className="p-0 rounded-xl bg-white/5">
-                  <ShowTransfers transferPenaliseCount={0} startingXi={wildcard.selectedTeam!.startingXi!} bench={wildcard.selectedTeam!.bench!} bank={wildcard.bank!} />
+                  <ShowTransfers transferPenaliseCount={0} startingXi={wildcard.selectedSquad!.startingXi!} bench={wildcard.selectedSquad!.bench!} bank={wildcard.bank!} />
                 </TabPanel>
               </TabPanels>
             </TabGroup>

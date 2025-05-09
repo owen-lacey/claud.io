@@ -48,5 +48,17 @@ public class FplOptions
         TransferPointsPenalty = 4
     };
 
+    public static FplOptions RealWorldXi => new()
+    {
+        MaxPlayersPerTeam = 3,
+        MinTeamDefenders = 3,
+        MinTeamMidfielders = 2,
+        MinTeamForwards = 1,
+        SquadDefenderCount = 5,
+        SquadMidfielderCount = 5,
+        SquadForwardCount = 3,
+        StartingTeamCount = 11
+    };
+
     public Player? GetRidOf { get; set; }
 }

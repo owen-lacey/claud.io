@@ -1,10 +1,11 @@
 using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation.Models;
 
-namespace FplTeamPicker.Services.Optimisation.Models;
+namespace FplTeamPicker.Services.Optimisation.UseCases.Transfers;
 
-public record FplTeamTransfersRequest
+public record TransfersModelInput
 {
-    public FplTeamTransfersRequest(
+    public TransfersModelInput(
         List<Player> existingPlayers,
         List<Player> otherPlayers,
         FplOptions options,

@@ -3,4 +3,4 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.GetCurrentTeam;
 
-public record GetCurrentTeamRequest(int UserId) : IRequest<SelectedTeam>;
+public record GetCurrentTeamRequest(int UserId) : IRequest<SelectedSquad>;

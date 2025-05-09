@@ -28,6 +28,8 @@ public record ApiPlayerDetails
 
     public int Team { get; set; }
 
+    public int TotalPoints { get; set; }
+
     public Player ToPlayer()
     {
         return new Player
@@ -39,7 +41,8 @@ public record ApiPlayerDetails
             XpThis = decimal.Parse(XpThis),
             Cost = Cost,
             Id = Id,
-            Team = Team
+            Team = Team,
+            SeasonPoints = TotalPoints
         };
     }
 

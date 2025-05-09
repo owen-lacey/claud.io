@@ -3,6 +3,7 @@ using FplTeamPicker.Domain.Extensions;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
+using FplTeamPicker.Services.Optimisation.UseCases.Transfers;
 using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateTransfers;
@@ -23,18 +24,18 @@ public class CalculateTransfersHandler
 
         players.PopulateCostsFrom(currentTeam);
 
-        var existingPlayers = currentTeam.SelectedTeam.StartingXi
-            .Concat(currentTeam.SelectedTeam.Bench)
+        var existingPlayers = currentTeam.SelectedSquad.StartingXi
+            .Concat(currentTeam.SelectedSquad.Bench)
             .OrderBy(r => r.Player.Id)
             .ToList();
         var otherPlayers = players.Where(p => existingPlayers.All(ep => ep.Player.Id != p.Id)).ToList();
-        var solverRequest = new FplTeamTransfersRequest(
+        var solverRequest = new TransfersModelInput(
             existingPlayers.Select(p => p.Player).ToList(),
             otherPlayers,
             FplOptions.RealWorld,
             currentTeam.FreeTransfers,
             currentTeam.Bank);
-        var solver = new FplTeamTransfersSolver(solverRequest);
+        var solver = new TransfersSolver(solverRequest);
         var transfers = solver.Solve();
 
         var playersIn = transfers.StartingXi
@@ -59,7 +60,7 @@ public class CalculateTransfersHandler
                 .ThenByDescending(p => p.Player.XpNext)
                 .ToList(),
             FreeTransfers = currentTeam.FreeTransfers - playersIn.Count,
-            Bank = currentTeam.Bank + currentTeam.SelectedTeam.SquadCost - transfers.SquadCost
+            Bank = currentTeam.Bank + currentTeam.SelectedSquad.SquadCost - transfers.SquadCost
         };
     }
 }

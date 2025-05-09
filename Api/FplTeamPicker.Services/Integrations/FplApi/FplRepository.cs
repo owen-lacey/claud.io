@@ -51,12 +51,12 @@ public class FplRepository : IFplRepository, IDisposable
         var userId = await GetManagerIdAsync(cancellationToken);
         var teamRequest = new HttpRequestMessage(HttpMethod.Get, $"api/my-team/{userId}");
         var teamResult = await MakeRequestAsync<ApiTeam>(teamRequest, cancellationToken);
-        var selectedTeam = new SelectedTeam();
+        var selectedTeam = new SelectedSquad();
         var team = new MyTeam
         {
             Bank = teamResult.Transfers.Bank,
             FreeTransfers = teamResult.Transfers.Limit - teamResult.Transfers.Made,
-            SelectedTeam = selectedTeam
+            SelectedSquad = selectedTeam
         };
 
         foreach (var pick in teamResult.Picks
@@ -84,12 +84,12 @@ public class FplRepository : IFplRepository, IDisposable
         return team;
     }
 
-    public async Task<SelectedTeam> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken)
+    public async Task<SelectedSquad> GetSelectedTeamAsync(int userId, int gameweek, CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"api/entry/{userId}/event/{gameweek}/picks");
         var result = await MakeRequestAsync<ApiEntryPicks>(request, cancellationToken);
 
-        var team = new SelectedTeam();
+        var team = new SelectedSquad();
         foreach (var pick in result.Picks
                      .Where(p => p.Position != (int)Position.Manager))
         {

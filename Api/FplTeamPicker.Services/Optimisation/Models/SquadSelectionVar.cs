@@ -7,9 +7,9 @@ namespace FplTeamPicker.Services.Optimisation.Models;
 /// Position-specific variables for player selections.
 /// Only one of these variables will ever be set to true.
 /// </summary>
-public class FplPlayerSelectionVar
+public class SquadSelectionVar
 {
-    public FplPlayerSelectionVar(CpModel model, Player player)
+    public SquadSelectionVar(CpModel model, Player player)
     {
         Id = player.Id;
         SquadSelected = model.NewBoolVar($"{player.Id}_squad_selected");

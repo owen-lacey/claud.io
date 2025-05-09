@@ -1,24 +1,24 @@
-import { Player, SelectedTeam } from "../../helpers/api";
+import { Player, SelectedSquad } from "../../helpers/api";
 
-function SelectionIcon({player, team}: {player: Player, team: SelectedTeam}) {
+function SelectionIcon({ player, team }: { player: Player, team: SelectedSquad }) {
 
-    let badgeText = '';
-    let cls = '';
-    const inXi = team.startingXi!.some(p => p.player?.id === player.id);
-    if (inXi) {
-        badgeText = 'XI';
-        cls = 'bg-gray-700 text-gray-200'
-    }
-    const onBench = team.bench!.some(p => p.player?.id === player.id);
-    if (onBench) {
-        badgeText = 'B';
-        cls = 'border border-gray-700 text-gray-700'
-    }
+  let badgeText = '';
+  let cls = '';
+  const inXi = team.startingXi!.some(p => p.player?.id === player.id);
+  if (inXi) {
+    badgeText = 'XI';
+    cls = 'bg-gray-700 text-gray-200'
+  }
+  const onBench = team.bench!.some(p => p.player?.id === player.id);
+  if (onBench) {
+    badgeText = 'B';
+    cls = 'border border-gray-700 text-gray-700'
+  }
 
-    if (!badgeText) {
-        return <></>;
-    }
-    return <div className={'text-xs rounded-sm font-mono mx-1 px-2 ' + cls}>{badgeText}</div>
+  if (!badgeText) {
+    return <></>;
+  }
+  return <div className={'text-xs rounded-sm font-mono mx-1 px-2 ' + cls}>{badgeText}</div>
 }
 
 export default SelectionIcon;

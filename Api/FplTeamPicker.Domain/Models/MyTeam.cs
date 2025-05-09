@@ -6,7 +6,7 @@ public record MyTeam
 
     public int Bank { get; set; }
 
-    public SelectedTeam SelectedTeam { get; set; } = null!;
+    public SelectedSquad SelectedSquad { get; set; } = null!;
 
-    public int Budget => Bank + SelectedTeam.SquadCost;
+    public int Budget => Bank + SelectedSquad.SquadCost;
 }

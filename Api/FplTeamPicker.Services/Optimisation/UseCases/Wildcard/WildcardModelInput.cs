@@ -1,10 +1,11 @@
 using FplTeamPicker.Domain.Models;
+using FplTeamPicker.Services.Optimisation.Models;
 
-namespace FplTeamPicker.Services.Optimisation.Models;
+namespace FplTeamPicker.Services.Optimisation.UseCases.Wildcard;
 
-public class PickFplTeamModel
+public class WildcardModelInput
 {
-    public PickFplTeamModel(List<Player> players, FplOptions options, int budget)
+    public WildcardModelInput(List<Player> players, FplOptions options, int budget)
     {
         Players = players;
         Options = options;

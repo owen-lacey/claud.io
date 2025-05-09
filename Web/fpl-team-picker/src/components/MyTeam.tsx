@@ -36,7 +36,7 @@ function MyTeam() {
     <table>
       <tbody>
         <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>XI</td></tr>
-        {myTeam.output!.selectedTeam!.startingXi!.map((player, index) => (
+        {myTeam.output!.selectedSquad!.startingXi!.map((player, index) => (
           <tr key={index} className={playerBg(player.player!)}>
             <td className="font-medium flex justify-between items-center px-2">
               <div>{player.player!.name}</div>
@@ -48,7 +48,7 @@ function MyTeam() {
           </tr>
         ))}
         <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>bench</td></tr>
-        {myTeam.output!.selectedTeam!.bench!.map((player, index) => (
+        {myTeam.output!.selectedSquad!.bench!.map((player, index) => (
           <tr key={index} className={playerBg(player.player!)}>
             <td className="font-medium flex justify-between items-center px-2">
               <div>{player.player!.name}</div>
@@ -63,7 +63,7 @@ function MyTeam() {
     </table>
     <div className="flex justify-end py-4 text-blue-500 text-sm">
       <div>XP (bench boost):&nbsp;</div>
-      <div className="font-mono">{myTeam.output!.selectedTeam!.predictedPoints?.toFixed(1)} ({myTeam.output!.selectedTeam!.benchBoostPredictedPoints?.toFixed(1)})</div>
+      <div className="font-mono">{myTeam.output!.selectedSquad!.predictedPoints?.toFixed(1)} ({myTeam.output!.selectedSquad!.benchBoostPredictedPoints?.toFixed(1)})</div>
     </div>
     <div className="flex justify-end mb-2">
       <button onClick={() => setShowCalculateModal(true)} className="border text-sm border-gray-200 p-2 bg-linear-to-r from-[rgb(10,229,255)] to-[rgb(66,162,255)]">&#x1F916; Calculate transfers</button>

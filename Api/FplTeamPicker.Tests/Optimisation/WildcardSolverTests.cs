@@ -3,11 +3,12 @@ using FluentAssertions.Execution;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Optimisation;
 using FplTeamPicker.Services.Optimisation.Models;
+using FplTeamPicker.Services.Optimisation.UseCases.Wildcard;
 using FplTeamPicker.Tests.Optimisation.Builders;
 
 namespace FplTeamPicker.Tests.Optimisation;
 
-public class PickFplTeamSolverTests
+public class WildcardSolverTests
 {
     [Fact]
     public void LotsOfGoodPlayersPlayForTeam_PicksWorsePlayersToNotExceedMaxPlayersRule()
@@ -35,8 +36,8 @@ public class PickFplTeamSolverTests
             StartingTeamCount = 4
         };
         const int budget = 10;
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 
@@ -67,8 +68,8 @@ public class PickFplTeamSolverTests
             StartingTeamCount = 3
         };
         const int budget = 10;
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 
@@ -105,8 +106,8 @@ public class PickFplTeamSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 
@@ -144,8 +145,8 @@ public class PickFplTeamSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 
@@ -190,8 +191,8 @@ public class PickFplTeamSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new PickFplTeamModel(players, options, budget);
-        var solver = new PickFplTeamSolver(model);
+        var model = new WildcardModelInput(players, options, budget);
+        var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
 

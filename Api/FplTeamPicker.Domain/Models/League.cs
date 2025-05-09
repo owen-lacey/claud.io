@@ -8,7 +8,7 @@ public class League
 
     public int CurrentPosition { get; set; }
 
-    public List<LeagueParticipant> Participants { get; set; } = new List<LeagueParticipant>();
+    public List<LeagueParticipant> Participants { get; set; } = [];
 
     public int NumberOfPlayers => Participants.Count;
 }

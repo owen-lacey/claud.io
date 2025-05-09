@@ -19,6 +19,8 @@ public record Player
     public decimal XpThis { get; set; }
 
     public int Team { get; set; }
+    
+    public int SeasonPoints { get; init; }
 
     public string Name => $"{FirstName} {SecondName}";
 
