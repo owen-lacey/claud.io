@@ -1,8 +1,10 @@
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Caching.Constants;
+using FplTeamPicker.Services.Integrations.FplApi.Exceptions;
 using FplTeamPicker.Services.Integrations.FplApi.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -36,6 +38,10 @@ public class FplRepository : IFplRepository, IDisposable
         var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
         var result = await MakeRequestAsync<ApiUserDetails>(request, cancellationToken);
 
+        if (result.User == null)
+        {
+            throw new FplApiException(HttpStatusCode.Unauthorized, $"Unable to get user details.");
+        }
         _memoryCache.Set(CacheKeys.UserLookup(_fplUserProvider.GetUserId()), result.User.Entry);
 
         return new User
@@ -200,7 +206,7 @@ public class FplRepository : IFplRepository, IDisposable
         {
             var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
             var result = await MakeRequestAsync<ApiUserDetails>(request, cancellationToken);
-            managerId = result.User.Entry;
+            managerId = result.User?.Entry ?? throw new FplApiException(HttpStatusCode.Unauthorized, "Unable to get user details");
             _memoryCache.Set(cacheKey, managerId);
         }
 
@@ -230,7 +236,7 @@ public class FplRepository : IFplRepository, IDisposable
         {
             var errorMessage = await response.Content.ReadAsStringAsync(cancellationToken);
             _logger.LogError("API Error: {StatusCode} {Message}", response.StatusCode, errorMessage);
-            throw new Exception("API Request failed");
+            throw new FplApiException(response.StatusCode, errorMessage);
         }
 
         var result = await response.Content.ReadFromJsonAsync<TApiModel>(_serializerOptions, cancellationToken);

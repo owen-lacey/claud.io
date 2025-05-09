@@ -1,6 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { DataContext } from "../App";
-import "../styles/sexy.scss";
 import { FplApi } from "../helpers/fpl-api";
 import { RivalTeam } from "../models/rival-league";
 import { LoadingCard } from "./utils/Loading";

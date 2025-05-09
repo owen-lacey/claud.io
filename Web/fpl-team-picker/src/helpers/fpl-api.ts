@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { Api, ApiConfig } from "./api.ts";
 
 export class FplApi extends Api<unknown> {
@@ -9,6 +10,13 @@ export class FplApi extends Api<unknown> {
         pl_profile: cookieVal
       }
     };
+
     super(config);
+
+    this.instance.interceptors.response.use((res) => res, (error: AxiosError) => {
+      if (error.status === 401) {
+        localStorage.removeItem('pl_profile');
+      }
+    });
   }
 }
