@@ -9,6 +9,7 @@ public class FplPlayerBuilder
     private readonly Position _position;
     private int _cost;
     private decimal _xpNext;
+    private int _seasonPoints;
 
     public FplPlayerBuilder(int team, Position position)
     {
@@ -19,6 +20,12 @@ public class FplPlayerBuilder
     public FplPlayerBuilder WithCost(int cost)
     {
         _cost = cost;
+        return this;
+    }
+
+    public FplPlayerBuilder WithSeasonPoints(int seasonPoints)
+    {
+        _seasonPoints = seasonPoints;
         return this;
     }
 
@@ -38,7 +45,8 @@ public class FplPlayerBuilder
             Cost = _cost,
             Team = _team,
             Position = _position,
-            XpNext = _xpNext
+            XpNext = _xpNext,
+            SeasonPoints = _seasonPoints
         };
     }
 }

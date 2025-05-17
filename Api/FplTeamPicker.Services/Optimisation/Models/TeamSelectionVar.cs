@@ -12,7 +12,6 @@ public class TeamSelectionVar
         Position = player.Position;
         Team = player.Team;
         Cost = player.Cost;
-        Points = player.XpNext;
     }
 
     public int Id { get; init; }
@@ -24,6 +23,4 @@ public class TeamSelectionVar
     public int Team { get; init; }
 
     public decimal Cost { get; init; }
-
-    public decimal Points { get; init; }
 }

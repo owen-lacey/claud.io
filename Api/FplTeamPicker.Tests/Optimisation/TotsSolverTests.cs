@@ -16,7 +16,7 @@ public class TotsSolverTests
         const int teamTwo = 2;
         var goodPlayers = Enumerable.Range(0, 3)
             .Select(_ => new FplPlayerBuilder(teamOne, Position.Defender)
-                .WithPredictedPoints(100)
+                .WithSeasonPoints(100)
                 .Build())
             .ToList();
         var badPlayers = Enumerable.Range(0, 3)
@@ -24,12 +24,11 @@ public class TotsSolverTests
             .ToList();
         var players = goodPlayers
             .Concat(badPlayers)
-            .Concat(new List<Player> { new FplPlayerBuilder(teamTwo, Position.Goalkeeper).Build() })
+            .Concat([new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build()])
             .OrderBy(r => r.Id)
             .ToList();
         var options = new FplOptions
         {
-            SquadGoalkeeperCount = 1,
             SquadDefenderCount = 3,
             MaxPlayersPerTeam = 2,
             StartingTeamCount = 4
@@ -56,17 +55,16 @@ public class TotsSolverTests
         var players = new List<Player>
             {
                 new FplPlayerBuilder(1, Position.Goalkeeper).Build(),
-                new FplPlayerBuilder(2, Position.Defender).WithPredictedPoints(100).Build(),
-                new FplPlayerBuilder(3, Position.Defender).WithPredictedPoints(100).Build(),
-                new FplPlayerBuilder(4, Position.Defender).WithPredictedPoints(100).Build(),
-                new FplPlayerBuilder(5, Position.Defender).WithPredictedPoints(100).Build(),
+                new FplPlayerBuilder(2, Position.Defender).WithSeasonPoints(100).Build(),
+                new FplPlayerBuilder(3, Position.Defender).WithSeasonPoints(100).Build(),
+                new FplPlayerBuilder(4, Position.Defender).WithSeasonPoints(100).Build(),
+                new FplPlayerBuilder(5, Position.Defender).WithSeasonPoints(100).Build(),
                 new FplPlayerBuilder(6, Position.Midfielder).Build()
             }
             .OrderBy(r => r.Id)
             .ToList();
         var options = new FplOptions
         {
-            SquadGoalkeeperCount = 1,
             SquadDefenderCount = 1,
             SquadMidfielderCount = 1,
             StartingTeamCount = 3
@@ -93,7 +91,7 @@ public class TotsSolverTests
         const int teamOne = 1;
         var expensivePlayer = new FplPlayerBuilder(teamOne, Position.Forward)
             .WithCost(26)
-            .WithPredictedPoints(100)
+            .WithSeasonPoints(100)
             .Build();
         var players = new List<Player>
             {
@@ -108,7 +106,6 @@ public class TotsSolverTests
         const int budget = 100;
         var options = new FplOptions
         {
-            SquadGoalkeeperCount = 1,
             SquadDefenderCount = 1,
             SquadMidfielderCount = 1,
             SquadForwardCount = 1,
@@ -134,25 +131,23 @@ public class TotsSolverTests
     }
 
     [Fact]
-    public void PlayersAreWithinBudget_MaximisesPlayerSelection()
+    public void AllPlayersCanBePicked_MaximisesSeasonPoints()
     {
         const int teamOne = 1;
-        var badForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(49).WithCost(25).Build();
-        var goodForward = new FplPlayerBuilder(teamOne, Position.Forward).WithPredictedPoints(51).WithCost(25).Build();
+        var badForward = new FplPlayerBuilder(teamOne, Position.Forward).WithSeasonPoints(49).Build();
+        var goodForward = new FplPlayerBuilder(teamOne, Position.Forward).WithSeasonPoints(51).Build();
         var players = new List<Player>
-            {
-                new FplPlayerBuilder(teamOne, Position.Goalkeeper).WithCost(25).Build(),
-                new FplPlayerBuilder(teamOne, Position.Defender).WithCost(25).Build(),
-                new FplPlayerBuilder(teamOne, Position.Midfielder).WithCost(25).Build(),
-                goodForward,
-                badForward
-            }
-            .OrderBy(r => r.Id)
-            .ToList();
-        const int budget = 100;
+        {
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build(),
+            new FplPlayerBuilder(teamOne, Position.Defender).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).Build(),
+            goodForward,
+            badForward
+        }
+        .OrderBy(p => p.Id)
+        .ToList();
         var options = new FplOptions
         {
-            SquadGoalkeeperCount = 1,
             SquadDefenderCount = 1,
             SquadMidfielderCount = 1,
             SquadForwardCount = 1,
@@ -162,8 +157,7 @@ public class TotsSolverTests
         var model = new TotsModelInput
         {
             Players = players,
-            Options = options,
-            Budget = budget
+            Options = options
         };
         var solver = new TotsSolver(model);
 
@@ -171,11 +165,10 @@ public class TotsSolverTests
 
         using (new AssertionScope())
         {
-            output.StartingXi.Should().HaveCountGreaterThan(0, "we should have at least one player");
             output.StartingXi.Any(p => p.Player.Id == badForward.Id).Should().BeFalse(
-                "we should not select the player with the lower selection percentage");
+                "we should not select the player with the lower season points");
             output.StartingXi.Any(p => p.Player.Id == goodForward.Id).Should().BeTrue(
-                "we should select the player that has a higher selection percentage");
+                "we should select the player that has a higher season points");
         }
     }
 }

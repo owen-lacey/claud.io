@@ -84,10 +84,10 @@ public class TotsSolver(TotsModelInput input)
 
         AddCostConstraint(model);
 
-        AddTeamConstraints(model);
+        AddPositionConstraints(model);
     }
 
-    private void AddTeamConstraints(TotsCpModel model)
+    private void AddPositionConstraints(TotsCpModel model)
     {
         var teamGoalkeepers = LinearExpr.Sum(model.SelectedGks.Select(p => p.Selected));
         var teamDefenders = LinearExpr.Sum(model.SelectedDefs.Select(p => p.Selected));
