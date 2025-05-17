@@ -28,7 +28,17 @@ public record ApiPlayerDetails
 
     public int Team { get; set; }
 
+    public string SelectedByPercent { get; set; }
+
     public int TotalPoints { get; set; }
+
+    public DateOnly? BirthDate { get; set; }
+
+    public int YellowCards { get; set; }
+
+    public int TransfersOut { get; set; }
+
+    public int RedCards { get; set; }
 
     public Player ToPlayer()
     {
@@ -42,7 +52,12 @@ public record ApiPlayerDetails
             Cost = Cost,
             Id = Id,
             Team = Team,
-            SeasonPoints = TotalPoints
+            SeasonPoints = TotalPoints,
+            SelectedByPercent = decimal.Parse(SelectedByPercent),
+            BirthDate = BirthDate,
+            YellowCards = YellowCards,
+            RedCards = RedCards,
+            TransfersOut = TransfersOut,
         };
     }
 

@@ -18,9 +18,19 @@ public record Player
 
     public decimal XpThis { get; set; }
 
+    public decimal SelectedByPercent { get; set; }
+
     public int Team { get; set; }
-    
+
     public int SeasonPoints { get; init; }
+    
+    public int YellowCards { get; set; }
+    
+    public DateOnly? BirthDate { get; set; }
+    
+    public int RedCards { get; set; }
+    
+    public int TransfersOut { get; set; }
 
     public string Name => $"{FirstName} {SecondName}";
 
