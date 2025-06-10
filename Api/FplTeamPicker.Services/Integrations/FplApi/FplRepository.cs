@@ -61,7 +61,7 @@ public class FplRepository : IFplRepository, IDisposable
         var team = new MyTeam
         {
             Bank = teamResult.Transfers.Bank,
-            FreeTransfers = teamResult.Transfers.Limit - teamResult.Transfers.Made,
+            FreeTransfers = (teamResult.Transfers.Limit ?? 0) - teamResult.Transfers.Made,
             SelectedSquad = selectedTeam
         };
 

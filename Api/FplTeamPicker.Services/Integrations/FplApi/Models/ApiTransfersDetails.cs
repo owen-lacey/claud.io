@@ -6,7 +6,7 @@ public record ApiTransfersDetails
 
     public int Value { get; set; }
 
-    public int Limit { get; set; }
+    public int? Limit { get; set; }
 
     public int Made { get; set; }
 }

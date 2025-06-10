@@ -1,15 +1,15 @@
 import { Player, SelectedSquad } from "../../helpers/api";
 
-function SelectionIcon({ player, team }: { player: Player, team: SelectedSquad }) {
+function SelectionIcon({ player, team }: { player: Player, team: SelectedSquad | null }) {
 
   let badgeText = '';
   let cls = '';
-  const inXi = team.startingXi!.some(p => p.player?.id === player.id);
+  const inXi = team?.startingXi!.some(p => p.player?.id === player.id);
   if (inXi) {
     badgeText = 'XI';
     cls = 'bg-gray-700 text-gray-200'
   }
-  const onBench = team.bench!.some(p => p.player?.id === player.id);
+  const onBench = team?.bench!.some(p => p.player?.id === player.id);
   if (onBench) {
     badgeText = 'B';
     cls = 'border border-gray-700 text-gray-700'

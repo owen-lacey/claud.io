@@ -10,7 +10,7 @@ function Players() {
   const allData = useContext(DataContext);
   const rivalTeams = useContext(RivalTeamsContext);
 
-  if (!allData?.players.output || !allData?.teams.output || !allData?.myTeam.output) {
+  if (!allData?.players.output || !allData?.teams.output) {
     return <LoadingCard />;
   }
 
@@ -26,7 +26,7 @@ function Players() {
             <td className="font-medium flex justify-between items-center px-2">
               <div className="flex items-center px-2">
                 {player.name}
-                <SelectionIcon player={player} team={myTeam.output!.selectedSquad!} />
+                <SelectionIcon player={player} team={myTeam.output?.selectedSquad || null} />
               </div>
               {showRivalSelectionCount ? <RivalSelectionCount rivalTeams={rivalTeams} playerId={player!.id!} /> : <></>}
             </td>

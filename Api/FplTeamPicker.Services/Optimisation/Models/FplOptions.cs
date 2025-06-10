@@ -45,7 +45,8 @@ public class FplOptions
         MinTeamMidfielders = 2,
         MinTeamForwards = 1,
         StartingTeamCount = 11,
-        TransferPointsPenalty = 4
+        TransferPointsPenalty = 4,
+        UsefulBenchPlayers = 3
     };
 
     public static FplOptions RealWorldXi => new()
