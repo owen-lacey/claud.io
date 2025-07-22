@@ -9,8 +9,6 @@ public static class CacheKeys
     public const string Players = "players";
     
     public const string Managers = "managers";
-
-    public static string UserLookup(int userId) => $"user-{userId}";
     
     public static string PlayerLookup(int playerId) => $"player-{playerId}";
     

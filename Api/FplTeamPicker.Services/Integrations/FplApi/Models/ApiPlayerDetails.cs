@@ -14,7 +14,7 @@ public record ApiPlayerDetails
 
     [JsonPropertyName("ep_next")] public string? XpNext { get; set; }
 
-    [JsonPropertyName("ep_this")] public string XpThis { get; set; } = null!;
+    [JsonPropertyName("ep_this")] public string? XpThis { get; set; }
 
     [JsonPropertyName("now_cost")] public int Cost { get; set; }
 
@@ -42,7 +42,7 @@ public record ApiPlayerDetails
             SecondName = SecondName,
             FirstName = FirstName,
             XpNext = XpNext != null ? decimal.Parse(XpNext) : 0,
-            XpThis = decimal.Parse(XpThis),
+            XpThis = XpThis != null ? decimal.Parse(XpThis) : 0,
             Cost = Cost,
             Id = Id,
             Team = Team,

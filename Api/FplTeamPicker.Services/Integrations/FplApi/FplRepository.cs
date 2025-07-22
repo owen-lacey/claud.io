@@ -42,7 +42,6 @@ public class FplRepository : IFplRepository, IDisposable
         {
             throw new FplApiException(HttpStatusCode.Unauthorized, $"Unable to get user details.");
         }
-        _memoryCache.Set(CacheKeys.UserLookup(_fplUserProvider.GetUserId()), result.User.Entry);
 
         return new User
         {
@@ -201,14 +200,9 @@ public class FplRepository : IFplRepository, IDisposable
 
     private async Task<int> GetManagerIdAsync(CancellationToken cancellationToken)
     {
-        var cacheKey = CacheKeys.UserLookup(_fplUserProvider.GetUserId());
-        if (!_memoryCache.TryGetValue(cacheKey, out int managerId))
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
-            var result = await MakeRequestAsync<ApiUserDetails>(request, cancellationToken);
-            managerId = result.User?.Entry ?? throw new FplApiException(HttpStatusCode.Unauthorized, "Unable to get user details");
-            _memoryCache.Set(cacheKey, managerId);
-        }
+        var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
+        var result = await MakeRequestAsync<ApiUserDetails>(request, cancellationToken);
+        var managerId = result.User?.Entry ?? throw new FplApiException(HttpStatusCode.Unauthorized, "Unable to get user details");
 
         return managerId;
     }
@@ -252,7 +246,8 @@ public class FplRepository : IFplRepository, IDisposable
         CachePlayers(result);
         CacheManagers(result);
 
-        var currentGameweek = result.Events.Single(e => e.IsCurrent);
+        var currentGameweek = result.Events.SingleOrDefault(e => e.IsCurrent)
+            ?? result.Events.Single(e => e.IsNext);
         _memoryCache.Set(CacheKeys.CurrentGameweek, currentGameweek.Id);
     }
 
