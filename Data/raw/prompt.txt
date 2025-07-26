@@ -1,0 +1,7 @@
+Can you manipulate this CSV such that:
+
+- you keep the name,position,team,xP,assists,bonus,bps,clean_sheets,creativity,element columns
+
+- you remove all other columns, except the last GW column
+
+- IMPORTANT. Some rows have different numbers of columns (should be 42, but some have more). Just ignore all data between `element` and gw please
