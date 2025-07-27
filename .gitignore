@@ -264,25 +264,98 @@ paket-files/
 __pycache__/
 *.pyc
 
-# Webpack resultant files
-/Source/ultra/src/Gleadell.Ultra.Ui/wwwroot/dist/**
-/Source/ultra/src/Gleadell.Ultra.Ui/Client/dist/**
-/Source/partner/src/partner/Gleadell.Partner.Ui/dist/**
+# Python Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.env/
 
-# AOT compiled files
-/Source/ultra/src/Gleadell.Ultra.Ui/Client/**/*.js
-/Source/ultra/src/Gleadell.Ultra.Ui/Client/**/*.js.map
+# Python Package Management
+*.egg-info/
+dist/
+build/
+.eggs/
 
-/Source/ultra/src/Gleadell.Ultra.Model/Gleadell.Ultra.Model.csproj.DotSettings
-/Source/ultra/src/Gleadell.Ultra.Api/tempkey.rsa
-/Source/ultra/src/Gleadell.Ultra.Ui/.npmrc
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Python bytecode
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# MacOS
+.DS_Store
+
+# IDE files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/.ropeproject
+
+# Model files (can be large)
+*.pkl
+*.h5
+*.model
+
+# Data files (often large/sensitive)
+*.csv
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!**/database/*.json
+
+# Logs
+*.log
 
 */.awcache/**
 */.cache-loader/**
-/Source/partner/src/partner/Gleadell.Partner.Api/tempkey.rsa
 
 /MigrationBackup/**
-/Source/ultra/src/Gleadell.Ultra.Dal/CommunicableObjects/**
 
 **/angular-webpack/**
 **/.angular/cache/**
@@ -291,12 +364,7 @@ __pycache__/
 *.key
 *.pem
 
-/Source/ultra/src/Gleadell.Ultra.Ui/documentation.json
-
 # Local config for scripts
 /Source/tools/scripts/config.cmd
-
-# generate component globals for partner/365
-Source/partner/src/partner/Gleadell.Partner.Ui/components.d.ts
 
 *storybook.log

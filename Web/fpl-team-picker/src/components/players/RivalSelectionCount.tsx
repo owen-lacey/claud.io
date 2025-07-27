@@ -17,7 +17,7 @@ function RivalSelectionCount({ playerId, rivalTeams }: { playerId: number, rival
     <PopoverPanel
       transition
       anchor="bottom"
-      className="z-8 rounded-md border border-gray-200 bg-white text-sm/6 transition duration-200 ease-in-out data-[closed]:-translate-y-1 data-[closed]:opacity-0"
+      className="z-8 rounded-md border border-border bg-popover text-popover-foreground text-sm/6 transition duration-200 ease-in-out data-[closed]:-translate-y-1 data-[closed]:opacity-0"
     >
       <div className="p-3">
         {selections.length > 0

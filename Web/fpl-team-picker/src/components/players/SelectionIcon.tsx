@@ -7,12 +7,12 @@ function SelectionIcon({ player, team }: { player: Player, team: SelectedSquad |
   const inXi = team?.startingXi!.some(p => p.player?.id === player.id);
   if (inXi) {
     badgeText = 'XI';
-    cls = 'bg-gray-700 text-gray-200'
+    cls = 'bg-primary text-primary-foreground'
   }
   const onBench = team?.bench!.some(p => p.player?.id === player.id);
   if (onBench) {
     badgeText = 'B';
-    cls = 'border border-gray-700 text-gray-700'
+    cls = 'border border-primary text-primary bg-primary/10'
   }
 
   if (!badgeText) {

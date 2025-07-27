@@ -3,7 +3,7 @@ import { ChevronRightIcon } from '@heroicons/react/24/solid';
 import { playerBg } from "../../helpers/styles";
 import { lookupTeam } from "../../helpers/lookups";
 import { useContext } from "react";
-import { DataContext } from "../../App";
+import { DataContext } from "@/lib/contexts";
 
 function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { startingXi: SelectedPlayer[], bench: SelectedPlayer[], transferPenaliseCount: number, bank: number }) {
   const allData = useContext(DataContext);
@@ -26,7 +26,7 @@ function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { sta
 
   return <div className="">
     <div className="grid grid-cols-1 gap-4 mb-4">
-      <div className="bg-white border border-gray-300 shadow-lg rounded-lg py-4 px-6 ">
+      <div className="bg-card border border-border shadow-lg rounded-lg py-4 px-6 ">
         <table>
           <tbody>
             <tr>
@@ -62,7 +62,7 @@ function ShowTransfers({ startingXi, bench, transferPenaliseCount, bank }: { sta
       </div>
     </div>
 
-    <div className="bg-white border border-gray-300 shadow-lg rounded-lg py-4 px-6 ">
+    <div className="bg-card border border-border shadow-lg rounded-lg py-4 px-6 ">
       <div className="flex justify-between">
         <span>Squad value:</span>
         <div>

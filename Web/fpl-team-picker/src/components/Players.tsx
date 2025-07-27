@@ -1,10 +1,12 @@
-import { useContext } from "react";
-import { DataContext, RivalTeamsContext } from "../App";
+"use client";
+
+import { memo, useContext } from "react";
 import { playerBg } from "../helpers/styles";
 import { lookupTeam } from "../helpers/lookups";
 import SelectionIcon from "./players/SelectionIcon";
 import RivalSelectionCount from "./players/RivalSelectionCount";
 import { LoadingCard } from "./utils/Loading";
+import { DataContext, RivalTeamsContext } from "@/lib/contexts";
 
 function Players() {
   const allData = useContext(DataContext);
@@ -17,8 +19,8 @@ function Players() {
   const { players, teams, myTeam } = allData;
   const showRivalSelectionCount = rivalTeams.length > 0;
 
-  return <div className="bg-white border border-gray-300 shadow-lg rounded-lg p-4 flex flex-col">
-    <h2 className="text-xl font-semibold mb-4">Players</h2>
+  return <div className="bg-card border border-border shadow-lg rounded-lg p-4 flex flex-col">
+    <h2 className="text-lg font-semibold mb-2 text-foreground">Players</h2>
     <table>
       <tbody>
         {players.output!.slice(0, 50).map((player, index) => (

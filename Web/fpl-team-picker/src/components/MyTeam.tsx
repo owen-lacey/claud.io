@@ -1,10 +1,12 @@
+"use client";
+
 import { useContext, useState } from "react";
-import { DataContext, RivalTeamsContext } from "../App";
 import { playerBg } from "../helpers/styles";
 import { lookupTeam } from "../helpers/lookups";
 import RivalSelectionCount from "./players/RivalSelectionCount";
 import CalculateModal from "./team/CalculateModal";
 import { LoadingCard } from "./utils/Loading";
+import { DataContext, RivalTeamsContext } from "@/lib/contexts";
 
 function MyTeam() {
   const allData = useContext(DataContext);
@@ -18,7 +20,7 @@ function MyTeam() {
 
   const showRivalSelectionCount = rivalTeams.length > 0;
 
-  return <div className="bg-white border border-gray-300 shadow-lg rounded-lg p-4 flex flex-col">
+  return <div className="bg-card border border-border shadow-lg rounded-lg p-4 flex flex-col">
     <div className="flex gap-1 justify-between mb-2">
       <div className="w-19 rounded-md bg-linear-to-br from-cyan-600 to-blue-900 p-2 text-gray-100 font-mono flex flex-col items-center justify-center">
         <div className="text-lg">£{(myTeam.output!.bank! / 10).toFixed(1)}</div>
@@ -66,7 +68,7 @@ function MyTeam() {
       <div className="font-mono">{myTeam.output!.selectedSquad!.predictedPoints?.toFixed(1)} ({myTeam.output!.selectedSquad!.benchBoostPredictedPoints?.toFixed(1)})</div>
     </div>
     <div className="flex justify-end mb-2">
-      <button onClick={() => setShowCalculateModal(true)} className="border text-sm border-gray-200 p-2 bg-linear-to-r from-[rgb(10,229,255)] to-[rgb(66,162,255)]">&#x1F916; Calculate transfers</button>
+      <button onClick={() => setShowCalculateModal(true)} className="border text-sm border-border p-2 bg-gradient-to-r from-[rgb(10,229,255)] to-[rgb(66,162,255)] text-white rounded-md hover:opacity-90">&#x1F916; Calculate transfers</button>
     </div>
     <CalculateModal open={showCalculateModal} onClose={() => setShowCalculateModal(false)} />
   </div>

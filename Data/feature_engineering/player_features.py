@@ -1,0 +1,600 @@
+# Player Feature Engineering - Shared Logic for Training and Prediction
+import pandas as pd
+import numpy as np
+from typing import Dict, List, Optional, Tuple, Union
+import json
+
+class PlayerFeatureEngine:
+    """
+    Shared feature engineering logic for both training and prediction.
+    
+    This ensures that features are calculated consistently between:
+    1. Training phase (using historical gameweek data)  
+    2. Prediction phase (using current season data + historical context)
+    """
+    
+    def __init__(self, teams_data: Optional[List[Dict]] = None):
+        """
+        Initialize the feature engine
+        
+        Args:
+            teams_data: List of team dictionaries with id and name
+        """
+        self.teams_dict = {}
+        if teams_data:
+            self.teams_dict = {team['id']: team['name'] for team in teams_data}
+    
+    def calculate_rolling_features(self, df: pd.DataFrame, 
+                                 group_col: str = 'name',
+                                 sort_cols: List[str] = None,
+                                 rolling_features: List[str] = None) -> pd.DataFrame:
+        """
+        Calculate rolling window features for training data
+        
+        Args:
+            df: DataFrame with historical gameweek data
+            group_col: Column to group by (usually player name)
+            sort_cols: Columns to sort by (usually ['name', 'GW'])
+            rolling_features: List of features to calculate rolling averages for (optional)
+            
+        Returns:
+            DataFrame with rolling features added
+        """
+        if sort_cols is None:
+            sort_cols = [group_col, 'GW'] if 'GW' in df.columns else [group_col]
+            
+        # Sort data chronologically
+        df_sorted = df.sort_values(sort_cols).copy()
+        
+        # Define default features to calculate rolling averages for
+        if rolling_features is None:
+            rolling_features = [
+                'minutes', 'total_points', 'goals_scored', 'assists', 'clean_sheets',
+                'saves', 'goals_conceded', 'yellow_cards', 'starts', 'threat',
+                'expected_goals', 'expected_assists', 'expected_goal_involvements',
+                'expected_goals_conceded', 'creativity', 'bps'
+            ]
+        window_sizes = [3, 5, 10]
+        
+        print(f"📊 Calculating rolling features for {len(rolling_features)} metrics...")
+        
+        for feature in rolling_features:
+            if feature not in df_sorted.columns:
+                print(f"⚠️ Feature '{feature}' not found in data, skipping...")
+                continue
+            
+            # Ensure feature is numeric
+            try:
+                df_sorted[feature] = pd.to_numeric(df_sorted[feature], errors='coerce').fillna(0)
+            except Exception as e:
+                print(f"⚠️ Could not convert feature '{feature}' to numeric, skipping... Error: {e}")
+                continue
+                
+            for window in window_sizes:
+                col_name = f'{feature}_avg_{window}gw'
+                
+                # Calculate rolling average, grouped by player
+                df_sorted[col_name] = (
+                    df_sorted.groupby(group_col)[feature]
+                    .rolling(window=window, min_periods=1)
+                    .mean()
+                    .reset_index(level=0, drop=True)
+                )
+        
+        # Calculate form (last 3 games total points sum)
+        if 'total_points' in df_sorted.columns:
+            df_sorted['form'] = (
+                df_sorted.groupby(group_col)['total_points']
+                .rolling(window=3, min_periods=1)
+                .sum()
+                .reset_index(level=0, drop=True)
+            )
+        
+        return df_sorted
+    
+    def get_historical_context(self, player_name: str, 
+                             historical_df: pd.DataFrame,
+                             num_recent_games: int = 5) -> Optional[Dict]:
+        """
+        Get recent historical context for a player to calculate rolling averages
+        
+        Args:
+            player_name: Name of the player
+            historical_df: DataFrame with historical gameweek data
+            num_recent_games: Number of recent games to consider
+            
+        Returns:
+            Dictionary with recent game statistics or None if not found
+        """
+        player_games = historical_df[
+            historical_df['name'] == player_name
+        ].sort_values('GW').tail(num_recent_games)
+        
+        if len(player_games) == 0:
+            return None
+            
+        # Calculate averages from recent games
+        recent_stats = {}
+        for window in [3, 5, 10]:
+            window_games = player_games.tail(window)
+            
+            if len(window_games) > 0:
+                recent_stats.update({
+                    f'minutes_avg_{window}gw': window_games['minutes'].mean(),
+                    f'total_points_avg_{window}gw': window_games['total_points'].mean(),
+                    f'goals_scored_avg_{window}gw': window_games['goals_scored'].mean(),
+                    f'assists_avg_{window}gw': window_games['assists'].mean(),
+                    f'clean_sheets_avg_{window}gw': window_games['clean_sheets'].mean(),
+                    f'saves_avg_{window}gw': window_games.get('saves', pd.Series([0]*len(window_games))).mean(),
+                    f'goals_conceded_avg_{window}gw': window_games.get('goals_conceded', pd.Series([0]*len(window_games))).mean(),
+                    f'yellow_cards_avg_{window}gw': window_games.get('yellow_cards', pd.Series([0]*len(window_games))).mean(),
+                    f'starts_avg_{window}gw': window_games.get('starts', pd.Series([0]*len(window_games))).mean(),
+                    f'threat_avg_{window}gw': window_games.get('threat', pd.Series([0]*len(window_games))).mean(),
+                    f'expected_goals_avg_{window}gw': window_games.get('expected_goals', pd.Series([0]*len(window_games))).mean(),
+                    f'expected_assists_avg_{window}gw': window_games.get('expected_assists', pd.Series([0]*len(window_games))).mean(),
+                    f'creativity_avg_{window}gw': window_games.get('creativity', pd.Series([0]*len(window_games))).mean(),
+                    f'bps_avg_{window}gw': window_games.get('bps', pd.Series([0]*len(window_games))).mean(),
+                })
+        
+        # Form = sum of last 3 games total points
+        form_games = player_games.tail(3)
+        recent_stats['form'] = form_games['total_points'].sum() if len(form_games) > 0 else 0.0
+        
+        return recent_stats
+    
+    def prepare_minutes_model_features(self, 
+                                     player_data: Dict,
+                                     historical_context: Optional[Dict] = None,
+                                     position_encoder = None,
+                                     team_encoder = None,
+                                     fixture_info: Optional[Dict] = None) -> List[float]:
+        """
+        Prepare features for minutes model prediction
+        
+        Args:
+            player_data: Current player data dictionary
+            historical_context: Recent game statistics (from get_historical_context)
+            position_encoder: Trained LabelEncoder for positions
+            team_encoder: Trained LabelEncoder for teams
+            fixture_info: Fixture information with opponent strength
+            
+        Returns:
+            List of feature values in the correct order (12 features total)
+        """
+        
+        # Get position and team encodings
+        position = self._get_position_name(player_data.get('element_type', 4))
+        team_id = player_data.get('team', 1)
+        
+        if position_encoder:
+            try:
+                position_encoded = position_encoder.transform([position])[0]
+            except ValueError:
+                position_encoded = 0  # Unknown position
+        else:
+            position_encoded = 0
+            
+        if team_encoder:
+            try:
+                # Ensure team_id is properly formatted for encoder
+                team_name = self.teams_dict.get(team_id, str(team_id))
+                team_encoded = team_encoder.transform([team_name])[0]
+            except (ValueError, TypeError, KeyError):
+                team_encoded = 0  # Unknown team
+        else:
+            team_encoded = 0
+        
+        # Get form from current data or historical context
+        form = float(player_data.get('form', 0.0))
+        
+        # Get rolling averages from historical context
+        if historical_context:
+            features = [
+                position_encoded,
+                team_encoded,
+                form,
+                historical_context.get('minutes_avg_3gw', 0.0),
+                historical_context.get('minutes_avg_5gw', 0.0),
+                historical_context.get('total_points_avg_3gw', 0.0),
+                historical_context.get('total_points_avg_5gw', 0.0),
+                historical_context.get('goals_scored_avg_3gw', 0.0),
+                historical_context.get('assists_avg_3gw', 0.0),
+                historical_context.get('clean_sheets_avg_3gw', 0.0),
+            ]
+        else:
+            # Fallback to season averages if no historical context
+            print(f"⚠️ No historical context for player, using season averages as fallback")
+            
+            # Estimate games played from minutes
+            total_minutes = float(player_data.get('minutes', 0))
+            games_played = max(1, total_minutes / 90.0)
+            
+            total_points = float(player_data.get('total_points', 0))
+            goals_scored = float(player_data.get('goals_scored', 0))
+            assists = float(player_data.get('assists', 0))
+            clean_sheets = float(player_data.get('clean_sheets', 0))
+            
+            features = [
+                position_encoded,
+                team_encoded,
+                form,
+                total_minutes / games_played,  # minutes_avg_3gw approximation
+                total_minutes / games_played,  # minutes_avg_5gw approximation  
+                total_points / games_played,   # total_points_avg_3gw approximation
+                total_points / games_played,   # total_points_avg_5gw approximation
+                goals_scored / games_played,   # goals_scored_avg_3gw approximation
+                assists / games_played,        # assists_avg_3gw approximation
+                clean_sheets / games_played,   # clean_sheets_avg_3gw approximation
+            ]
+        
+        # Add opponent strength features (required for enhanced minutes model)
+        if fixture_info:
+            opponent_overall_strength_normalized = fixture_info.get('opponent_overall_strength', 1150) / 1400.0
+            fixture_attractiveness = fixture_info.get('fixture_attractiveness', 0.5)
+        else:
+            # Default values when no fixture info available
+            opponent_overall_strength_normalized = 0.82  # Default ~1150/1400
+            fixture_attractiveness = 0.5  # Neutral fixture
+        
+        # Append opponent strength features (features 10 and 11)
+        features.extend([
+            opponent_overall_strength_normalized,
+            fixture_attractiveness
+        ])
+        
+        return features
+    
+    def prepare_goals_model_features(self, 
+                                   player_data: Dict,
+                                   historical_context: Optional[Dict] = None,
+                                   position_encoder = None,
+                                   team_encoder = None,
+                                   was_home: bool = True) -> List[float]:
+        """
+        Prepare features for expected goals model prediction
+        
+        Args:
+            player_data: Current player data dictionary
+            historical_context: Recent game statistics
+            position_encoder: Trained LabelEncoder for positions (optional)
+            team_encoder: Trained LabelEncoder for teams (optional)
+            was_home: Whether playing at home
+            
+        Returns:
+            List of feature values for goals model
+        """
+        
+        # Get basic info
+        position = self._get_position_name(player_data.get('element_type', 4))
+        is_forward = 1.0 if position == 'FWD' else 0.0
+        was_home_encoded = 1.0 if was_home else 0.0
+        
+        if historical_context:
+            # Calculate goal efficiency
+            goals_3gw = historical_context.get('goals_scored_avg_3gw', 0.0)
+            xg_3gw = historical_context.get('expected_goals_avg_3gw', 0.1)
+            goal_efficiency = goals_3gw / max(xg_3gw, 0.1)
+            
+            # Recent form
+            recent_form = historical_context.get('form', 0.0)
+            
+            features = [
+                historical_context.get('goals_scored_avg_3gw', 0.0),     # goals_avg_3gw
+                historical_context.get('goals_scored_avg_5gw', 0.0),     # goals_avg_5gw  
+                historical_context.get('goals_scored_avg_10gw', 0.0),    # goals_avg_10gw
+                historical_context.get('expected_goals_avg_3gw', 0.0),   # xg_avg_3gw
+                historical_context.get('expected_goals_avg_5gw', 0.0),   # xg_avg_5gw
+                historical_context.get('expected_goals_avg_10gw', 0.0),  # xg_avg_10gw
+                historical_context.get('minutes_avg_3gw', 0.0),          # minutes_avg_3gw
+                historical_context.get('minutes_avg_5gw', 0.0),          # minutes_avg_5gw
+                historical_context.get('starts_avg_3gw', 0.0),           # starts_avg_3gw
+                historical_context.get('starts_avg_5gw', 0.0),           # starts_avg_5gw
+                historical_context.get('threat_avg_3gw', 0.0),           # threat_avg_3gw
+                historical_context.get('threat_avg_5gw', 0.0),           # threat_avg_5gw
+                goal_efficiency,                                         # goal_efficiency
+                recent_form,                                             # recent_form
+                is_forward,                                              # is_forward
+                was_home_encoded,                                        # was_home
+            ]
+        else:
+            # Fallback to season averages
+            games_played = max(1, float(player_data.get('minutes', 0)) / 90.0)
+            goals_scored = float(player_data.get('goals_scored', 0))
+            expected_goals = float(player_data.get('expected_goals', 0))
+            total_points = float(player_data.get('total_points', 0))
+            minutes = float(player_data.get('minutes', 0))
+            threat = float(player_data.get('threat', 0))
+            
+            goal_efficiency = goals_scored / max(expected_goals, 0.1)
+            
+            features = [
+                goals_scored / games_played,      # goals_avg_3gw proxy
+                goals_scored / games_played,      # goals_avg_5gw proxy
+                goals_scored / games_played,      # goals_avg_10gw proxy
+                expected_goals / games_played,    # xg_avg_3gw proxy
+                expected_goals / games_played,    # xg_avg_5gw proxy
+                expected_goals / games_played,    # xg_avg_10gw proxy
+                minutes / games_played,           # minutes_avg_3gw proxy
+                minutes / games_played,           # minutes_avg_5gw proxy
+                1.0,                              # starts_avg_3gw proxy (assume starting if playing)
+                1.0,                              # starts_avg_5gw proxy
+                threat / games_played,            # threat_avg_3gw proxy
+                threat / games_played,            # threat_avg_5gw proxy
+                goal_efficiency,                  # goal_efficiency
+                total_points / games_played,      # recent_form proxy
+                is_forward,                       # is_forward
+                was_home_encoded,                 # was_home
+            ]
+        
+        return features
+    
+    def prepare_assists_model_features(self, 
+                                     player_data: Dict,
+                                     historical_context: Optional[Dict] = None,
+                                     position_encoder = None,
+                                     team_encoder = None,
+                                     was_home: bool = True) -> List[float]:
+        """Prepare features for expected assists model prediction"""
+        
+        position = self._get_position_name(player_data.get('element_type', 4))
+        is_midfielder = 1.0 if position == 'MID' else 0.0
+        is_defender = 1.0 if position == 'DEF' else 0.0
+        was_home_encoded = 1.0 if was_home else 0.0
+        
+        if historical_context:
+            features = [
+                historical_context.get('assists_avg_3gw', 0.0),           # assists_avg_3gw
+                historical_context.get('assists_avg_5gw', 0.0),           # assists_avg_5gw
+                historical_context.get('assists_avg_10gw', 0.0),          # assists_avg_10gw
+                historical_context.get('expected_assists_avg_3gw', 0.0),  # xa_avg_3gw
+                historical_context.get('expected_assists_avg_5gw', 0.0),  # xa_avg_5gw
+                historical_context.get('expected_assists_avg_10gw', 0.0), # xa_avg_10gw
+                historical_context.get('creativity_avg_3gw', 0.0),        # creativity_avg_3gw
+                historical_context.get('creativity_avg_5gw', 0.0),        # creativity_avg_5gw
+                historical_context.get('minutes_avg_3gw', 0.0),           # minutes_avg_3gw
+                historical_context.get('minutes_avg_5gw', 0.0),           # minutes_avg_5gw
+                historical_context.get('starts_avg_3gw', 0.0),            # starts_avg_3gw
+                historical_context.get('starts_avg_5gw', 0.0),            # starts_avg_5gw
+                is_midfielder,                                            # is_midfielder
+                is_defender,                                              # is_defender
+                was_home_encoded,                                         # was_home
+            ]
+        else:
+            # Fallback to season averages
+            games_played = max(1, float(player_data.get('minutes', 0)) / 90.0)
+            assists = float(player_data.get('assists', 0))
+            expected_assists = float(player_data.get('expected_assists', 0))
+            creativity = float(player_data.get('creativity', 0))
+            minutes = float(player_data.get('minutes', 0))
+            
+            features = [
+                assists / games_played,           # assists_avg_3gw proxy
+                assists / games_played,           # assists_avg_5gw proxy
+                assists / games_played,           # assists_avg_10gw proxy
+                expected_assists / games_played,  # xa_avg_3gw proxy
+                expected_assists / games_played,  # xa_avg_5gw proxy
+                expected_assists / games_played,  # xa_avg_10gw proxy
+                creativity / games_played,        # creativity_avg_3gw proxy
+                creativity / games_played,        # creativity_avg_5gw proxy
+                minutes / games_played,           # minutes_avg_3gw proxy
+                minutes / games_played,           # minutes_avg_5gw proxy
+                1.0,                              # starts_avg_3gw proxy
+                1.0,                              # starts_avg_5gw proxy
+                is_midfielder,                    # is_midfielder
+                is_defender,                      # is_defender
+                was_home_encoded,                 # was_home
+            ]
+        
+        return features
+    
+    def _get_position_name(self, element_type: int) -> str:
+        """Convert element_type to position name"""
+        position_map = {1: 'GK', 2: 'DEF', 3: 'MID', 4: 'FWD'}
+        return position_map.get(element_type, 'MID')
+    
+    def get_feature_column_names(self) -> List[str]:
+        """Get the feature column names in the correct order"""
+        return [
+            'position_encoded', 'team_encoded', 'form',
+            'minutes_avg_3gw', 'minutes_avg_5gw',
+            'total_points_avg_3gw', 'total_points_avg_5gw',
+            'goals_scored_avg_3gw', 'assists_avg_3gw', 'clean_sheets_avg_3gw'
+        ]
+
+    def calculate_team_rolling_features(self, team_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate rolling features for team-level data (goals conceded model)
+        
+        Args:
+            team_df: DataFrame with team performance data
+            
+        Returns:
+            DataFrame with team rolling features
+        """
+        print("🔧 Engineering team defensive features with shared engine...")
+        
+        # Sort by team and gameweek for chronological rolling averages
+        team_df_sorted = team_df.sort_values(['team_id', 'GW']).reset_index(drop=True)
+        
+        # Define rolling windows
+        rolling_windows = [3, 5, 10]
+        
+        for window in rolling_windows:
+            print(f"  📊 Adding {window}-game rolling averages...")
+            
+            # Goals conceded rolling average
+            team_df_sorted[f'goals_conceded_avg_{window}gw'] = team_df_sorted.groupby('team_id')['goals_conceded'].transform(
+                lambda x: x.rolling(window=window, min_periods=1).mean().shift(1)
+            )
+            
+            # Clean sheets rolling average  
+            team_df_sorted[f'clean_sheets_avg_{window}gw'] = team_df_sorted.groupby('team_id')['clean_sheets'].transform(
+                lambda x: x.rolling(window=window, min_periods=1).mean().shift(1)
+            )
+            
+            # Goals scored rolling average
+            team_df_sorted[f'goals_scored_avg_{window}gw'] = team_df_sorted.groupby('team_id')['goals_scored'].transform(
+                lambda x: x.rolling(window=window, min_periods=1).mean().shift(1)
+            )
+            
+            # Total points rolling average
+            team_df_sorted[f'total_points_avg_{window}gw'] = team_df_sorted.groupby('team_id')['total_points'].transform(
+                lambda x: x.rolling(window=window, min_periods=1).mean().shift(1)
+            )
+        
+        # Home/Away specific averages
+        print("  🏠 Adding home/away specific averages...")
+        
+        # Home goals conceded average
+        home_mask = team_df_sorted['was_home'] == 1
+        team_df_sorted.loc[home_mask, 'home_goals_conceded_avg_5gw'] = team_df_sorted[home_mask].groupby('team_id')['goals_conceded'].transform(
+            lambda x: x.rolling(window=5, min_periods=1).mean().shift(1)
+        )
+        
+        # Away goals conceded average  
+        away_mask = team_df_sorted['was_home'] == 0
+        team_df_sorted.loc[away_mask, 'away_goals_conceded_avg_5gw'] = team_df_sorted[away_mask].groupby('team_id')['goals_conceded'].transform(
+            lambda x: x.rolling(window=5, min_periods=1).mean().shift(1)
+        )
+        
+        # Fill NaN values with overall averages
+        team_df_sorted['home_goals_conceded_avg_5gw'] = team_df_sorted['home_goals_conceded_avg_5gw'].fillna(team_df_sorted['goals_conceded_avg_5gw'])
+        team_df_sorted['away_goals_conceded_avg_5gw'] = team_df_sorted['away_goals_conceded_avg_5gw'].fillna(team_df_sorted['goals_conceded_avg_5gw'])
+        
+        # Additional derived features
+        print("  ⚡ Adding derived defensive features...")
+        
+        # Defensive strength (inverse of goals conceded)
+        team_df_sorted['defensive_strength'] = 1 / (team_df_sorted['goals_conceded_avg_5gw'] + 0.1)
+        
+        # Recent form (last 3 games total points)
+        team_df_sorted['recent_form'] = team_df_sorted.groupby('team_id')['total_points'].transform(
+            lambda x: x.rolling(window=3, min_periods=1).mean().shift(1)
+        )
+        
+        # Season progress
+        team_df_sorted['season_progress'] = team_df_sorted['GW']
+        
+        print("✅ Team defensive features engineered using shared engine")
+        
+        return team_df_sorted
+
+    def get_team_feature_columns(self) -> List[str]:
+        """
+        Get the standard feature column names for team defensive model
+        
+        Returns:
+            List of feature column names
+        """
+        return [
+            'goals_conceded_avg_3gw', 'goals_conceded_avg_5gw', 'goals_conceded_avg_10gw',
+            'clean_sheets_avg_3gw', 'clean_sheets_avg_5gw', 'clean_sheets_avg_10gw', 
+            'goals_scored_avg_3gw', 'goals_scored_avg_5gw', 'goals_scored_avg_10gw',
+            'total_points_avg_3gw', 'total_points_avg_5gw', 'total_points_avg_10gw',
+            'home_goals_conceded_avg_5gw', 'away_goals_conceded_avg_5gw',
+            'defensive_strength', 'recent_form', 'season_progress', 'was_home'
+        ]
+
+    def calculate_yellow_cards_features(self, outfield_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate rolling features for yellow cards model
+        
+        Args:
+            outfield_df: DataFrame with outfield player data
+            
+        Returns:
+            DataFrame with yellow cards rolling features
+        """
+        print("🔧 Engineering yellow cards features with shared engine...")
+        
+        # Define yellow cards specific features
+        yellow_cards_features = [
+            'yellow_cards', 'red_cards', 'minutes', 'starts',
+            'goals_scored', 'assists', 'clean_sheets', 'total_points'
+        ]
+        
+        # Calculate rolling features using the base method
+        outfield_df = self.calculate_rolling_features(
+            outfield_df, 
+            group_col='name',
+            sort_cols=['name', 'GW'],
+            rolling_features=yellow_cards_features
+        )
+        
+        # Additional yellow cards specific features
+        print("  ⚡ Adding yellow cards specific derived features...")
+        
+        # Disciplinary rate (cards per minute)
+        outfield_df['disciplinary_rate'] = (
+            outfield_df['yellow_cards_avg_5gw'] / (outfield_df['minutes_avg_5gw'] + 1)
+        ) * 90  # Per 90 minutes
+        
+        # Aggression indicator (cards when playing regularly)
+        outfield_df['aggression_indicator'] = np.where(
+            outfield_df['starts_avg_5gw'] > 0.5,
+            outfield_df['yellow_cards_avg_5gw'],
+            0
+        )
+        
+        # Position risk factor (will be enhanced with position encoding)
+        outfield_df['position_risk'] = outfield_df.get('position_encoded', 0)
+        
+        print("✅ Yellow cards features engineered using shared engine")
+        
+        return outfield_df
+
+    def get_yellow_cards_feature_columns(self) -> List[str]:
+        """
+        Get the standard feature column names for yellow cards model
+        
+        Returns:
+            List of feature column names
+        """
+        return [
+            'yellow_cards_avg_3gw', 'yellow_cards_avg_5gw', 'yellow_cards_avg_10gw',
+            'red_cards_avg_3gw', 'red_cards_avg_5gw', 'red_cards_avg_10gw',
+            'minutes_avg_3gw', 'minutes_avg_5gw', 'minutes_avg_10gw',
+            'starts_avg_3gw', 'starts_avg_5gw', 'starts_avg_10gw',
+            'goals_scored_avg_3gw', 'goals_scored_avg_5gw', 'goals_scored_avg_10gw',
+            'assists_avg_3gw', 'assists_avg_5gw', 'assists_avg_10gw',
+            'clean_sheets_avg_3gw', 'clean_sheets_avg_5gw', 'clean_sheets_avg_10gw',
+            'total_points_avg_3gw', 'total_points_avg_5gw', 'total_points_avg_10gw',
+            'disciplinary_rate', 'aggression_indicator', 'position_risk'
+        ]
+
+
+def load_historical_data(filepath: str) -> pd.DataFrame:
+    """Load and prepare historical gameweek data"""
+    print(f"📊 Loading historical data from {filepath}")
+    df = pd.read_csv(filepath)
+    print(f"✅ Loaded {len(df):,} gameweek records")
+    return df
+
+
+def load_teams_data(filepath: str) -> List[Dict]:
+    """Load teams data"""
+    with open(filepath, 'r') as f:
+        teams_data = json.load(f)
+    print(f"✅ Loaded {len(teams_data)} teams")
+    return teams_data
+
+
+# Example usage:
+if __name__ == "__main__":
+    # Load data
+    historical_df = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv')
+    teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
+    
+    # Initialize feature engine
+    feature_engine = PlayerFeatureEngine(teams_data)
+    
+    # For training: calculate rolling features
+    training_df = feature_engine.calculate_rolling_features(historical_df)
+    print(f"✅ Training data with rolling features: {training_df.shape}")
+    
+    # For prediction: get historical context for a player
+    player_context = feature_engine.get_historical_context('Haaland', historical_df)
+    if player_context:
+        print(f"✅ Historical context loaded for Haaland")
+        print(f"   Recent form: {player_context.get('form', 0):.1f}")
+        print(f"   Avg minutes (5gw): {player_context.get('minutes_avg_5gw', 0):.1f}")

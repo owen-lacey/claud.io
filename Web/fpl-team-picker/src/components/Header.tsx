@@ -1,46 +1,50 @@
+"use client";
+
 import { memo, useCallback, useContext } from "react";
-import { DataContext } from "../App.tsx";
 import { ArrowPathRoundedSquareIcon } from '@heroicons/react/24/solid';
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import { LoadingCard } from "./utils/Loading.tsx";
+import { DataContext } from "@/lib/contexts";
+import { LoadingCard } from "./utils/Loading";
 
 const Header = memo(function Header() {
   const allData = useContext(DataContext);
-  const [, savePlProfile] = useLocalStorage<string | null>("pl_profile", null);
 
   const clearLocal = useCallback(() => {
-    savePlProfile(null);
-  }, [])
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("pl_profile");
+      // Force page reload to restart the app
+      window.location.reload();
+    }
+  }, []);
 
   if (!allData?.myDetails.output) {
     return <LoadingCard />;
   }
+  
   const { myDetails } = allData;
 
-  return <header className="bg-white border border-gray-300 shadow-lg rounded-lg py-4 px-6 flex justify-between items-center">
-    <h1 className="text-2xl font-semibold">Welcome, <span>{myDetails.output!.firstName}</span>!</h1>
-    <div className="text-sm flex items-center">
-      <span>User ID: &nbsp;</span>
+  return <header className="bg-card border border-border shadow-lg rounded-lg py-4 px-6 flex justify-between items-center">
+    <h1 className="text-2xl font-semibold text-foreground">Welcome, <span>{myDetails.output!.firstName}</span>!</h1>
+    <div className="text-sm flex items-center gap-3 text-foreground">
+      <div className="flex items-center">
+        <span>User ID: &nbsp;</span>
 
-      <Popover className="relative">
+        <Popover className="relative">
+          <PopoverButton className="font-normal font-mono bg-muted text-muted-foreground px-2 py-1 rounded-md focus:outline-none hover:bg-accent hover:text-accent-foreground">{myDetails.output!.id}</PopoverButton>
 
-        <PopoverButton className="font-normal font-mono bg-gray-100 px-2 py-1 rounded-md focus:outline-none">{myDetails.output!.id}</PopoverButton>
-
-
-        <PopoverPanel
-          transition
-          anchor="bottom"
-          className="z-8 rounded-md border border-gray-200 bg-white text-sm/6 transition duration-200 ease-in-out data-[closed]:-translate-y-1 data-[closed]:opacity-0">
-          <button className="flex gap-2 p-4" onClick={clearLocal}>
-            <ArrowPathRoundedSquareIcon className="w-4" />
-            Reset
-          </button>
-        </PopoverPanel>
-      </Popover>
+          <PopoverPanel
+            transition
+            anchor="bottom"
+            className="z-8 rounded-md border border-border bg-popover text-popover-foreground text-sm/6 transition duration-200 ease-in-out data-[closed]:-translate-y-1 data-[closed]:opacity-0">
+            <button className="flex gap-2 p-4 hover:bg-accent hover:text-accent-foreground transition-colors" onClick={clearLocal}>
+              <ArrowPathRoundedSquareIcon className="w-4" />
+              Reset
+            </button>
+          </PopoverPanel>
+        </Popover>
+      </div>
     </div>
   </header>
-
 });
 
 export default Header;
