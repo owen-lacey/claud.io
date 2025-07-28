@@ -321,17 +321,21 @@ class FPLPredictionEngine:
         elif expected_saves is None:
             expected_saves = 0.0  # Non-GK players don't need saves predictions
             
-        clean_sheet_prob = self._predict_clean_sheet(player_data, gameweek)
-        if clean_sheet_prob is None and position in ['GK', 'DEF']:
-            print(f"⚠️  SKIPPING {name} ({position}, {team_name}) - Clean sheet prediction failed")
-            return None
-        elif clean_sheet_prob is None:
-            clean_sheet_prob = 0.0  # Non-defensive players don't get clean sheet points
+        # Get clean sheet prediction and goals conceded for defensive players
+        clean_sheet_prob = 0.0
+        predicted_goals_conceded = None
         
+        if position in ['GK', 'DEF']:
+            clean_sheet_result = self._predict_clean_sheet(player_data, gameweek)
+            # No need to check for None - _predict_clean_sheet now raises exceptions
+            clean_sheet_prob, predicted_goals_conceded = clean_sheet_result
+        else:
+            clean_sheet_prob = 0.0  # Non-defensive players don't get clean sheet points
+
         # Calculate base FPL points using our scoring engine (no yellow cards)
         base_points = self._calculate_base_fpl_points(
             position, expected_goals, expected_assists, expected_saves,
-            clean_sheet_prob
+            clean_sheet_prob, predicted_goals_conceded
         )
         
         # Add bonus points if requested
@@ -813,17 +817,22 @@ class FPLPredictionEngine:
         
         return features
     
-    def _predict_clean_sheet(self, player_data: Dict, gameweek: int) -> float:
-        """Predict clean sheet probability using our team goals conceded model"""
+    def _predict_clean_sheet(self, player_data: Dict, gameweek: int) -> tuple[float, float]:
+        """Predict clean sheet probability using our team goals conceded model
+        
+        Returns:
+            tuple: (clean_sheet_prob, predicted_goals_conceded)
+        """
         
         position = self._get_position_name(player_data.get('element_type', 4))
         if position not in ['GK', 'DEF']:
-            return 0.0
+            return (0.0, None)
         
         if not self.models.get('team_goals_conceded'):
             player_name = player_data.get('web_name', 'Unknown')
-            print(f"❌ TEAM GOALS CONCEDED MODEL NOT LOADED for {player_name} ({position})")
-            return None
+            error_msg = f"❌ TEAM GOALS CONCEDED MODEL NOT LOADED for {player_name} ({position})"
+            print(error_msg)
+            raise RuntimeError(error_msg)
         
         try:
             # Use team goals conceded model to estimate clean sheet probability
@@ -844,21 +853,21 @@ class FPLPredictionEngine:
             # Using Poisson distribution: P(0 goals) = e^(-λ)
             clean_sheet_prob = np.exp(-max(0, predicted_goals_conceded))
             
-            return min(1.0, max(0.0, clean_sheet_prob))
+            # Return both values - clean sheet prob and the original predicted goals conceded
+            return (min(1.0, max(0.0, clean_sheet_prob)), max(0.0, predicted_goals_conceded))
             
         except Exception as e:
             player_name = player_data.get('web_name', 'Unknown')
             position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"❌ CLEAN SHEET PREDICTION FAILED for {player_name} ({position}):")
-            print(f"   Error type: {type(e).__name__}")
-            print(f"   Error message: {str(e)}")
+            error_msg = f"❌ CLEAN SHEET PREDICTION FAILED for {player_name} ({position}): {type(e).__name__}: {str(e)}"
+            print(error_msg)
             try:
                 features = self._prepare_clean_sheet_features(player_data, gameweek)
                 print(f"   Features prepared: {features}")
             except Exception as feature_error:
                 print(f"   Feature preparation failed: {feature_error}")
-            print(f"   🚫 Skipping prediction - cannot generate valid features")
-            return None
+            print(f"   🚫 Cannot generate valid features - this is a critical error")
+            raise RuntimeError(error_msg) from e
     
     def _prepare_clean_sheet_features(self, player_data: Dict, gameweek: int) -> List[float]:
         """Prepare features for clean sheet/team goals conceded model - matches trained model EXACTLY"""
@@ -1065,7 +1074,7 @@ class FPLPredictionEngine:
         # Calculate base FPL points
         base_points = self._calculate_base_fpl_points(
             position, expected_goals, expected_assists, expected_saves,
-            clean_sheet_prob
+            clean_sheet_prob, None  # No goals conceded penalty for simplified predictions
         )
         
         # Minimal bonus points for players with insufficient data
@@ -1135,14 +1144,15 @@ class FPLPredictionEngine:
                                  goals: float,
                                  assists: float,
                                  saves: float,
-                                 clean_sheet_prob: float) -> float:
-        """Calculate base FPL points using our scoring engine (without yellow cards)"""
+                                 clean_sheet_prob: float,
+                                 predicted_goals_conceded: float = None) -> float:
+        """Calculate base FPL points using our scoring engine (with goal conceded penalties)"""
         
         # Base appearance points
         points = 2.0  # Assume player plays
         
         # Goals points (position-dependent)
-        goal_points = {'GK': 6, 'DEF': 6, 'MID': 5, 'FWD': 4}
+        goal_points = {'GK': 10, 'DEF': 6, 'MID': 5, 'FWD': 4}
         points += goals * goal_points.get(position, 4)
         
         # Assists points
@@ -1157,6 +1167,43 @@ class FPLPredictionEngine:
         # Saves points (GK only)
         if position == 'GK':
             points += (saves / 3) * 1  # 1 point per 3 saves
+        
+        # Goal conceded penalties for defenders and goalkeepers
+        if position in ['GK', 'DEF'] and predicted_goals_conceded is not None:
+            # Use Poisson distribution to calculate penalty probabilities in non-overlapping buckets
+            # P(X = k) = (λ^k * e^(-λ)) / k! where λ = predicted_goals_conceded
+            
+            exp_neg_lambda = np.exp(-predicted_goals_conceded)
+            lambda_val = predicted_goals_conceded
+            
+            # Calculate individual probabilities for exact goal counts
+            p0 = exp_neg_lambda  # P(0 goals)
+            p1 = lambda_val * exp_neg_lambda  # P(1 goal)
+            p2 = (lambda_val ** 2 / 2) * exp_neg_lambda  # P(2 goals)
+            p3 = (lambda_val ** 3 / 6) * exp_neg_lambda  # P(3 goals)
+            p4 = (lambda_val ** 4 / 24) * exp_neg_lambda  # P(4 goals)
+            p5 = (lambda_val ** 5 / 120) * exp_neg_lambda  # P(5 goals)
+            p6 = (lambda_val ** 6 / 720) * exp_neg_lambda  # P(6 goals)
+            p7 = (lambda_val ** 7 / 5040) * exp_neg_lambda  # P(7 goals)
+            p8 = (lambda_val ** 8 / 40320) * exp_neg_lambda  # P(8 goals)
+            p9 = (lambda_val ** 9 / 362880) * exp_neg_lambda  # P(9 goals)
+            
+            # Non-overlapping penalty buckets:
+            # 2-3 goals: -1 point penalty
+            prob_2_to_3_goals = p2 + p3
+            points -= prob_2_to_3_goals * 1
+            
+            # 4-5 goals: -2 point penalty (additional -1 beyond the 2-3 penalty)
+            prob_4_to_5_goals = p4 + p5
+            points -= prob_4_to_5_goals * 2
+            
+            # 6-7 goals: -3 point penalty (additional -1 beyond the 4-5 penalty)
+            prob_6_to_7_goals = p6 + p7
+            points -= prob_6_to_7_goals * 3
+            
+            # 8-9 goals: -4 point penalty (additional -1 beyond the 6-7 penalty)
+            prob_8_to_9_goals = p8 + p9
+            points -= prob_8_to_9_goals * 4
         
         return max(0, points)
     

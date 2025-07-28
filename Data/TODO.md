@@ -6,21 +6,19 @@
 - [x] ~~Why are MID/FWDs predicted lower than others?~~ **FIXED:** Double clean sheet calculation bug was inflating GK/DEF predictions by ~2pts
 - [ ] Why are predictions consistent across GWs?
 - [x] ~~Why is Travers so popular?~~ **IDENTIFIED:** Name matching failure between "Travers" (db) vs "Mark Travers" (historical) causes fallback to season averages instead of recent 0-minute form
-- [ ] **CRITICAL: Fix historical data matching** - Use ID mapping instead of names (historical.element ≠ players.id, e.g., Mo Salah: 328→381)
+- [x] **CRITICAL: Fix historical data matching** - Use ID mapping instead of names (historical.element ≠ players.id, e.g., Mo Salah: 328→381)
 - [ ] Can we calculated expected goals conceded instead?
 - [ ] Should we estimate expected defensive interactions? We might want to pull from a different data store here
-- [ ] Bonus points - are we doing it? Do we want to enable always?
+- [x] ~~Bonus points - are we doing it? Do we want to enable always?~~ **CONFIRMED:** Bonus points are implemented and being calculated (include_bonus=True in prediction engine)
 - [ ] Potential: Looking at season total minutes as a threshold for minutes predictions, should we not use % of minutes played in the last few gameweeks?
 - [ ] Defensive coding everywhere! I would much rather fail obviously from a data issue. A good example of this is default parameter values.
 - [ ] Bring in data from other leagues if we can!
-- [ ] Quite a lot of defenders are predicted to score highly?
+- [x] ~~Quite a lot of defenders are predicted to score highly?~~ **FIXED:** Implemented Poisson-based goal conceded penalty system - now +1.24 pts over-prediction vs previous +1.58 pts
+- [ ] Learning curve for existing models? Do we have enough training data?
 
 ### Model Calibration Issues (From Prediction vs Reality Analysis)
-- [ ] **Defender prediction logic needs refinement** - Model is 88.1% too optimistic for defenders (+1.58 pts average)
+- [x] ~~**CRITICAL: Implement negative penalties**~~ **COMPLETED:** Implemented Poisson-based goal conceded penalties (2-3 goals: -1pt, 4-5: -2pts, 6-7: -3pts, 8-9: -4pts) with proper non-overlapping buckets
+- [ ] **Defender goal expectations too high** - 36 defenders predicted >0.1 goals/game (e.g., Kiwior 0.215, many at 0.15+) - need position-specific caps or model recalibration
+- [ ] **Clean sheet probability validation** - A few defenders have >40% CS probability (Calafiori 50.3%, Fofana 49.3%) - check team defense model
 - [ ] **Elite player identification** - Under-predicting top performers (Salah: pred 6.0 vs actual 9.1, Isak: pred 3.8 vs actual 6.2)
-- [ ] **Playing time estimation for young/squad players** - Over-predicting rotation-prone players (Lewis-Skelly: pred 5.05 vs actual 1.61)
-- [ ] **Investigate defender over-prediction** - Why are defenders consistently predicted too high? Check clean sheet probability calculations
-- [ ] **Improve ceiling detection** - Model may not be capturing the upside potential of premium players
-
-### Bug Fixes Completed ✅
-- [x] **Clean Sheet Double Calculation:** Fixed duplicate clean sheet points in `_calculate_base_fpl_points()` - defenders/GKs were getting 4pts twice instead of once
+- [x] ~~**Playing time estimation for young/squad players**~~ **PARTIALLY IMPROVED:** Still over-predicting rotation players (Lewis-Skelly: pred 4.7 vs actual 1.6) but penalty system now differentiates strong vs weak defenses (+1.08 pt separation)
