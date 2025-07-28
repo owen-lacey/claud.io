@@ -16,6 +16,7 @@
 - [x] ~~Quite a lot of defenders are predicted to score highly?~~ **FIXED:** Implemented Poisson-based goal conceded penalty system - now +1.24 pts over-prediction vs previous +1.58 pts
 - [ ] Learning curve for existing models? Do we have enough training data?
 - [ ] Should we be using form?
+- [ ] Put players we don't have predictions for into buckets and tackle them
 
 ### Model Calibration Issues (From Prediction vs Reality Analysis)
 - [x] ~~**CRITICAL: Implement negative penalties**~~ **COMPLETED:** Implemented Poisson-based goal conceded penalties (2-3 goals: -1pt, 4-5: -2pts, 6-7: -3pts, 8-9: -4pts) with proper non-overlapping buckets

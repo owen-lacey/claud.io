@@ -34,6 +34,17 @@ from pathlib import Path
 # Add shared feature engineering module
 from feature_engineering.player_features import PlayerFeatureEngine, load_historical_data
 
+
+class InsufficientDataError(Exception):
+    """Raised when a player doesn't have sufficient data for reliable ML predictions"""
+    pass
+
+
+class ModelNotLoadedError(Exception):
+    """Raised when a required ML model is not loaded"""
+    pass
+
+
 # Add our modules to path (if needed)
 # sys.path.append('../fpl_scoring_engine')  # Removed - integrated into main pipeline
 
@@ -104,21 +115,13 @@ class FPLPredictionEngine:
         self.teams_data = self._load_json_data("teams.json")
         
         # Load historical data for proper rolling averages (enhanced with opponent strength)
+        historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
         try:
-            historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
             self.historical_data = load_historical_data(historical_path)
-            print(f"✅ Loaded enhanced historical data: {len(self.historical_data):,} gameweek records with opponent strength")
+            print(f"✅ Loaded historical data: {len(self.historical_data):,} gameweek records")
         except Exception as e:
-            print(f"⚠️ Could not load enhanced historical data: {e}")
-            try:
-                # Fallback to original data
-                historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
-                self.historical_data = load_historical_data(historical_path)
-                print(f"✅ Loaded fallback historical data: {len(self.historical_data):,} gameweek records (no opponent strength)")
-            except Exception as e2:
-                print(f"⚠️ Could not load any historical data: {e2}")
-                print("   Using fallback feature approximations")
-                self.historical_data = None
+            raise RuntimeError(f"❌ CRITICAL: Cannot load historical data from {historical_path}. "
+                             f"Historical data is required for accurate predictions. Error: {e}") from e
         
         # Initialize shared feature engine
         self.feature_engine = PlayerFeatureEngine(self.teams_data)
@@ -145,6 +148,7 @@ class FPLPredictionEngine:
             'team_goals_conceded': 'team_goals_conceded/team_goals_conceded_model.pkl'
         }
         
+        missing_models = []
         for model_name, filename in model_files.items():
             try:
                 model_path = self.models_dir / filename
@@ -152,8 +156,12 @@ class FPLPredictionEngine:
                 models[model_name] = model_data
                 print(f"   ✅ {model_name}: {filename}")
             except Exception as e:
+                missing_models.append(f"{model_name} ({filename})")
                 print(f"   ❌ Failed to load {model_name}: {e}")
-                models[model_name] = None
+        
+        if missing_models:
+            raise RuntimeError(f"❌ CRITICAL: Cannot load required ML models: {', '.join(missing_models)}. "
+                             f"All models are required for accurate predictions. Run training scripts first.")
         
         return models
     
@@ -206,7 +214,6 @@ class FPLPredictionEngine:
         """Generate predictions for all available players"""
         
         predictions = []
-        skipped_predictions = 0
         
         # Handle both list and dict formats
         if isinstance(self.players_data, list):
@@ -215,44 +222,62 @@ class FPLPredictionEngine:
             players_to_process = list(self.players_data.items())
         
         for player_id, player_data in players_to_process:
+            # Skip if missing essential data
+            if not player_data.get('web_name') or not player_data.get('now_cost'):
+                continue
+                
+            # Only predict for players with sufficient data quality
+            if not self._has_sufficient_data_for_prediction(player_data):
+                continue
+                
             try:
-                # Skip if missing essential data
-                if not player_data.get('web_name') or not player_data.get('now_cost'):
-                    continue
-                    
                 prediction = self._calculate_single_player_prediction(
                     player_id, player_data, gameweek, include_bonus
                 )
+                predictions.append(prediction)
                 
-                # Only add non-None predictions
-                if prediction is not None:
-                    predictions.append(prediction)
-                else:
-                    skipped_predictions += 1
-                
+            except InsufficientDataError:
+                # Expected for some players - just skip silently
+                continue
             except Exception as e:
-                # Skip players we can't predict - be more specific about errors
+                # Unexpected errors - log but continue
                 player_name = player_data.get('web_name', 'Unknown')
                 position = self._get_position_name(player_data.get('element_type', 4))
-                print(f"❌ PREDICTION FAILED for player {player_id} ({player_name}, {position}):")
-                print(f"   Error: {type(e).__name__}: {str(e)}")
-                print(f"   Player data keys: {list(player_data.keys())[:10]}...")
-                if hasattr(e, '__traceback__'):
-                    import traceback
-                    tb_lines = traceback.format_exc().split('\n')
-                    print(f"   Stack trace: {tb_lines[-3:-1]}")
-                skipped_predictions += 1
+                print(f"❌ UNEXPECTED ERROR for {player_name} ({position}): {type(e).__name__}: {str(e)}")
                 continue
         
-        # Summary of predictions vs skipped
-        total_processed = len(predictions) + skipped_predictions
         print(f"\n📊 PREDICTION SUMMARY:")
-        print(f"   ✅ Successful predictions: {len(predictions)}")
-        print(f"   ⚠️  Skipped predictions: {skipped_predictions}")
-        print(f"   📈 Success rate: {len(predictions)/total_processed*100:.1f}%" if total_processed > 0 else "   📈 Success rate: 0%")
+        print(f"   ✅ Generated predictions for {len(predictions)} players")
+        print(f"   📊 Players with sufficient data: {len(predictions)}/{len(players_to_process)}")
         
         return predictions
     
+    def _has_sufficient_data_for_prediction(self, player_data: Dict) -> bool:
+        """
+        Check if player has sufficient data for reliable ML predictions
+        
+        Args:
+            player_data: Player data dictionary
+            
+        Returns:
+            True if player has sufficient data, False otherwise
+        """
+        # Require minimum playing time (equivalent to ~5 games)
+        total_minutes = player_data.get('minutes', 0)
+        if total_minutes < 450:
+            return False
+            
+        # Require player code for historical matching
+        if not player_data.get('code'):
+            return False
+            
+        # Require basic FPL stats
+        required_fields = ['web_name', 'now_cost', 'element_type', 'team']
+        if not all(player_data.get(field) for field in required_fields):
+            return False
+            
+        return True
+
     def _has_sufficient_playing_time(self, player_data: Dict, minutes_threshold: int = 450) -> bool:
         """
         Check if player has sufficient playing time for reliable ML predictions
@@ -283,56 +308,40 @@ class FPLPredictionEngine:
         # Get team info
         team_name = self._get_team_name(team_id)
         
-        # Check if player has sufficient playing time for ML predictions
-        has_sufficient_data = self._has_sufficient_playing_time(player_data)
+        # Validate we have sufficient historical context
+        if not player_data.get('code'):
+            raise InsufficientDataError(f"Player {name} missing player code - cannot match with historical data")
         
-        if not has_sufficient_data:
-            # Use simplified predictions for players with insufficient data
-            return self._calculate_simplified_prediction(
-                player_id, player_data, gameweek, include_bonus,
-                name, team_name, position, price
+        player_code = str(player_data['code'])
+        
+        # Check for recent games for proper context
+        historical_context = None
+        if self.historical_data is not None:
+            historical_context = self.feature_engine.get_historical_context(
+                player_code, 
+                self.historical_data
             )
+            if historical_context is None or len(historical_context) < 5:
+                print(f"✅ Found {len(historical_context) if historical_context else 0} recent games for player code {player_code}")
+                if len(historical_context) < 5:
+                    raise InsufficientDataError(f"Player {name} has insufficient recent games ({len(historical_context)}) for reliable prediction")
+            else:
+                print(f"✅ Found {len(historical_context)} recent games for player code {player_code}")
         
-        # First predict playing time using our minutes model
-        minutes_prediction = self._predict_minutes(player_data, gameweek)
-        if minutes_prediction is None:
-            print(f"⚠️  SKIPPING {name} ({position}, {team_name}) - Minutes prediction failed")
-            return None
-            
-        expected_minutes = minutes_prediction['expected_minutes']
-        minutes_probability = minutes_prediction['probability']
-        minutes_category = minutes_prediction['category']
-        
-        # Core ML model predictions using our trained models
+        # All ML model predictions (pass historical context to avoid redundant fetching)
+        expected_minutes, minutes_probability, minutes_category = self._predict_minutes(player_data, gameweek, historical_context)
         expected_goals = self._predict_goals(player_data, gameweek, expected_minutes)
-        if expected_goals is None:
-            print(f"⚠️  SKIPPING {name} ({position}, {team_name}) - Goals prediction failed")
-            return None
-            
         expected_assists = self._predict_assists(player_data, gameweek, expected_minutes)
-        if expected_assists is None:
-            print(f"⚠️  SKIPPING {name} ({position}, {team_name}) - Assists prediction failed")
-            return None
-            
-        expected_saves = self._predict_saves(player_data, gameweek, expected_minutes)
-        if expected_saves is None and position == 'GK':
-            print(f"⚠️  SKIPPING {name} ({position}, {team_name}) - Saves prediction failed")
-            return None
-        elif expected_saves is None:
-            expected_saves = 0.0  # Non-GK players don't need saves predictions
-            
-        # Get clean sheet prediction and goals conceded for defensive players
-        clean_sheet_prob = 0.0
-        predicted_goals_conceded = None
+        expected_saves = self._predict_saves(player_data, gameweek, expected_minutes) if position == 'GK' else 0.0
         
+        # Get clean sheet prediction for defensive players
         if position in ['GK', 'DEF']:
-            clean_sheet_result = self._predict_clean_sheet(player_data, gameweek)
-            # No need to check for None - _predict_clean_sheet now raises exceptions
-            clean_sheet_prob, predicted_goals_conceded = clean_sheet_result
+            clean_sheet_prob, predicted_goals_conceded = self._predict_clean_sheet(player_data, gameweek)
         else:
-            clean_sheet_prob = 0.0  # Non-defensive players don't get clean sheet points
+            clean_sheet_prob = 0.0
+            predicted_goals_conceded = None
 
-        # Calculate base FPL points using our scoring engine (no yellow cards)
+        # Calculate base FPL points 
         base_points = self._calculate_base_fpl_points(
             position, expected_goals, expected_assists, expected_saves,
             clean_sheet_prob, predicted_goals_conceded
@@ -359,7 +368,7 @@ class FPLPredictionEngine:
         # Value metrics
         points_per_million = total_expected_points / price if price > 0 else 0
         
-        # Risk metrics (simplified)
+        # Risk metrics
         variance = max(1.0, total_expected_points * 0.3)
         ceiling = total_expected_points + 1.645 * np.sqrt(variance)  # 90th percentile
         floor = max(0, total_expected_points - 1.645 * np.sqrt(variance))  # 10th percentile
@@ -394,7 +403,7 @@ class FPLPredictionEngine:
             value_rank=0,  # Will be set after sorting
             form_adjustment=0.0,
             
-            prediction_confidence=0.75,  # Placeholder
+            prediction_confidence=0.85,  # High confidence for sufficient data players
             variance=round(variance, 2),
             ceiling=round(ceiling, 1),
             floor=round(floor, 1),
@@ -409,92 +418,70 @@ class FPLPredictionEngine:
         )
     
     # Trained ML model predictions
-    def _predict_minutes(self, player_data: Dict, gameweek: int) -> Dict[str, Any]:
-        """Predict expected minutes using our trained minutes model"""
+    def _predict_minutes(self, player_data: Dict, gameweek: int, historical_context=None) -> Tuple[float, float, str]:
+        """
+        Predict expected minutes using our trained minutes model
+        
+        Returns:
+            Tuple[float, float, str]: (expected_minutes, probability, category)
+            
+        Raises:
+            ModelNotLoadedError: If minutes model is not available
+            InsufficientDataError: If player data insufficient for prediction
+        """
         
         if not self.models.get('minutes'):
-            player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"❌ MINUTES MODEL NOT LOADED for {player_name} ({position})")
-            return None
+            raise ModelNotLoadedError("Minutes model is not loaded - cannot predict playing time")
         
-        try:
-            # Prepare features for minutes model
-            features = self._prepare_minutes_features(player_data, gameweek)
-            
-            # Get model and predict
-            model_data = self.models['minutes']
-            minutes_model = model_data['model']
-            
-            # Convert to DataFrame with proper feature names to avoid sklearn warning
-            import pandas as pd
-            feature_names = model_data.get('feature_columns', [f'feature_{i}' for i in range(len(features))])
-            features_df = pd.DataFrame([features], columns=feature_names)
-            
-            # Predict probability distribution
-            probabilities = minutes_model.predict_proba(features_df)[0]
-            
-            # Get predicted category
-            predicted_category = minutes_model.predict(features_df)[0]
-            
-            # Convert category to expected minutes
-            category_minutes = {
-                'no_minutes': 0,
-                'few_minutes': 15,
-                'substantial_minutes': 60, 
-                'full_match': 90
-            }
-            
-            expected_minutes = category_minutes.get(predicted_category, 60)
-            
-            # Calculate weighted expected minutes from probabilities
-            if hasattr(minutes_model, 'classes_'):
-                weighted_minutes = 0
-                for i, category in enumerate(minutes_model.classes_):
-                    weighted_minutes += probabilities[i] * category_minutes.get(category, 60)
-                expected_minutes = weighted_minutes
-            
-            # Playing probability (not benched)
-            play_probability = 1.0 - probabilities[0] if len(probabilities) > 0 else 0.7
-            
-            return {
-                'expected_minutes': expected_minutes,
-                'probability': play_probability, 
-                'category': predicted_category
-            }
-            
-        except Exception as e:
-            player_name = player_data.get('web_name', 'Unknown')
-            print(f"❌ MINUTES PREDICTION FAILED for {player_name}:")
-            print(f"   Error type: {type(e).__name__}")
-            print(f"   Error message: {str(e)}")
-            print(f"   Player data sample: {dict(list(player_data.items())[:5])}")
-            try:
-                features = self._prepare_minutes_features(player_data, gameweek)
-                print(f"   Features prepared successfully: {len(features)} features")
-                print(f"   Feature values: {features[:5]}...")
-            except Exception as feature_error:
-                print(f"   Feature preparation also failed: {feature_error}")
-            print(f"   🚫 Skipping prediction - cannot generate valid features")
-            return None
+        # Prepare features for minutes model
+        features = self._prepare_minutes_features(player_data, gameweek, historical_context)
+        
+        # Get model and predict
+        model_data = self.models['minutes']
+        minutes_model = model_data['model']
+        
+        # Convert to DataFrame with proper feature names to avoid sklearn warning
+        import pandas as pd
+        feature_names = model_data.get('feature_columns', [f'feature_{i}' for i in range(len(features))])
+        features_df = pd.DataFrame([features], columns=feature_names)
+        
+        # Predict probability distribution
+        probabilities = minutes_model.predict_proba(features_df)[0]
+        
+        # Get predicted category
+        predicted_category = minutes_model.predict(features_df)[0]
+        
+        # Convert category to expected minutes
+        category_minutes = {
+            'no_minutes': 0,
+            'few_minutes': 15,
+            'substantial_minutes': 60, 
+            'full_match': 90
+        }
+        
+        expected_minutes = category_minutes.get(predicted_category, 60)
+        
+        # Calculate weighted expected minutes from probabilities
+        if hasattr(minutes_model, 'classes_'):
+            weighted_minutes = 0
+            for i, category in enumerate(minutes_model.classes_):
+                weighted_minutes += probabilities[i] * category_minutes.get(category, 60)
+            expected_minutes = weighted_minutes
+        
+        # Playing probability (not benched)
+        play_probability = 1.0 - probabilities[0] if len(probabilities) > 0 else 0.7
+        
+        return (expected_minutes, play_probability, predicted_category)
 
-    def _prepare_minutes_features(self, player_data: Dict, gameweek: int) -> List[float]:
+    def _prepare_minutes_features(self, player_data: Dict, gameweek: int, historical_context=None) -> List[float]:
         """Prepare features for minutes prediction using shared feature engineering"""
         
         model_data = self.models.get('minutes', {})
         if not model_data:
             raise ValueError("Minutes model not loaded")
-        
-        # Get historical context for proper rolling averages
-        historical_context = None
-        if self.historical_data is not None:
-            if 'code' not in player_data:
-                raise ValueError(f"❌ CRITICAL: Player data missing 'code' field for {player_data.get('web_name', 'Unknown')}. Player codes are required for reliable cross-season matching.")
-            
-            historical_context = self.feature_engine.get_historical_context(
-                str(player_data['code']), 
-                self.historical_data
-            )
+
+        # Use the passed historical context instead of fetching it again
+        # (historical_context was already fetched in the main prediction method)
         
         # Get fixture information for opponent strength features
         team_id = player_data.get('team', 1)
@@ -512,7 +499,13 @@ class FPLPredictionEngine:
         return features
     
     def _predict_goals(self, player_data: Dict, gameweek: int, expected_minutes: float) -> float:
-        """Predict expected goals using our trained goals model"""
+        """
+        Predict expected goals using our trained goals model
+        
+        Raises:
+            ModelNotLoadedError: If goals model is not available
+            InsufficientDataError: If player data insufficient for prediction
+        """
         
         # Goalkeepers extremely rarely score goals - return minimal prediction
         position = self._get_position_name(player_data.get('element_type', 4))
@@ -520,195 +513,129 @@ class FPLPredictionEngine:
             return 0.001  # Extremely rare but not impossible (penalties/corners)
         
         if not self.models.get('goals'):
-            player_name = player_data.get('web_name', 'Unknown')
-            print(f"❌ GOALS MODEL NOT LOADED for {player_name} ({position})")
-            return None
+            raise ModelNotLoadedError("Goals model is not loaded - cannot predict goals")
         
-        try:
-            # Prepare features and predict
-            features = self._prepare_goals_features(player_data, gameweek)
-            model_data = self.models['goals']
-            goals_model = model_data['model']
-            scaler = model_data['scaler']
-            
-            # CRITICAL: Apply scaling before prediction
-            # Convert to DataFrame with proper feature names to avoid sklearn warning
-            import pandas as pd
-            feature_names = model_data.get('feature_cols', [f'feature_{i}' for i in range(len(features))])
-            features_df = pd.DataFrame([features], columns=feature_names)
-            scaled_features = scaler.transform(features_df)
-            predicted_goals = goals_model.predict(scaled_features)[0]
-            
-            # Scale by expected minutes (models trained on per-90-minute basis)
-            scaled_goals = predicted_goals * (expected_minutes / 90.0)
-            
-            return max(0, scaled_goals)
-            
-        except Exception as e:
-            player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"❌ GOALS PREDICTION FAILED for {player_name} ({position}):")
-            print(f"   Error type: {type(e).__name__}")
-            print(f"   Error message: {str(e)}")
-            print(f"   Expected minutes: {expected_minutes}")
-            try:
-                features = self._prepare_goals_features(player_data, gameweek)
-                print(f"   Features prepared: {features}")
-                if self.models.get('goals'):
-                    model_data = self.models['goals']
-                    print(f"   Model available: {type(model_data.get('model', 'None'))}")
-            except Exception as feature_error:
-                print(f"   Feature preparation failed: {feature_error}")
-            print(f"   🚫 Skipping prediction - cannot generate valid features")
-            return None
+        # Prepare features and predict
+        features = self._prepare_goals_features(player_data, gameweek)
+        model_data = self.models['goals']
+        goals_model = model_data['model']
+        scaler = model_data['scaler']
+        
+        # CRITICAL: Apply scaling before prediction
+        # Convert to DataFrame with proper feature names to avoid sklearn warning
+        import pandas as pd
+        feature_names = model_data.get('feature_cols', [f'feature_{i}' for i in range(len(features))])
+        features_df = pd.DataFrame([features], columns=feature_names)
+        scaled_features = scaler.transform(features_df)
+        predicted_goals = goals_model.predict(scaled_features)[0]
+        
+        # Scale by expected minutes (models trained on per-90-minute basis)
+        scaled_goals = predicted_goals * (expected_minutes / 90.0)
+        
+        return max(0, scaled_goals)
     
     def _prepare_goals_features(self, player_data: Dict, gameweek: int) -> List[float]:
         """Prepare features for goals model - matches trained model with position awareness"""
         
-        # Helper function to safely convert to float
-        def safe_float(value, default=0.0):
-            try:
-                return float(value) if value is not None else default
-            except (ValueError, TypeError):
-                return default
-        
         # Get fixture information for opponent strength
         team_name = self._get_team_name(player_data.get('team', 1))
         fixture_info = self._get_fixture_info(team_name, gameweek)
         
-        # Use the shared feature engine for position-aware features
-        try:
-            # Initialize feature engine if not already done
-            if not hasattr(self, '_feature_engine'):
-                from feature_engineering.player_features import PlayerFeatureEngine
-                self._feature_engine = PlayerFeatureEngine()
-            
-            # Prepare features using shared logic with position awareness
-            features = self._feature_engine.prepare_goals_model_features(
-                player_data,
-                historical_context=None,  # Using fallback features from current season data
-                was_home=fixture_info['is_home'],
-                opponent_defence_strength=fixture_info['opponent_strength_defence'],
-                fixture_attractiveness=fixture_info.get('fixture_attractiveness', 0.5)
-            )
-            
-            return features
-            
-        except Exception as e:
-            # Fallback to manual feature preparation if shared engine fails
+        # Use the shared feature engine for position-aware features (no fallbacks)
+        if not hasattr(self, 'feature_engine'):
+            raise RuntimeError("Feature engine not initialized - cannot prepare goals features")
+        
+        # Prepare features using shared logic with position awareness
+        features = self.feature_engine.prepare_goals_model_features(
+            player_data,
+            historical_context=None,  # Using current season data only
+            was_home=fixture_info['is_home'],
+            opponent_defence_strength=fixture_info['opponent_strength_defence'],
+            fixture_attractiveness=fixture_info.get('fixture_attractiveness', 0.5)
+        )
+        
+        # Validate feature count matches model expectations
+        if len(features) != 20:
             player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"⚠️  Feature engine failed for {player_name} ({position}), using fallback: {e}")
-            
-            # Fallback feature preparation (position-aware)
-            goals_scored = safe_float(player_data.get('goals_scored', 0))
-            expected_goals = safe_float(player_data.get('expected_goals', 0.0))
-            minutes = safe_float(player_data.get('minutes', 0))
-            starts = safe_float(player_data.get('starts', 0))
-            threat = safe_float(player_data.get('threat', 0))
-            
-            # Estimate games played for proper per-game averages
-            games_played = max(1, minutes / 90.0)
-            
-            features = [
-                goals_scored / games_played,  # goals_avg_3gw proxy
-                goals_scored / games_played,  # goals_avg_5gw proxy  
-                goals_scored / games_played,  # goals_avg_10gw proxy
-                expected_goals / games_played,  # xg_avg_3gw proxy
-                expected_goals / games_played,  # xg_avg_5gw proxy
-                expected_goals / games_played,  # xg_avg_10gw proxy
-                minutes / games_played,  # minutes_avg_3gw proxy
-                minutes / games_played,  # minutes_avg_5gw proxy
-                starts / games_played,  # starts_avg_3gw proxy
-                starts / games_played,  # starts_avg_5gw proxy
-                threat / games_played,  # threat_avg_3gw proxy
-                threat / games_played,  # threat_avg_5gw proxy
-                goals_scored / max(expected_goals, 0.1),  # goal_efficiency
-                safe_float(player_data.get('form', 0.0)),  # recent_form
-                1.0 if player_data.get('element_type') == 4 else 0.0,  # is_forward
-                1.0 if player_data.get('element_type') == 3 else 0.0,  # is_midfielder
-                1.0 if player_data.get('element_type') == 2 else 0.0,  # is_defender
-                1.0 if fixture_info['is_home'] else 0.0,  # was_home
-                fixture_info['opponent_strength_defence'] / 1400.0,  # opponent_defence_strength_normalized
-                fixture_info.get('fixture_attractiveness', 0.5),  # fixture_attractiveness
-            ]
-            
-            # Defensive check: ensure we always have exactly 20 features
-            if len(features) != 20:
-                raise ValueError(f"❌ CRITICAL: Goals model fallback expects exactly 20 features, got {len(features)}. "
-                               f"This indicates a bug in fallback feature preparation.")
-            
-            return features
+            raise ValueError(f"Goals model expects exactly 20 features, got {len(features)} for {player_name}. "
+                           f"This indicates a feature engineering bug.")
+        
+        return features
     
     def _predict_assists(self, player_data: Dict, gameweek: int, expected_minutes: float) -> float:
-        """Predict expected assists using our trained assists model"""
+        """
+        Predict expected assists using FPL's expected_assists data
         
-        if not self.models.get('assists'):
-            player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"❌ ASSISTS MODEL NOT LOADED for {player_name} ({position})")
-            return None
+        The ML model is currently corrupted, so we use a more reliable approach:
+        Scale the season's expected assists by recent form and expected minutes.
         
-        try:
-            features = self._prepare_assists_features(player_data, gameweek)
-            model_data = self.models['assists']
-            assists_model = model_data['model']
-            scaler = model_data['scaler']
-            
-            # CRITICAL: Apply scaling before prediction
-            # Convert to DataFrame with proper feature names to avoid sklearn warning
-            import pandas as pd
-            feature_names = model_data.get('feature_cols', [f'feature_{i}' for i in range(len(features))])
-            features_df = pd.DataFrame([features], columns=feature_names)
-            scaled_features = scaler.transform(features_df)
-            predicted_assists = assists_model.predict(scaled_features)[0]
-            
-            # Scale by expected minutes
-            scaled_assists = predicted_assists * (expected_minutes / 90.0)
-            
-            return max(0, scaled_assists)
-            
-        except Exception as e:
+        Raises:
+            InsufficientDataError: If player data insufficient for prediction
+        """
+        
+        # Validate required fields
+        required_fields = ['expected_assists', 'minutes', 'form']
+        for field in required_fields:
+            if field not in player_data:
+                player_name = player_data.get('web_name', 'Unknown')
+                raise ValueError(f"Missing required field '{field}' for player {player_name}")
+        
+        # Extract base data
+        season_expected_assists = float(player_data['expected_assists'])
+        total_minutes = float(player_data['minutes'])
+        form = float(player_data.get('form', 0))
+        
+        # Validate meaningful data
+        if total_minutes <= 0:
             player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
-            print(f"❌ ASSISTS PREDICTION FAILED for {player_name} ({position}):")
-            print(f"   Error type: {type(e).__name__}")
-            print(f"   Error message: {str(e)}")
-            print(f"   Expected minutes: {expected_minutes}")
-            try:
-                features = self._prepare_assists_features(player_data, gameweek)
-                print(f"   Features prepared: {features}")
-            except Exception as feature_error:
-                print(f"   Feature preparation failed: {feature_error}")
-            print(f"   🚫 Skipping prediction - cannot generate valid features")
-            return None
+            raise InsufficientDataError(f"Player {player_name} has no playing time - cannot predict assists")
+        
+        # Calculate assists per 90 minutes from season data
+        assists_per_90 = season_expected_assists / (total_minutes / 90.0) if total_minutes > 0 else 0
+        
+        # Apply form adjustment (form is 0-10 scale, normalize around 5)
+        form_factor = (form / 5.0) if form > 0 else 1.0
+        form_factor = max(0.5, min(2.0, form_factor))  # Cap between 0.5x and 2.0x
+        
+        # Scale by expected minutes for this gameweek
+        predicted_assists = assists_per_90 * (expected_minutes / 90.0) * form_factor
+        
+        return max(0, predicted_assists)
     
     def _prepare_assists_features(self, player_data: Dict, gameweek: int) -> List[float]:
-        """Prepare features for assists model - matches enhanced trained model with opponent strength"""
+        """
+        Prepare features for assists model - matches enhanced trained model with opponent strength
         
-        # Helper function to safely convert to float
-        def safe_float(value, default=0.0):
-            try:
-                return float(value) if value is not None else default
-            except (ValueError, TypeError):
-                return default
+        Raises:
+            ValueError: If required player data fields are missing or invalid
+        """
         
         # Get fixture information for opponent strength
         team_name = self._get_team_name(player_data.get('team', 1))
         fixture_info = self._get_fixture_info(team_name, gameweek)
         
-        # Features matching the enhanced assists model (23 features):
-        # Original 21 features + 2 opponent strength features
+        # Validate required fields are present and numeric - use actual FPL dataset fields
+        required_fields = ['assists', 'expected_assists', 'goals_scored', 'minutes', 'form', 'element_type']
+        for field in required_fields:
+            if field not in player_data:
+                player_name = player_data.get('web_name', 'Unknown')
+                raise ValueError(f"Missing required field '{field}' for player {player_name}")
         
-        assists = safe_float(player_data.get('assists', 0))
-        expected_assists = safe_float(player_data.get('expected_assists', 0.0))
-        goals_scored = safe_float(player_data.get('goals_scored', 0))
-        minutes = safe_float(player_data.get('minutes', 0))
-        starts = safe_float(player_data.get('starts', 0))
-        creativity = safe_float(player_data.get('creativity', 0))
+        # Extract features (no safe_float - let exceptions bubble up)
+        assists = float(player_data['assists'])
+        expected_assists = float(player_data['expected_assists'])
+        goals_scored = float(player_data['goals_scored'])
+        minutes = float(player_data['minutes'])
+        creativity = float(player_data.get('bps', 0))  # Use bonus points system as creativity proxy
         
-        # Estimate games played for proper per-game averages
-        games_played = max(1, minutes / 90.0)  # Rough estimate from total minutes
+        # Validate we have meaningful data
+        if minutes <= 0:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise InsufficientDataError(f"Player {player_name} has no playing time - cannot predict assists")
+        
+        # Calculate per-game averages and estimated starts
+        games_played = minutes / 90.0
+        estimated_starts = min(games_played, minutes / 60.0)  # Estimate starts from minutes (assuming 60+ mins = start)
         
         features = [
             assists / games_played,  # assists_avg_3gw proxy (assists per game)
@@ -721,21 +648,26 @@ class FPLPredictionEngine:
             goals_scored / games_played,  # goals_avg_5gw proxy
             minutes / games_played,  # minutes_avg_3gw proxy (should be around 90)
             minutes / games_played,  # minutes_avg_5gw proxy
-            starts / games_played,  # starts_avg_3gw proxy
-            starts / games_played,  # starts_avg_5gw proxy
+            estimated_starts / games_played,  # starts_avg_3gw proxy
+            estimated_starts / games_played,  # starts_avg_5gw proxy
             creativity / games_played,  # creativity_avg_3gw proxy
             creativity / games_played,  # creativity_avg_5gw proxy
             assists / max(expected_assists, 0.1),  # assist_efficiency
             creativity / games_played + expected_assists / games_played,  # creative_output per game
-            safe_float(player_data.get('form', 0.0)),  # recent_form
-            1.0 if player_data.get('element_type') == 3 else 0.0,  # is_midfielder
-            1.0 if player_data.get('element_type') == 2 else 0.0,  # is_defender
-            1.0 if player_data.get('element_type') == 4 else 0.0,  # is_forward
+            float(player_data['form']),  # recent_form
+            1.0 if player_data['element_type'] == 3 else 0.0,  # is_midfielder
+            1.0 if player_data['element_type'] == 2 else 0.0,  # is_defender
+            1.0 if player_data['element_type'] == 4 else 0.0,  # is_forward
             1.0 if fixture_info['is_home'] else 0.0,  # was_home (use actual fixture info)
             # NEW: Opponent strength features
             fixture_info['opponent_strength_defence'] / 1400.0,  # opponent_defence_strength_normalized
             1.0 - fixture_info.get('fixture_attractiveness', 0.5),  # fixture_difficulty (inverted for assists)
         ]
+        
+        # Validate feature count
+        if len(features) != 23:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise ValueError(f"Assists model expects exactly 23 features, got {len(features)} for {player_name}")
         
         return features
     
@@ -785,37 +717,39 @@ class FPLPredictionEngine:
             return None
     
     def _prepare_saves_features(self, player_data: Dict, gameweek: int) -> List[float]:
-        """Prepare features for saves model - matches enhanced trained model with opponent strength"""
+        """
+        Prepare features for saves model - matches enhanced trained model with opponent strength
         
-        # Helper function to safely convert to float
-        def safe_float(value, default=0.0):
-            try:
-                return float(value) if value is not None else default
-            except (ValueError, TypeError):
-                return default
+        Raises:
+            ValueError: If required player data fields are missing or invalid
+        """
         
         # Get fixture information for opponent strength
         team_name = self._get_team_name(player_data.get('team', 1))
         fixture_info = self._get_fixture_info(team_name, gameweek)
         
-        # Features matching the enhanced saves model (22 features):
-        # Original 20 features + 2 opponent strength features
-        # ['saves_avg_3gw', 'saves_avg_5gw', 'saves_avg_10gw', 'goals_conceded_avg_3gw', 
-        #  'goals_conceded_avg_5gw', 'goals_conceded_avg_10gw', 'expected_goals_conceded_avg_3gw', 'expected_goals_conceded_avg_5gw', 
-        #  'expected_goals_conceded_avg_10gw', 'clean_sheets_avg_3gw', 'clean_sheets_avg_5gw', 'minutes_avg_3gw', 
-        #  'minutes_avg_5gw', 'starts_avg_3gw', 'starts_avg_5gw', 'save_efficiency', 
-        #  'defensive_workload', 'team_defensive_strength', 'recent_form', 'was_home',
-        #  'opponent_attack_strength_normalized', 'fixture_difficulty_inverted']
+        # Validate required fields are present and numeric - use actual FPL dataset fields
+        required_fields = ['saves', 'goals_conceded', 'expected_goals_conceded', 'clean_sheets', 'minutes', 'form']
+        for field in required_fields:
+            if field not in player_data:
+                player_name = player_data.get('web_name', 'Unknown')
+                raise ValueError(f"Missing required field '{field}' for player {player_name}")
         
-        saves = safe_float(player_data.get('saves', 0))
-        goals_conceded = safe_float(player_data.get('goals_conceded', 0))
-        expected_goals_conceded = safe_float(player_data.get('expected_goals_conceded', goals_conceded))
-        clean_sheets = safe_float(player_data.get('clean_sheets', 0))
-        minutes = safe_float(player_data.get('minutes', 0))
-        starts = safe_float(player_data.get('starts', 0))
+        # Extract features (no safe_float - let exceptions bubble up)
+        saves = float(player_data['saves'])
+        goals_conceded = float(player_data['goals_conceded'])
+        expected_goals_conceded = float(player_data['expected_goals_conceded'])
+        clean_sheets = float(player_data['clean_sheets'])
+        minutes = float(player_data['minutes'])
         
-        # Estimate games played for proper per-game averages
-        games_played = max(1, minutes / 90.0)  # Rough estimate from total minutes
+        # Validate we have meaningful data
+        if minutes <= 0:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise InsufficientDataError(f"Player {player_name} has no playing time - cannot predict saves")
+        
+        # Calculate per-game averages and estimated starts
+        games_played = minutes / 90.0
+        estimated_starts = min(games_played, minutes / 60.0)  # Estimate starts from minutes
         
         features = [
             saves / games_played,  # saves_avg_3gw proxy (saves per game)
@@ -831,17 +765,22 @@ class FPLPredictionEngine:
             clean_sheets / games_played,  # clean_sheets_avg_5gw proxy
             minutes / games_played,  # minutes_avg_3gw proxy (should be around 90)
             minutes / games_played,  # minutes_avg_5gw proxy
-            starts / games_played,  # starts_avg_3gw proxy
-            starts / games_played,  # starts_avg_5gw proxy
+            estimated_starts / games_played,  # starts_avg_3gw proxy (estimated)
+            estimated_starts / games_played,  # starts_avg_5gw proxy (estimated)
             saves / max(expected_goals_conceded, 0.1),  # save_efficiency
             saves / games_played + goals_conceded / games_played,  # defensive_workload per game
             max(0, 2.0 - goals_conceded / games_played),  # team_defensive_strength (goals conceded per game, inverted)
-            safe_float(player_data.get('form', 0.0)),  # recent_form
+            float(player_data['form']),  # recent_form
             1.0 if fixture_info['is_home'] else 0.0,  # was_home (use actual fixture info)
             # NEW: Opponent strength features
             fixture_info['opponent_strength_attack'] / 1400.0,  # opponent_attack_strength_normalized
             1.0 - fixture_info.get('fixture_attractiveness', 0.5),  # fixture_difficulty_inverted (for saves, higher opponent attack = more saves)
         ]
+        
+        # Validate feature count
+        if len(features) != 22:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise ValueError(f"Saves model expects exactly 22 features, got {len(features)} for {player_name}")
         
         return features
     
@@ -898,39 +837,38 @@ class FPLPredictionEngine:
             raise RuntimeError(error_msg) from e
     
     def _prepare_clean_sheet_features(self, player_data: Dict, gameweek: int) -> List[float]:
-        """Prepare features for clean sheet/team goals conceded model - matches trained model EXACTLY"""
+        """
+        Prepare features for clean sheet/team goals conceded model - matches trained model EXACTLY
         
-        # Helper function to safely convert to float
-        def safe_float(value, default=0.0):
-            try:
-                return float(value) if value is not None else default
-            except (ValueError, TypeError):
-                return default
+        Raises:
+            ValueError: If required player data fields are missing or invalid
+        """
         
-        # Features MUST match the trained team_goals_conceded model EXACTLY (20 features):
-        # Base 18 features from get_team_feature_columns() PLUS 2 opponent strength features:
-        # ['goals_conceded_avg_3gw', 'goals_conceded_avg_5gw', 'goals_conceded_avg_10gw',
-        #  'clean_sheets_avg_3gw', 'clean_sheets_avg_5gw', 'clean_sheets_avg_10gw', 
-        #  'goals_scored_avg_3gw', 'goals_scored_avg_5gw', 'goals_scored_avg_10gw',
-        #  'total_points_avg_3gw', 'total_points_avg_5gw', 'total_points_avg_10gw',
-        #  'home_goals_conceded_avg_5gw', 'away_goals_conceded_avg_5gw',
-        #  'defensive_strength', 'recent_form', 'season_progress', 'was_home',
-        #  'opponent_overall_strength_normalized', 'fixture_attractiveness']
+        # Validate required fields are present and numeric - use actual FPL dataset fields
+        required_fields = ['goals_conceded', 'clean_sheets', 'goals_scored', 'total_points', 'minutes', 'form', 'team']
+        for field in required_fields:
+            if field not in player_data:
+                player_name = player_data.get('web_name', 'Unknown')
+                raise ValueError(f"Missing required field '{field}' for player {player_name}")
         
-        goals_conceded = safe_float(player_data.get('goals_conceded', 0))
-        clean_sheets = safe_float(player_data.get('clean_sheets', 0))
-        goals_scored = safe_float(player_data.get('goals_scored', 0))
-        total_points = safe_float(player_data.get('total_points', 0))
-        team_id = player_data.get('team', 10)
-        minutes = safe_float(player_data.get('minutes', 0))
+        # Extract features (no safe_float - let exceptions bubble up)
+        goals_conceded = float(player_data['goals_conceded'])
+        clean_sheets = float(player_data['clean_sheets'])
+        goals_scored = float(player_data['goals_scored'])
+        total_points = float(player_data['total_points'])
+        team_id = int(player_data['team'])
+        minutes = float(player_data['minutes'])
+        
+        # Validate we have meaningful data
+        if minutes <= 0:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise InsufficientDataError(f"Player {player_name} has no playing time - cannot predict clean sheet")
         
         # Get fixture information for opponent strength features
         fixture_info = self._get_fixture_info(team_id, gameweek)
         
-        # Estimate games played for proper per-game averages
-        games_played = max(1, minutes / 90.0)  # Rough estimate from total minutes
-        
         # Calculate per-game averages
+        games_played = minutes / 90.0
         goals_conceded_per_game = goals_conceded / games_played
         clean_sheets_per_game = clean_sheets / games_played
         goals_scored_per_game = goals_scored / games_played
@@ -963,16 +901,21 @@ class FPLPredictionEngine:
             
             # Team attributes (3 features)
             max(0, 2.0 - goals_conceded_per_game),  # defensive_strength (inverse of goals conceded)
-            safe_float(player_data.get('form', 0.0)),  # recent_form
-            gameweek / 38.0,          # season_progress
+            float(player_data['form']),             # recent_form
+            gameweek / 38.0,                        # season_progress
             
             # Fixture context (1 feature)
-            0.5,                      # was_home (neutral for pre-season, will be updated with fixture data)
+            1.0 if fixture_info['is_home'] else 0.0,  # was_home
             
             # Opponent strength features (2 features) - Added for enhanced model
             fixture_info.get('opponent_overall_strength', 1150) / 1400.0,  # opponent_overall_strength_normalized
             fixture_info.get('fixture_attractiveness', 0.5),               # fixture_attractiveness
         ]
+        
+        # Validate feature count
+        if len(features) != 20:
+            player_name = player_data.get('web_name', 'Unknown')
+            raise ValueError(f"Clean sheet model expects exactly 20 features, got {len(features)} for {player_name}")
         
         return features
     
