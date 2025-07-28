@@ -15,5 +15,12 @@
 - [ ] Bring in data from other leagues if we can!
 - [ ] Quite a lot of defenders are predicted to score highly?
 
+### Model Calibration Issues (From Prediction vs Reality Analysis)
+- [ ] **Defender prediction logic needs refinement** - Model is 88.1% too optimistic for defenders (+1.58 pts average)
+- [ ] **Elite player identification** - Under-predicting top performers (Salah: pred 6.0 vs actual 9.1, Isak: pred 3.8 vs actual 6.2)
+- [ ] **Playing time estimation for young/squad players** - Over-predicting rotation-prone players (Lewis-Skelly: pred 5.05 vs actual 1.61)
+- [ ] **Investigate defender over-prediction** - Why are defenders consistently predicted too high? Check clean sheet probability calculations
+- [ ] **Improve ceiling detection** - Model may not be capturing the upside potential of premium players
+
 ### Bug Fixes Completed ✅
 - [x] **Clean Sheet Double Calculation:** Fixed duplicate clean sheet points in `_calculate_base_fpl_points()` - defenders/GKs were getting 4pts twice instead of once
