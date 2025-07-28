@@ -98,6 +98,7 @@ def process_csv_file(file_path: str) -> str:
     """
     Manipulates a CSV file to keep specified columns and the last column of each row.
     Now also adds player code information for cross-season consistency.
+    Handles variable column formats by using relative positioning from the end.
 
     Args:
         file_path: Path to the input CSV file.
@@ -195,7 +196,10 @@ def process_csv_file(file_path: str) -> str:
             for row_data in csv_reader:
                 if not row_data:  # Skip empty rows
                     continue
-                    
+                
+                # Detect column format based on number of fields
+                num_columns = len(row_data)
+                
                 output_row_values = []
                 
                 # Build the row according to the new header structure
@@ -209,6 +213,17 @@ def process_csv_file(file_path: str) -> str:
                             output_row_values.append(player_code)
                         except Exception as e:
                             print(f"⚠️ Warning: Could not get player code for element {element_id}: {e}")
+                            output_row_values.append('')
+                    elif col_name == 'total_points':
+                        # Use relative positioning: total_points is 8th column from the end
+                        try:
+                            total_points_idx = num_columns - 8
+                            if total_points_idx >= 0 and total_points_idx < len(row_data):
+                                output_row_values.append(row_data[total_points_idx])
+                            else:
+                                output_row_values.append('')
+                        except Exception as e:
+                            print(f"⚠️ Warning: Could not get total_points for row with {num_columns} columns: {e}")
                             output_row_values.append('')
                     elif col_name in ['opponent_attack_strength', 'opponent_defence_strength', 
                                     'opponent_overall_strength', 'fixture_attractiveness']:
