@@ -5,15 +5,17 @@ Predicts goals scored by individual players using Poisson regression.
 Foundation for attacking returns and bonus points predictions.
 """
 
+# Add parent directory to Python path for shared modules
+import sys
+import os
+data_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if data_dir not in sys.path:
+    sys.path.insert(0, data_dir)
+
 import pandas as pd
 import numpy as np
 import json
 import joblib
-import sys
-import os
-
-# Add parent directory to Python path for shared modules
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from datetime import datetime
 from collections import defaultdict
@@ -22,7 +24,6 @@ import seaborn as sns
 from scipy import stats
 
 # Add shared feature engineering module
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__))))
 from feature_engineering.player_features import PlayerFeatureEngine, load_historical_data, load_teams_data
 
 # Set style for plots
@@ -57,12 +58,12 @@ def load_data():
     return historical_df, players_data, teams_data
 
 def filter_attacking_players(historical_df):
-    """Filter to attacking players (FWD, MID) who have goal-scoring potential"""
-    print("\n⚽ Filtering to attacking players...")
+    """Filter to outfield players (FWD, MID, DEF) - includes defenders for position-aware training"""
+    print("\n⚽ Filtering to ALL outfield players (including defenders for position-aware model)...")
     
-    # Focus on forwards and midfielders
+    # Include forwards, midfielders AND defenders
     attacking_df = historical_df[
-        historical_df['position'].isin(['FWD', 'MID'])
+        historical_df['position'].isin(['FWD', 'MID', 'DEF'])
     ].copy()
     
     # Ensure numeric columns
@@ -72,16 +73,18 @@ def filter_attacking_players(historical_df):
     for col in numeric_cols:
         attacking_df[col] = pd.to_numeric(attacking_df[col], errors='coerce').fillna(0)
     
-    print(f"✅ Attacking players data: {len(attacking_df):,} records")
+    print(f"✅ Outfield players data: {len(attacking_df):,} records")
     print(f"✅ Unique players: {attacking_df['name'].nunique()}")
     print(f"✅ Position distribution:")
-    print(attacking_df['position'].value_counts())
+    position_counts = attacking_df['position'].value_counts()
+    for pos, count in position_counts.items():
+        print(f"    {pos}: {count:,} records ({count/len(attacking_df)*100:.1f}%)")
     
     return attacking_df
 
 def engineer_goal_scoring_features(attacking_df, feature_engine):
-    """Engineer features for goal prediction using shared feature engineering"""
-    print("\n🔧 Engineering goal-scoring features with shared PlayerFeatureEngine...")
+    """Engineer features for goal prediction using shared feature engineering with position awareness"""
+    print("\n🔧 Engineering goal-scoring features with position awareness...")
     
     # Define features relevant for goal scoring prediction
     goal_scoring_features = [
@@ -98,8 +101,10 @@ def engineer_goal_scoring_features(attacking_df, feature_engine):
         rolling_features=goal_scoring_features
     )
     
-    # Add position-specific features
+    # Add position-specific features (one-hot encoding)
     attacking_df_with_features['is_forward'] = (attacking_df_with_features['position'] == 'FWD').astype(int)
+    attacking_df_with_features['is_midfielder'] = (attacking_df_with_features['position'] == 'MID').astype(int)
+    attacking_df_with_features['is_defender'] = (attacking_df_with_features['position'] == 'DEF').astype(int)
     
     # Add derived features
     # Goal efficiency (goals per expected goal)
@@ -111,7 +116,11 @@ def engineer_goal_scoring_features(attacking_df, feature_engine):
     # Recent form (last 3 games total points) - already calculated by shared engine as 'form'
     attacking_df_with_features['recent_form'] = attacking_df_with_features['form']
     
-    print(f"✅ Feature engineering completed using shared engine")
+    print(f"✅ Feature engineering completed with position features")
+    print(f"✅ Position feature distribution:")
+    print(f"    Forwards: {attacking_df_with_features['is_forward'].sum():,}")
+    print(f"    Midfielders: {attacking_df_with_features['is_midfielder'].sum():,}")
+    print(f"    Defenders: {attacking_df_with_features['is_defender'].sum():,}")
     
     return attacking_df_with_features
 
@@ -178,10 +187,10 @@ def fit_goals_model(attacking_df, feature_engine):
     print(f"   Defence strength range: {model_df['opponent_defence_strength'].min():.0f} - {model_df['opponent_defence_strength'].max():.0f}")
     print(f"   Fixture attractiveness range: {model_df['fixture_attractiveness'].min():.3f} - {model_df['fixture_attractiveness'].max():.3f}")
     
-    # Get feature columns from shared method (single source of truth)
+    # Get feature columns from shared method (single source of truth) - use position-aware version
     feature_cols = feature_engine.get_goals_model_feature_columns()
     
-    print(f"🎯 Using shared feature definition: {len(feature_cols)} features")
+    print(f"🎯 Using position-aware feature definition: {len(feature_cols)} features")
     print(f"   Features: {', '.join(feature_cols[:5])}... (showing first 5)")
     
     # Prepare features and target
@@ -190,6 +199,13 @@ def fit_goals_model(attacking_df, feature_engine):
     
     print(f"✅ Training samples: {len(X):,}")
     print(f"✅ Features: {len(feature_cols)}")
+    
+    # Show goal distribution by position
+    print(f"\n📊 Goals by position in training data:")
+    for position in ['DEF', 'MID', 'FWD']:
+        pos_goals = model_df[model_df['position'] == position]['goals_scored']
+        if len(pos_goals) > 0:
+            print(f"   {position}: {pos_goals.mean():.3f} avg goals ({len(pos_goals):,} samples)")
     print(f"✅ Goals distribution:")
     print(y.value_counts().sort_index())
     
@@ -225,7 +241,7 @@ def fit_goals_model(attacking_df, feature_engine):
     train_mae = mean_absolute_error(y_train, y_train_pred)
     test_mae = mean_absolute_error(y_test, y_test_pred)
     
-    print(f"\n📊 Expected Goals Model Performance:")
+    print(f"\n📊 Position-Aware Expected Goals Model Performance:")
     print(f"  Training MSE: {train_mse:.3f}")
     print(f"  Test MSE: {test_mse:.3f}")
     print(f"  Training MAE: {train_mae:.3f}")
@@ -237,9 +253,29 @@ def fit_goals_model(attacking_df, feature_engine):
         'coefficient': poisson_model.coef_
     }).sort_values('coefficient', key=abs, ascending=False)
     
-    print(f"\n🎯 Feature Coefficients:")
-    for _, row in feature_importance.head(8).iterrows():
-        print(f"  {row['feature']}: {row['coefficient']:.3f}")
+    print(f"\n🎯 Feature Coefficients (Top 10):")
+    for _, row in feature_importance.head(10).iterrows():
+        print(f"  {row['feature']}: {row['coefficient']:+.3f}")
+    
+    # Position-specific analysis
+    print(f"\n🏷️ Position Coefficients:")
+    position_features = ['is_forward', 'is_midfielder', 'is_defender']
+    for feature in position_features:
+        if feature in feature_importance['feature'].values:
+            coef = feature_importance[feature_importance['feature'] == feature]['coefficient'].iloc[0]
+            print(f"  {feature}: {coef:+.3f}")
+    
+    # Test predictions by position
+    print(f"\n🎲 Test Set Predictions by Position:")
+    X_test_df = pd.DataFrame(X_test, columns=feature_cols)
+    
+    for pos_feature, pos_name in [('is_defender', 'DEF'), ('is_midfielder', 'MID'), ('is_forward', 'FWD')]:
+        if pos_feature in feature_cols:
+            pos_mask = X_test_df[pos_feature] == 1
+            if pos_mask.sum() > 0:
+                pos_pred = y_test_pred[pos_mask]
+                pos_actual = y_test.values[pos_mask]  # Use .values to avoid indexing issue
+                print(f"  {pos_name}: {pos_pred.mean():.3f} predicted vs {pos_actual.mean():.3f} actual (n={pos_mask.sum()})")
     
     return poisson_model, scaler, feature_cols
 
@@ -270,7 +306,7 @@ def create_prediction_functions(poisson_model, scaler, feature_cols, feature_eng
                 historical_df
             )
         
-        # Prepare features using shared logic
+        # Prepare features using shared logic - now includes position features
         features = feature_engine.prepare_goals_model_features(
             player_data,
             historical_context=historical_context,

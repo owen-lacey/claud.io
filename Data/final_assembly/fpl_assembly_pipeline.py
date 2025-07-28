@@ -563,7 +563,7 @@ class FPLPredictionEngine:
             return None
     
     def _prepare_goals_features(self, player_data: Dict, gameweek: int) -> List[float]:
-        """Prepare features for goals model - matches trained model with opponent strength"""
+        """Prepare features for goals model - matches trained model with position awareness"""
         
         # Helper function to safely convert to float
         def safe_float(value, default=0.0):
@@ -576,41 +576,69 @@ class FPLPredictionEngine:
         team_name = self._get_team_name(player_data.get('team', 1))
         fixture_info = self._get_fixture_info(team_name, gameweek)
         
-        # Features matching the enhanced goals model (18 features):
-        # Original 16 features + 2 opponent strength features
-        
-        goals_scored = safe_float(player_data.get('goals_scored', 0))
-        expected_goals = safe_float(player_data.get('expected_goals', 0.0))
-        minutes = safe_float(player_data.get('minutes', 0))
-        starts = safe_float(player_data.get('starts', 0))
-        threat = safe_float(player_data.get('threat', 0))
-        
-        # Estimate games played for proper per-game averages
-        games_played = max(1, minutes / 90.0)  # Rough estimate from total minutes
-        
-        features = [
-            goals_scored / games_played,  # goals_avg_3gw proxy (goals per game)
-            goals_scored / games_played,  # goals_avg_5gw proxy  
-            goals_scored / games_played,  # goals_avg_10gw proxy
-            expected_goals / games_played,  # xg_avg_3gw proxy
-            expected_goals / games_played,  # xg_avg_5gw proxy
-            expected_goals / games_played,  # xg_avg_10gw proxy
-            minutes / games_played,  # minutes_avg_3gw proxy (should be around 90)
-            minutes / games_played,  # minutes_avg_5gw proxy
-            starts / games_played,  # starts_avg_3gw proxy
-            starts / games_played,  # starts_avg_5gw proxy
-            threat / games_played,  # threat_avg_3gw proxy
-            threat / games_played,  # threat_avg_5gw proxy
-            goals_scored / max(expected_goals, 0.1),  # goal_efficiency
-            safe_float(player_data.get('form', 0.0)),  # recent_form
-            1.0 if player_data.get('element_type') == 4 else 0.0,  # is_forward
-            1.0 if fixture_info['is_home'] else 0.0,  # was_home (use actual fixture info)
-            # NEW: Opponent strength features
-            fixture_info['opponent_strength_defence'] / 1400.0,  # opponent_defence_strength_normalized
-            fixture_info.get('fixture_attractiveness', 0.5),  # fixture_attractiveness
-        ]
-        
-        return features
+        # Use the shared feature engine for position-aware features
+        try:
+            # Initialize feature engine if not already done
+            if not hasattr(self, '_feature_engine'):
+                from feature_engineering.player_features import PlayerFeatureEngine
+                self._feature_engine = PlayerFeatureEngine()
+            
+            # Prepare features using shared logic with position awareness
+            features = self._feature_engine.prepare_goals_model_features(
+                player_data,
+                historical_context=None,  # Using fallback features from current season data
+                was_home=fixture_info['is_home'],
+                opponent_defence_strength=fixture_info['opponent_strength_defence'],
+                fixture_attractiveness=fixture_info.get('fixture_attractiveness', 0.5)
+            )
+            
+            return features
+            
+        except Exception as e:
+            # Fallback to manual feature preparation if shared engine fails
+            player_name = player_data.get('web_name', 'Unknown')
+            position = self._get_position_name(player_data.get('element_type', 4))
+            print(f"⚠️  Feature engine failed for {player_name} ({position}), using fallback: {e}")
+            
+            # Fallback feature preparation (position-aware)
+            goals_scored = safe_float(player_data.get('goals_scored', 0))
+            expected_goals = safe_float(player_data.get('expected_goals', 0.0))
+            minutes = safe_float(player_data.get('minutes', 0))
+            starts = safe_float(player_data.get('starts', 0))
+            threat = safe_float(player_data.get('threat', 0))
+            
+            # Estimate games played for proper per-game averages
+            games_played = max(1, minutes / 90.0)
+            
+            features = [
+                goals_scored / games_played,  # goals_avg_3gw proxy
+                goals_scored / games_played,  # goals_avg_5gw proxy  
+                goals_scored / games_played,  # goals_avg_10gw proxy
+                expected_goals / games_played,  # xg_avg_3gw proxy
+                expected_goals / games_played,  # xg_avg_5gw proxy
+                expected_goals / games_played,  # xg_avg_10gw proxy
+                minutes / games_played,  # minutes_avg_3gw proxy
+                minutes / games_played,  # minutes_avg_5gw proxy
+                starts / games_played,  # starts_avg_3gw proxy
+                starts / games_played,  # starts_avg_5gw proxy
+                threat / games_played,  # threat_avg_3gw proxy
+                threat / games_played,  # threat_avg_5gw proxy
+                goals_scored / max(expected_goals, 0.1),  # goal_efficiency
+                safe_float(player_data.get('form', 0.0)),  # recent_form
+                1.0 if player_data.get('element_type') == 4 else 0.0,  # is_forward
+                1.0 if player_data.get('element_type') == 3 else 0.0,  # is_midfielder
+                1.0 if player_data.get('element_type') == 2 else 0.0,  # is_defender
+                1.0 if fixture_info['is_home'] else 0.0,  # was_home
+                fixture_info['opponent_strength_defence'] / 1400.0,  # opponent_defence_strength_normalized
+                fixture_info.get('fixture_attractiveness', 0.5),  # fixture_attractiveness
+            ]
+            
+            # Defensive check: ensure we always have exactly 20 features
+            if len(features) != 20:
+                raise ValueError(f"❌ CRITICAL: Goals model fallback expects exactly 20 features, got {len(features)}. "
+                               f"This indicates a bug in fallback feature preparation.")
+            
+            return features
     
     def _predict_assists(self, player_data: Dict, gameweek: int, expected_minutes: float) -> float:
         """Predict expected assists using our trained assists model"""

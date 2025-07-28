@@ -272,6 +272,9 @@ class PlayerFeatureEngine:
         """
         Prepare features for expected goals model prediction
         
+        This method ALWAYS uses the position-aware 20-feature format that includes
+        all positions (GK, DEF, MID, FWD) with position one-hot encoding.
+        
         Args:
             player_data: Current player data dictionary
             historical_context: Recent game statistics
@@ -282,12 +285,14 @@ class PlayerFeatureEngine:
             fixture_attractiveness: Fixture difficulty score (0-1, higher = easier)
             
         Returns:
-            List of feature values for goals model
+            List of 20 feature values for position-aware goals model
         """
         
         # Get basic info
         position = self._get_position_name(player_data.get('element_type', 4))
         is_forward = 1.0 if position == 'FWD' else 0.0
+        is_midfielder = 1.0 if position == 'MID' else 0.0
+        is_defender = 1.0 if position == 'DEF' else 0.0
         was_home_encoded = 1.0 if was_home else 0.0
         
         # Normalize opponent defence strength (same as training)
@@ -302,6 +307,7 @@ class PlayerFeatureEngine:
             # Recent form
             recent_form = historical_context.get('form', 0.0)
             
+            # Position-aware feature set (20 features total)
             features = [
                 historical_context.get('goals_scored_avg_3gw', 0.0),     # goals_avg_3gw
                 historical_context.get('goals_scored_avg_5gw', 0.0),     # goals_avg_5gw  
@@ -318,8 +324,9 @@ class PlayerFeatureEngine:
                 goal_efficiency,                                         # goal_efficiency
                 recent_form,                                             # recent_form
                 is_forward,                                              # is_forward
+                is_midfielder,                                           # is_midfielder
+                is_defender,                                             # is_defender
                 was_home_encoded,                                        # was_home
-                # NEW: Opponent strength features (matches training)
                 opponent_defence_strength_normalized,                    # opponent_defence_strength_normalized
                 fixture_attractiveness,                                  # fixture_attractiveness
             ]
@@ -334,6 +341,7 @@ class PlayerFeatureEngine:
             
             goal_efficiency = goals_scored / max(expected_goals, 0.1)
             
+            # Position-aware fallback features (20 features total)
             features = [
                 goals_scored / games_played,      # goals_avg_3gw proxy
                 goals_scored / games_played,      # goals_avg_5gw proxy
@@ -348,13 +356,19 @@ class PlayerFeatureEngine:
                 threat / games_played,            # threat_avg_3gw proxy
                 threat / games_played,            # threat_avg_5gw proxy
                 goal_efficiency,                  # goal_efficiency
-                total_points / games_played,      # recent_form proxy
+                player_data.get('form', 0.0),    # recent_form (proper FPL form field)
                 is_forward,                       # is_forward
+                is_midfielder,                    # is_midfielder
+                is_defender,                      # is_defender
                 was_home_encoded,                 # was_home
-                # NEW: Opponent strength features (matches training)
-                opponent_defence_strength_normalized,                    # opponent_defence_strength_normalized
-                fixture_attractiveness,                                  # fixture_attractiveness
+                opponent_defence_strength_normalized,  # opponent_defence_strength_normalized
+                fixture_attractiveness,           # fixture_attractiveness
             ]
+        
+        # Defensive check: ensure we always return exactly 20 features
+        if len(features) != 20:
+            raise ValueError(f"❌ CRITICAL: Goals model expects exactly 20 features, got {len(features)}. "
+                           f"This indicates a bug in feature preparation.")
         
         return features
     
@@ -363,8 +377,10 @@ class PlayerFeatureEngine:
         Get feature column names for goals model in the correct order.
         This must match the order in prepare_goals_model_features.
         
+        ALWAYS returns the position-aware 20-feature format.
+        
         Returns:
-            List of feature column names (18 features total)
+            List of 20 feature column names
         """
         return [
             # Goal scoring rolling averages (3, 5, 10 gameweeks) - 6 features
@@ -376,8 +392,10 @@ class PlayerFeatureEngine:
             'threat_avg_3gw', 'threat_avg_5gw', 
             # Derived features - 2 features
             'goal_efficiency', 'recent_form',
-            # Position and venue - 2 features
-            'is_forward', 'was_home',
+            # Position features (one-hot encoded) - 3 features
+            'is_forward', 'is_midfielder', 'is_defender',
+            # Venue - 1 feature
+            'was_home',
             # Opponent strength features - 2 features
             'opponent_defence_strength_normalized', 'fixture_attractiveness'
         ]
