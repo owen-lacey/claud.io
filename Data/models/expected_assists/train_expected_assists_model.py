@@ -86,7 +86,7 @@ def load_data():
     print("📊 Loading training data...")
     
     # Load the parsed GW data with features
-    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv', low_memory=False)
+    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv', low_memory=False)
     
     # Convert data types safely
     def convert_was_home(val):
@@ -201,7 +201,7 @@ def engineer_assist_features(creative_df, feature_engine):
     
     return creative_df_with_features
 
-def fit_assists_model(creative_df):
+def fit_assists_model(creative_df, feature_engine):
     """Fit Poisson regression model for assists prediction"""
     print("\n📈 Fitting Poisson model for assists...")
     
@@ -215,19 +215,9 @@ def fit_assists_model(creative_df):
     
     print(f"✅ Filtered to players with regular playing time: {len(model_df):,} records")
     
-    # Define features for the model (using shared feature engineering column names)
-    feature_cols = [
-        'assists_avg_3gw', 'assists_avg_5gw', 'assists_avg_10gw',
-        'expected_assists_avg_3gw', 'expected_assists_avg_5gw', 'expected_assists_avg_10gw',
-        'goals_scored_avg_3gw', 'goals_scored_avg_5gw',  # Attacking players often get both
-        'minutes_avg_3gw', 'minutes_avg_5gw',
-        'starts_avg_3gw', 'starts_avg_5gw',
-        'creativity_avg_3gw', 'creativity_avg_5gw',
-        'assist_efficiency', 'creative_output', 'recent_form',
-        'is_midfielder', 'is_defender', 'is_forward', 'was_home',
-        # NEW: Opponent strength features for fixture difficulty
-        'opponent_defence_strength_normalized', 'fixture_attractiveness'
-    ]
+    # Get feature columns from shared feature engine
+    feature_cols = feature_engine.get_assists_model_feature_columns()
+    print(f"✅ Using {len(feature_cols)} features from shared feature engine")
     
     # Add opponent strength features to the dataframe
     if 'opponent_defence_strength' in model_df.columns:
@@ -300,49 +290,47 @@ def fit_assists_model(creative_df):
     
     return poisson_model, scaler, feature_cols
 
-def create_prediction_functions(poisson_model, scaler, feature_cols):
+def create_prediction_functions(poisson_model, scaler, feature_cols, feature_engine):
     """Create functions to predict assists for any player"""
     print("\n🎯 Creating prediction functions...")
     
-    def predict_player_assists_distribution(player_stats, max_assists=3):
+    def predict_player_assists_distribution(player_data, historical_df=None, was_home=True, max_assists=3,
+                                           opponent_defence_strength=1100.0, fixture_attractiveness=0.5):
         """
         Predict probability distribution of assists for a player
         
         Args:
-            player_stats: Dict with player recent stats
+            player_data: Dict with current player data
+            historical_df: Optional historical data for better rolling averages
+            was_home: Whether playing at home
             max_assists: Maximum assists to calculate probabilities for
+            opponent_defence_strength: Opponent's defensive strength (raw value)
+            fixture_attractiveness: Fixture difficulty score (0-1, higher = easier)
             
         Returns:
             Dict with expected assists and probabilities
         """
         
-        # Prepare features
-        features = np.array([[
-            player_stats.get('assists_avg_3gw', 0.05),
-            player_stats.get('assists_avg_5gw', 0.05),
-            player_stats.get('assists_avg_10gw', 0.05),
-            player_stats.get('expected_assists_avg_3gw', 0.05),
-            player_stats.get('expected_assists_avg_5gw', 0.05),
-            player_stats.get('expected_assists_avg_10gw', 0.05),
-            player_stats.get('goals_scored_avg_3gw', 0.1),
-            player_stats.get('goals_scored_avg_5gw', 0.1),
-            player_stats.get('minutes_avg_3gw', 45),
-            player_stats.get('minutes_avg_5gw', 45),
-            player_stats.get('starts_avg_3gw', 0.5),
-            player_stats.get('starts_avg_5gw', 0.5),
-            player_stats.get('creativity_avg_3gw', 15),
-            player_stats.get('creativity_avg_5gw', 15),
-            player_stats.get('assist_efficiency', 1.0),
-            player_stats.get('creative_output', 0.15),
-            player_stats.get('recent_form', 3.0),
-            player_stats.get('is_midfielder', 0),
-            player_stats.get('is_defender', 0),
-            player_stats.get('is_forward', 0),
-            player_stats.get('was_home', 1)
-        ]])
+        # Get historical context if available
+        historical_context = None
+        if historical_df is not None and 'code' in player_data:
+            historical_context = feature_engine.get_historical_context(
+                str(player_data['code']), 
+                historical_df
+            )
         
-        # Scale features
-        features_scaled = scaler.transform(features)
+        # Prepare features using shared logic
+        features = feature_engine.prepare_assists_model_features(
+            player_data,
+            historical_context=historical_context,
+            was_home=was_home,
+            opponent_defence_strength=opponent_defence_strength,
+            fixture_attractiveness=fixture_attractiveness
+        )
+        
+        # Convert to numpy array and scale
+        features_array = np.array([features])
+        features_scaled = scaler.transform(features_array)
         
         # Predict expected assists
         expected_assists = poisson_model.predict(features_scaled)[0]
@@ -455,10 +443,10 @@ def main():
     creative_df = engineer_assist_features(creative_df, feature_engine)
     
     # Fit Poisson models
-    poisson_model, scaler, feature_cols = fit_assists_model(creative_df)
+    poisson_model, scaler, feature_cols = fit_assists_model(creative_df, feature_engine)
     
     # Create prediction functions
-    predict_fn = create_prediction_functions(poisson_model, scaler, feature_cols)
+    predict_fn = create_prediction_functions(poisson_model, scaler, feature_cols, feature_engine)
     
     # Save model with shared feature engine
     save_model(poisson_model, scaler, feature_cols, feature_engine)

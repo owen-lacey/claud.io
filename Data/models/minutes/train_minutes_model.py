@@ -27,7 +27,7 @@ print("🚀 Starting Minutes Model Training Pipeline\n")
 
 # Load data using shared utilities
 print("📊 Loading data...")
-historical_data = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv')
+historical_data = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv')
 teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
 
 with open('/Users/owen/src/Personal/fpl-team-picker/Data/database/players.json', 'r') as f:
@@ -128,12 +128,9 @@ for feature in categorical_features:
     label_encoders[feature] = le
 
 # Get feature columns from the shared engine
-feature_columns = feature_engine.get_feature_column_names()
+feature_columns = feature_engine.get_minutes_model_feature_columns()
 
-# Add opponent strength features for fixture difficulty
-opponent_strength_features = ['opponent_overall_strength_normalized', 'fixture_attractiveness']
-
-# Add opponent strength features to the dataframe
+# Add opponent strength features to the dataframe (preprocessing step)
 if 'opponent_overall_strength' in historical_data_with_features.columns:
     historical_data_with_features['opponent_overall_strength_normalized'] = historical_data_with_features['opponent_overall_strength'] / 1400.0
     print("✅ Added normalized opponent overall strength")
@@ -145,19 +142,16 @@ if 'fixture_attractiveness' not in historical_data_with_features.columns:
     historical_data_with_features['fixture_attractiveness'] = 0.5  # Default neutral
     print("⚠️ Using default fixture attractiveness")
 
-# Combine all features including opponent strength
-all_features = feature_columns + opponent_strength_features
-
 # Prepare training data
 print("\n🎯 Preparing training data...")
-training_data = historical_data_with_features[all_features + ['minutes_category']].dropna()
+training_data = historical_data_with_features[feature_columns + ['minutes_category']].dropna()
 
-X = training_data[all_features]
+X = training_data[feature_columns]
 y = training_data['minutes_category']
 
 print(f"✅ Training samples: {len(X):,}")
-print(f"✅ Features: {len(all_features)} (original: {len(feature_columns)}, opponent strength: {len(opponent_strength_features)})")
-print(f"✅ Opponent strength features: {opponent_strength_features}")
+print(f"✅ Features: {len(feature_columns)} (from shared feature engine)")
+print(f"✅ All feature columns: {feature_columns}")
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(
@@ -189,7 +183,7 @@ print(classification_report(y_test, y_pred))
 
 # Feature importance
 feature_importance = pd.DataFrame({
-    'feature': all_features,
+    'feature': feature_columns,
     'importance': rf_model.feature_importances_
 }).sort_values('importance', ascending=False)
 
@@ -199,6 +193,7 @@ for _, row in feature_importance.head(10).iterrows():
 
 # Highlight opponent strength features specifically
 print(f"\n🏆 Opponent Strength Feature Impact:")
+opponent_strength_features = ['opponent_overall_strength_normalized', 'fixture_attractiveness']
 opponent_features_importance = feature_importance[feature_importance['feature'].isin(opponent_strength_features)]
 for _, row in opponent_features_importance.iterrows():
     print(f"   {row['feature']}: {row['importance']:.4f}")
@@ -211,8 +206,7 @@ print("\n💾 Saving model and encoders...")
 model_data = {
     'model': rf_model,
     'label_encoders': label_encoders,
-    'feature_columns': all_features,  # Updated to include opponent strength features
-    'opponent_strength_features': opponent_strength_features,
+    'feature_columns': feature_columns,  # All features from shared engine
     'feature_importance': feature_importance.to_dict('records'),
     'feature_engine': feature_engine,  # Include the shared feature engine
     'enhanced_features': True,

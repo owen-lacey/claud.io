@@ -34,7 +34,7 @@ def load_data():
     print("📊 Loading data...")
     
     # Load ENHANCED data with opponent strength features
-    historical_df = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv')
+    historical_df = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv')
     teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
     
     # Convert data types safely
@@ -114,18 +114,6 @@ def engineer_goal_scoring_features(attacking_df, feature_engine):
     print(f"✅ Feature engineering completed using shared engine")
     
     return attacking_df_with_features
-    
-    # Goal scoring efficiency
-    attacking_df['goal_efficiency'] = attacking_df['goals_avg_5gw'] / (attacking_df['xg_avg_5gw'] + 0.01)
-    
-    # Recent form
-    attacking_df['recent_form'] = attacking_df.groupby('name')['total_points'].transform(
-        lambda x: x.rolling(window=3, min_periods=1).mean().shift(1)
-    )
-    
-    print("✅ Goal-scoring features engineered")
-    
-    return attacking_df
 
 def filter_training_data(df, minutes_threshold=450):
     """
@@ -161,8 +149,8 @@ def filter_training_data(df, minutes_threshold=450):
     
     return filtered_df
 
-def fit_goals_model(attacking_df):
-    """Fit Poisson regression model for goals prediction"""
+def fit_goals_model(attacking_df, feature_engine):
+    """Fit Poisson regression model for goals prediction using shared feature engineering"""
     print("\n📈 Fitting Poisson model for goals...")
     
     from sklearn.model_selection import train_test_split
@@ -190,20 +178,11 @@ def fit_goals_model(attacking_df):
     print(f"   Defence strength range: {model_df['opponent_defence_strength'].min():.0f} - {model_df['opponent_defence_strength'].max():.0f}")
     print(f"   Fixture attractiveness range: {model_df['fixture_attractiveness'].min():.3f} - {model_df['fixture_attractiveness'].max():.3f}")
     
-    # Define features for the model (ENHANCED with opponent strength)
-    feature_cols = [
-        # Original 16 features
-        'goals_scored_avg_3gw', 'goals_scored_avg_5gw', 'goals_scored_avg_10gw',
-        'expected_goals_avg_3gw', 'expected_goals_avg_5gw', 'expected_goals_avg_10gw', 
-        'minutes_avg_3gw', 'minutes_avg_5gw',
-        'starts_avg_3gw', 'starts_avg_5gw',
-        'threat_avg_3gw', 'threat_avg_5gw',
-        'goal_efficiency', 'recent_form',
-        'is_forward', 'was_home',
-        # NEW: Opponent strength features (2 additional features = 18 total)
-        'opponent_defence_strength_normalized',  # Stronger defense = harder to score
-        'fixture_attractiveness'                 # Easier fixture = more goals expected
-    ]
+    # Get feature columns from shared method (single source of truth)
+    feature_cols = feature_engine.get_goals_model_feature_columns()
+    
+    print(f"🎯 Using shared feature definition: {len(feature_cols)} features")
+    print(f"   Features: {', '.join(feature_cols[:5])}... (showing first 5)")
     
     # Prepare features and target
     X = model_df[feature_cols].copy()
@@ -268,7 +247,8 @@ def create_prediction_functions(poisson_model, scaler, feature_cols, feature_eng
     """Create functions to predict goals for any player using shared feature engineering"""
     print("\n🎯 Creating prediction functions...")
     
-    def predict_player_goals_distribution(player_data, historical_df=None, was_home=True, max_goals=4):
+    def predict_player_goals_distribution(player_data, historical_df=None, was_home=True, max_goals=4,
+                                         opponent_defence_strength=1100.0, fixture_attractiveness=0.5):
         """
         Predict probability distribution of goals for a player using shared feature engineering
         
@@ -294,7 +274,9 @@ def create_prediction_functions(poisson_model, scaler, feature_cols, feature_eng
         features = feature_engine.prepare_goals_model_features(
             player_data,
             historical_context=historical_context,
-            was_home=was_home
+            was_home=was_home,
+            opponent_defence_strength=opponent_defence_strength,
+            fixture_attractiveness=fixture_attractiveness
         )
         
         # Convert to numpy array and scale
@@ -396,8 +378,8 @@ def main():
     # Engineer features using shared engine
     attacking_df = engineer_goal_scoring_features(attacking_df, feature_engine)
     
-    # Fit Poisson models
-    poisson_model, scaler, feature_cols = fit_goals_model(attacking_df)
+    # Fit Poisson models using shared feature definition
+    poisson_model, scaler, feature_cols = fit_goals_model(attacking_df, feature_engine)
     
     # Create prediction functions
     predict_fn = create_prediction_functions(poisson_model, scaler, feature_cols, feature_engine)

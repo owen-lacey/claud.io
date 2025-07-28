@@ -69,7 +69,7 @@ def load_data():
     print("📊 Loading training data...")
     
     # Load the parsed GW data with features
-    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv', low_memory=False)
+    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv', low_memory=False)
     
     # Convert data types safely
     def convert_was_home(val):
@@ -185,8 +185,8 @@ def engineer_saves_features(gk_df, feature_engine):
     
     return gk_df_with_features
 
-def fit_saves_model(gk_df):
-    """Fit Poisson regression model for saves prediction"""
+def fit_saves_model(gk_df, feature_engine):
+    """Fit Poisson regression model for saves prediction using shared feature engineering"""
     print("\n📈 Fitting Poisson model for saves...")
     
     from sklearn.model_selection import train_test_split
@@ -200,21 +200,13 @@ def fit_saves_model(gk_df):
     
     print(f"✅ Filtered to goalkeepers with regular playing time: {len(model_df):,} records")
     
-    # Define features for the model (using shared feature engineering column names)
-    feature_cols = [
-        'saves_avg_3gw', 'saves_avg_5gw', 'saves_avg_10gw',
-        'goals_conceded_avg_3gw', 'goals_conceded_avg_5gw', 'goals_conceded_avg_10gw',
-        'expected_goals_conceded_avg_3gw', 'expected_goals_conceded_avg_5gw', 'expected_goals_conceded_avg_10gw',
-        'clean_sheets_avg_3gw', 'clean_sheets_avg_5gw',
-        'minutes_avg_3gw', 'minutes_avg_5gw',
-        'starts_avg_3gw', 'starts_avg_5gw',
-        'save_efficiency', 'defensive_workload', 'team_defensive_strength',
-        'recent_form', 'was_home',
-        # NEW: Opponent strength features for fixture difficulty
-        'opponent_attack_strength_normalized', 'fixture_difficulty_inverted'
-    ]
+    # Get feature columns from shared method (single source of truth)
+    feature_cols = feature_engine.get_saves_model_feature_columns()
     
-    # Add opponent strength features to the dataframe
+    print(f"🎯 Using shared feature definition: {len(feature_cols)} features")
+    print(f"   Features: {', '.join(feature_cols[:5])}... (showing first 5)")
+    
+    # Add opponent strength features to the dataframe if not present
     if 'opponent_attack_strength' in model_df.columns:
         model_df['opponent_attack_strength_normalized'] = model_df['opponent_attack_strength'] / 1400.0
         print("✅ Added normalized opponent attack strength")
@@ -314,51 +306,42 @@ def fit_saves_model(gk_df):
     
     return poisson_model, scaler, feature_cols
 
-def create_prediction_functions(poisson_model, scaler, feature_cols):
+def create_prediction_functions(poisson_model, scaler, feature_cols, feature_engine):
     """Create functions to predict saves for any goalkeeper"""
     print("\n🎯 Creating prediction functions...")
     
-    def predict_goalkeeper_saves_distribution(gk_stats, max_saves=10):
+    def predict_goalkeeper_saves_distribution(player_data, historical_context=None, 
+                                             was_home=True, opponent_attack_strength=1100.0,
+                                             fixture_attractiveness=0.5, max_saves=10):
         """
-        Predict probability distribution of saves for a goalkeeper
+        Predict probability distribution of saves for a goalkeeper using shared feature engine
         
         Args:
-            gk_stats: Dict with goalkeeper recent stats
+            player_data: Current player data dictionary
+            historical_context: Recent game statistics from get_historical_context
+            was_home: Whether playing at home
+            opponent_attack_strength: Opponent's attacking strength (raw value)
+            fixture_attractiveness: Fixture difficulty score (0-1, higher = easier)
             max_saves: Maximum saves to calculate probabilities for
             
         Returns:
             Dict with expected saves and probabilities
         """
         
-        # Prepare features
-        features = np.array([[
-            gk_stats.get('saves_avg_3gw', 2.0),
-            gk_stats.get('saves_avg_5gw', 2.0),
-            gk_stats.get('saves_avg_10gw', 2.0),
-            gk_stats.get('goals_conceded_avg_3gw', 1.2),
-            gk_stats.get('goals_conceded_avg_5gw', 1.2),
-            gk_stats.get('goals_conceded_avg_10gw', 1.2),
-            gk_stats.get('expected_goals_conceded_avg_3gw', 1.3),
-            gk_stats.get('expected_goals_conceded_avg_5gw', 1.3),
-            gk_stats.get('expected_goals_conceded_avg_10gw', 1.3),
-            gk_stats.get('clean_sheets_avg_3gw', 0.3),
-            gk_stats.get('clean_sheets_avg_5gw', 0.3),
-            gk_stats.get('minutes_avg_3gw', 85),
-            gk_stats.get('minutes_avg_5gw', 85),
-            gk_stats.get('starts_avg_3gw', 1.0),
-            gk_stats.get('starts_avg_5gw', 1.0),
-            gk_stats.get('save_efficiency', 2.0),
-            gk_stats.get('defensive_workload', 0.1),
-            gk_stats.get('team_defensive_strength', 0.8),
-            gk_stats.get('recent_form', 4.0),
-            gk_stats.get('was_home', 1),
-            # NEW: Opponent strength features
-            gk_stats.get('opponent_attack_strength_normalized', 0.82),  # Default ~1150/1400
-            gk_stats.get('fixture_difficulty_inverted', 0.5)  # Default neutral
-        ]])
+        # Prepare features using shared logic
+        features = feature_engine.prepare_saves_model_features(
+            player_data=player_data,
+            historical_context=historical_context,
+            was_home=was_home,
+            opponent_attack_strength=opponent_attack_strength,
+            fixture_attractiveness=fixture_attractiveness
+        )
+        
+        # Convert to numpy array and reshape for prediction
+        features_array = np.array(features).reshape(1, -1)
         
         # Scale features
-        features_scaled = scaler.transform(features)
+        features_scaled = scaler.transform(features_array)
         
         # Predict expected saves
         expected_saves = poisson_model.predict(features_scaled)[0]
@@ -458,11 +441,11 @@ def main():
     # Engineer features using shared feature engineering
     gk_df = engineer_saves_features(gk_df, feature_engine)
     
-    # Fit Poisson models
-    poisson_model, scaler, feature_cols = fit_saves_model(gk_df)
+    # Fit Poisson models using shared feature definition
+    poisson_model, scaler, feature_cols = fit_saves_model(gk_df, feature_engine)
     
     # Create prediction functions
-    predict_fn = create_prediction_functions(poisson_model, scaler, feature_cols)
+    predict_fn = create_prediction_functions(poisson_model, scaler, feature_cols, feature_engine)
     
     # Save model with shared feature engine
     save_model(poisson_model, scaler, feature_cols, feature_engine)

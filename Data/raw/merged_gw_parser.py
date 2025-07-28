@@ -73,9 +73,31 @@ def calculate_opponent_strength(opponent_team_id: str, is_home: bool, team_stren
         'fixture_attractiveness': round(fixture_attractiveness, 3)
     }
 
+def load_player_codes(players_file_path: str) -> dict:
+    """
+    Load player code mapping from CSV file.
+    
+    Returns:
+        Dictionary mapping element IDs to player codes for cross-season consistency
+    """
+    players_df = pd.read_csv(players_file_path)
+    
+    player_codes = {}
+    for _, row in players_df.iterrows():
+        element_id = str(row['id'])  # This is the element ID from historical data
+        code = str(row['code'])      # This is the consistent cross-season identifier
+        player_codes[element_id] = {
+            'code': code,
+            'name': row['web_name'],
+            'full_name': f"{row['first_name']} {row['second_name']}"
+        }
+    
+    return player_codes
+
 def process_csv_file(file_path: str) -> str:
     """
     Manipulates a CSV file to keep specified columns and the last column of each row.
+    Now also adds player code information for cross-season consistency.
 
     Args:
         file_path: Path to the input CSV file.
@@ -96,11 +118,21 @@ def process_csv_file(file_path: str) -> str:
         print("   Using default opponent strength values")
         team_strengths = {}
 
+    # Load player code mapping
+    players_file = os.path.join(os.path.dirname(file_path), 'players_raw2425.csv')
+    try:
+        player_codes = load_player_codes(players_file)
+        print(f"✅ Loaded player codes for {len(player_codes)} players")
+    except Exception as e:
+        print(f"⚠️ Warning: Could not load player codes from {players_file}: {e}")
+        print("   Player code information will not be available")
+        player_codes = {}
+
     # Define the columns to keep by name (prefix columns)
     # These columns are selected for their relevance to player performance prediction
     columns_to_keep_prefix = [
-        # Player identification
-        'name', 'position', 'team', 'element',
+        # Player identification (now includes code for cross-season consistency)
+        'name', 'position', 'team', 'element', 'player_code',
         
         # Performance metrics (target and features)
         'total_points', 'xP', 
@@ -154,27 +186,10 @@ def process_csv_file(file_path: str) -> str:
             new_header = columns_to_keep_prefix + [name_for_last_gw_column]
             csv_writer.writerow(new_header)
 
-            # Get indices of the base columns (excluding opponent strength columns)
-            base_columns = [col for col in columns_to_keep_prefix 
-                          if col not in ['opponent_attack_strength', 'opponent_defence_strength', 
-                                       'opponent_overall_strength', 'fixture_attractiveness']]
-            
-            prefix_column_indices = []
-            missing_columns_in_header = []
-            for col_name in base_columns:
-                try:
-                    prefix_column_indices.append(original_header.index(col_name))
-                except ValueError:
-                    missing_columns_in_header.append(col_name)
-            
-            if missing_columns_in_header:
-                raise ValueError(
-                    f"The following specified columns were not found in the CSV header: {', '.join(missing_columns_in_header)}"
-                )
-            
             # Get indices for opponent strength calculation
             opponent_team_idx = original_header.index('opponent_team')
             was_home_idx = original_header.index('was_home')
+            element_idx = original_header.index('element')
 
             # Process each data row
             for row_data in csv_reader:
@@ -182,13 +197,34 @@ def process_csv_file(file_path: str) -> str:
                     continue
                     
                 output_row_values = []
-                # Extract data for the base prefix columns
-                for col_idx in prefix_column_indices:
-                    if col_idx < len(row_data):
-                        output_row_values.append(row_data[col_idx])
+                
+                # Build the row according to the new header structure
+                for col_name in columns_to_keep_prefix:
+                    if col_name == 'player_code':
+                        # Add player code based on element ID lookup
+                        try:
+                            element_id = row_data[element_idx] if element_idx < len(row_data) else ''
+                            player_info = player_codes.get(str(element_id), {})
+                            player_code = player_info.get('code', '')
+                            output_row_values.append(player_code)
+                        except Exception as e:
+                            print(f"⚠️ Warning: Could not get player code for element {element_id}: {e}")
+                            output_row_values.append('')
+                    elif col_name in ['opponent_attack_strength', 'opponent_defence_strength', 
+                                    'opponent_overall_strength', 'fixture_attractiveness']:
+                        # These will be added later in the opponent strength calculation
+                        continue
                     else:
-                        # Row is shorter than expected for a prefix column
-                        output_row_values.append('') # Placeholder for missing data
+                        # Regular column from original data
+                        try:
+                            col_idx = original_header.index(col_name)
+                            if col_idx < len(row_data):
+                                output_row_values.append(row_data[col_idx])
+                            else:
+                                output_row_values.append('')
+                        except ValueError:
+                            # Column not found in original data
+                            output_row_values.append('')
                 
                 # Calculate opponent strength features
                 try:
@@ -229,17 +265,17 @@ def process_csv_file(file_path: str) -> str:
     except Exception as e:
         raise Exception(f"An unexpected error occurred during CSV manipulation: {str(e)}")
 
-# The user uploaded 'merged_gw.csv'.
+# The user uploaded 'merged_gw_2425.csv'.
 # In a real environment, 'files[0]' would be the path provided by the system.
 # For this execution, I will use the placeholder name.
-file_id = "/Users/owen/src/Personal/fpl-team-picker/Data/raw/merged_gw.csv" 
+file_id = "/Users/owen/src/Personal/fpl-team-picker/Data/raw/merged_gw_2425.csv" 
 
 try:
     # Process the CSV
     manipulated_csv_data = process_csv_file(file_id)
     
     # Define the output filename
-    output_filename = "/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv"
+    output_filename = "/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv"
     
     # In a typical environment, this string data would be written to a file
     # that can then be offered for download.

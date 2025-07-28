@@ -1,13 +1,14 @@
 [
   {
     "id": 1,
+    "code": 154561,
     "web_name": "Raya",
     "first_name": "David",
     "second_name": "Raya Mart\u00edn",
     "element_type": 1,
     "team": 1,
     "now_cost": 55,
-    "selected_by_percent": "18.5",
+    "selected_by_percent": "18.7",
     "form": "0.0",
     "points_per_game": "3.7",
     "total_points": 142,
@@ -31,6 +32,7 @@
   },
   {
     "id": 2,
+    "code": 109745,
     "web_name": "Arrizabalaga",
     "first_name": "Kepa",
     "second_name": "Arrizabalaga Revuelta",
@@ -61,6 +63,7 @@
   },
   {
     "id": 3,
+    "code": 463748,
     "web_name": "Hein",
     "first_name": "Karl",
     "second_name": "Hein",
@@ -91,6 +94,7 @@
   },
   {
     "id": 4,
+    "code": 551221,
     "web_name": "Setford",
     "first_name": "Tommy",
     "second_name": "Setford",
@@ -121,13 +125,14 @@
   },
   {
     "id": 5,
+    "code": 226597,
     "web_name": "Gabriel",
     "first_name": "Gabriel",
     "second_name": "dos Santos Magalh\u00e3es",
     "element_type": 2,
     "team": 1,
     "now_cost": 60,
-    "selected_by_percent": "26.9",
+    "selected_by_percent": "26.7",
     "form": "0.0",
     "points_per_game": "4.2",
     "total_points": 117,
@@ -151,13 +156,14 @@
   },
   {
     "id": 6,
+    "code": 462424,
     "web_name": "Saliba",
     "first_name": "William",
     "second_name": "Saliba",
     "element_type": 2,
     "team": 1,
     "now_cost": 60,
-    "selected_by_percent": "13.3",
+    "selected_by_percent": "13.5",
     "form": "0.0",
     "points_per_game": "3.7",
     "total_points": 130,
@@ -181,6 +187,7 @@
   },
   {
     "id": 7,
+    "code": 466075,
     "web_name": "Calafiori",
     "first_name": "Riccardo",
     "second_name": "Calafiori",
@@ -211,13 +218,14 @@
   },
   {
     "id": 8,
+    "code": 445122,
     "web_name": "J.Timber",
     "first_name": "Jurri\u00ebn",
     "second_name": "Timber",
     "element_type": 2,
     "team": 1,
     "now_cost": 55,
-    "selected_by_percent": "2.6",
+    "selected_by_percent": "2.5",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 114,
@@ -241,6 +249,7 @@
   },
   {
     "id": 9,
+    "code": 440854,
     "web_name": "Kiwior",
     "first_name": "Jakub",
     "second_name": "Kiwior",
@@ -271,13 +280,14 @@
   },
   {
     "id": 10,
+    "code": 499169,
     "web_name": "Lewis-Skelly",
     "first_name": "Myles",
     "second_name": "Lewis-Skelly",
     "element_type": 2,
     "team": 1,
     "now_cost": 55,
-    "selected_by_percent": "6.4",
+    "selected_by_percent": "6.3",
     "form": "0.0",
     "points_per_game": "1.6",
     "total_points": 37,
@@ -301,13 +311,14 @@
   },
   {
     "id": 11,
+    "code": 198869,
     "web_name": "White",
     "first_name": "Benjamin",
     "second_name": "White",
     "element_type": 2,
     "team": 1,
     "now_cost": 55,
-    "selected_by_percent": "0.7",
+    "selected_by_percent": "0.8",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 50,
@@ -331,6 +342,7 @@
   },
   {
     "id": 12,
+    "code": 206325,
     "web_name": "Zinchenko",
     "first_name": "Oleksandr",
     "second_name": "Zinchenko",
@@ -361,6 +373,7 @@
   },
   {
     "id": 13,
+    "code": 563324,
     "web_name": "Clarke",
     "first_name": "Brayden",
     "second_name": "Clarke",
@@ -391,6 +404,7 @@
   },
   {
     "id": 14,
+    "code": 588793,
     "web_name": "Kacurri",
     "first_name": "Maldini",
     "second_name": "Kacurri",
@@ -421,6 +435,7 @@
   },
   {
     "id": 15,
+    "code": 499167,
     "web_name": "Nichols",
     "first_name": "Josh",
     "second_name": "Nichols",
@@ -451,6 +466,7 @@
   },
   {
     "id": 16,
+    "code": 223340,
     "web_name": "Saka",
     "first_name": "Bukayo",
     "second_name": "Saka",
@@ -481,13 +497,14 @@
   },
   {
     "id": 17,
+    "code": 184029,
     "web_name": "\u00d8degaard",
     "first_name": "Martin",
     "second_name": "\u00d8degaard",
     "element_type": 3,
     "team": 1,
     "now_cost": 80,
-    "selected_by_percent": "3.0",
+    "selected_by_percent": "3.1",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 116,
@@ -511,13 +528,14 @@
   },
   {
     "id": 18,
+    "code": 248857,
     "web_name": "Madueke",
     "first_name": "Noni",
     "second_name": "Madueke",
     "element_type": 3,
     "team": 1,
     "now_cost": 70,
-    "selected_by_percent": "2.2",
+    "selected_by_percent": "2.1",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 120,
@@ -541,13 +559,14 @@
   },
   {
     "id": 19,
+    "code": 444145,
     "web_name": "Martinelli",
     "first_name": "Gabriel",
     "second_name": "Martinelli Silva",
     "element_type": 3,
     "team": 1,
     "now_cost": 70,
-    "selected_by_percent": "1.6",
+    "selected_by_percent": "1.5",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 125,
@@ -571,6 +590,7 @@
   },
   {
     "id": 20,
+    "code": 116216,
     "web_name": "Trossard",
     "first_name": "Leandro",
     "second_name": "Trossard",
@@ -601,6 +621,7 @@
   },
   {
     "id": 21,
+    "code": 204480,
     "web_name": "Rice",
     "first_name": "Declan",
     "second_name": "Rice",
@@ -631,13 +652,14 @@
   },
   {
     "id": 22,
+    "code": 195384,
     "web_name": "Merino",
     "first_name": "Mikel",
     "second_name": "Merino Zaz\u00f3n",
     "element_type": 3,
     "team": 1,
     "now_cost": 60,
-    "selected_by_percent": "0.8",
+    "selected_by_percent": "0.9",
     "form": "0.0",
     "points_per_game": "3.3",
     "total_points": 92,
@@ -661,6 +683,7 @@
   },
   {
     "id": 23,
+    "code": 438098,
     "web_name": "F\u00e1bio Vieira",
     "first_name": "F\u00e1bio",
     "second_name": "Ferreira Vieira",
@@ -691,6 +714,7 @@
   },
   {
     "id": 24,
+    "code": 128295,
     "web_name": "N\u00f8rgaard",
     "first_name": "Christian",
     "second_name": "N\u00f8rgaard",
@@ -721,6 +745,7 @@
   },
   {
     "id": 25,
+    "code": 499175,
     "web_name": "Nwaneri",
     "first_name": "Ethan",
     "second_name": "Nwaneri",
@@ -751,6 +776,7 @@
   },
   {
     "id": 26,
+    "code": 481655,
     "web_name": "Zubimendi",
     "first_name": "Mart\u00edn",
     "second_name": "Zubimendi Ib\u00e1\u00f1ez",
@@ -781,6 +807,7 @@
   },
   {
     "id": 27,
+    "code": 200641,
     "web_name": "Nelson",
     "first_name": "Reiss",
     "second_name": "Nelson",
@@ -811,6 +838,7 @@
   },
   {
     "id": 28,
+    "code": 588796,
     "web_name": "Kabia",
     "first_name": "Ismeal",
     "second_name": "Kabia",
@@ -841,6 +869,7 @@
   },
   {
     "id": 29,
+    "code": 437742,
     "web_name": "Sambi",
     "first_name": "Albert",
     "second_name": "Sambi Lokonga",
@@ -871,6 +900,7 @@
   },
   {
     "id": 30,
+    "code": 219847,
     "web_name": "Havertz",
     "first_name": "Kai",
     "second_name": "Havertz",
@@ -901,6 +931,7 @@
   },
   {
     "id": 31,
+    "code": 205651,
     "web_name": "G.Jesus",
     "first_name": "Gabriel",
     "second_name": "Fernando de Jesus",
@@ -931,6 +962,7 @@
   },
   {
     "id": 662,
+    "code": 500040,
     "web_name": "Mosquera",
     "first_name": "Cristhian",
     "second_name": "Mosquera",
@@ -961,6 +993,7 @@
   },
   {
     "id": 32,
+    "code": 98980,
     "web_name": "Martinez",
     "first_name": "Emiliano",
     "second_name": "Mart\u00ednez Romero",
@@ -991,6 +1024,7 @@
   },
   {
     "id": 33,
+    "code": 72147,
     "web_name": "M.Bizot",
     "first_name": "Marco",
     "second_name": "Bizot",
@@ -1021,6 +1055,7 @@
   },
   {
     "id": 34,
+    "code": 462492,
     "web_name": "Gauci",
     "first_name": "Joe",
     "second_name": "Gauci",
@@ -1051,6 +1086,7 @@
   },
   {
     "id": 35,
+    "code": 462381,
     "web_name": "Marschall",
     "first_name": "Filip",
     "second_name": "Marschall",
@@ -1081,6 +1117,7 @@
   },
   {
     "id": 36,
+    "code": 199796,
     "web_name": "Cash",
     "first_name": "Matty",
     "second_name": "Cash",
@@ -1111,6 +1148,7 @@
   },
   {
     "id": 37,
+    "code": 101188,
     "web_name": "Digne",
     "first_name": "Lucas",
     "second_name": "Digne",
@@ -1141,13 +1179,14 @@
   },
   {
     "id": 38,
+    "code": 199798,
     "web_name": "Konsa",
     "first_name": "Ezri",
     "second_name": "Konsa Ngoyo",
     "element_type": 2,
     "team": 2,
     "now_cost": 45,
-    "selected_by_percent": "23.4",
+    "selected_by_percent": "23.7",
     "form": "0.0",
     "points_per_game": "3.0",
     "total_points": 103,
@@ -1171,13 +1210,14 @@
   },
   {
     "id": 39,
+    "code": 441302,
     "web_name": "Maatsen",
     "first_name": "Ian",
     "second_name": "Maatsen",
     "element_type": 2,
     "team": 2,
     "now_cost": 45,
-    "selected_by_percent": "1.1",
+    "selected_by_percent": "1.0",
     "form": "0.0",
     "points_per_game": "2.0",
     "total_points": 57,
@@ -1201,6 +1241,7 @@
   },
   {
     "id": 40,
+    "code": 149484,
     "web_name": "Mings",
     "first_name": "Tyrone",
     "second_name": "Mings",
@@ -1231,6 +1272,7 @@
   },
   {
     "id": 41,
+    "code": 244954,
     "web_name": "Pau",
     "first_name": "Pau",
     "second_name": "Torres",
@@ -1261,6 +1303,7 @@
   },
   {
     "id": 42,
+    "code": 606798,
     "web_name": "A.Garc\u00eda",
     "first_name": "Andr\u00e9s",
     "second_name": "Garc\u00eda",
@@ -1291,6 +1334,7 @@
   },
   {
     "id": 43,
+    "code": 106468,
     "web_name": "Alex Moreno",
     "first_name": "\u00c1lex",
     "second_name": "Moreno Lopera",
@@ -1321,6 +1365,7 @@
   },
   {
     "id": 44,
+    "code": 515597,
     "web_name": "Bogarde",
     "first_name": "Lamare",
     "second_name": "Bogarde",
@@ -1351,6 +1396,7 @@
   },
   {
     "id": 45,
+    "code": 514315,
     "web_name": "Sousa",
     "first_name": "Lino",
     "second_name": "da Cruz Sousa",
@@ -1381,6 +1427,7 @@
   },
   {
     "id": 46,
+    "code": 587178,
     "web_name": "Yasin",
     "first_name": "Yasin",
     "second_name": "\u00d6zcan",
@@ -1411,13 +1458,14 @@
   },
   {
     "id": 47,
+    "code": 244850,
     "web_name": "Rogers",
     "first_name": "Morgan",
     "second_name": "Rogers",
     "element_type": 3,
     "team": 2,
     "now_cost": 70,
-    "selected_by_percent": "21.2",
+    "selected_by_percent": "22.0",
     "form": "0.0",
     "points_per_game": "4.4",
     "total_points": 161,
@@ -1441,6 +1489,7 @@
   },
   {
     "id": 48,
+    "code": 166989,
     "web_name": "Tielemans",
     "first_name": "Youri",
     "second_name": "Tielemans",
@@ -1471,6 +1520,7 @@
   },
   {
     "id": 49,
+    "code": 215711,
     "web_name": "Bailey",
     "first_name": "Leon",
     "second_name": "Bailey",
@@ -1501,6 +1551,7 @@
   },
   {
     "id": 50,
+    "code": 195546,
     "web_name": "Buend\u00eda",
     "first_name": "Emiliano",
     "second_name": "Buend\u00eda Stati",
@@ -1531,6 +1582,7 @@
   },
   {
     "id": 51,
+    "code": 469247,
     "web_name": "Iling Jr",
     "first_name": "Samuel",
     "second_name": "Iling-Junior",
@@ -1561,6 +1613,7 @@
   },
   {
     "id": 52,
+    "code": 232653,
     "web_name": "J.Ramsey",
     "first_name": "Jacob",
     "second_name": "Ramsey",
@@ -1591,13 +1644,14 @@
   },
   {
     "id": 53,
+    "code": 204646,
     "web_name": "Malen",
     "first_name": "Donyell",
     "second_name": "Malen",
     "element_type": 3,
     "team": 2,
     "now_cost": 55,
-    "selected_by_percent": "0.6",
+    "selected_by_percent": "0.7",
     "form": "0.0",
     "points_per_game": "2.4",
     "total_points": 34,
@@ -1621,6 +1675,7 @@
   },
   {
     "id": 54,
+    "code": 122806,
     "web_name": "McGinn",
     "first_name": "John",
     "second_name": "McGinn",
@@ -1651,6 +1706,7 @@
   },
   {
     "id": 55,
+    "code": 88894,
     "web_name": "Barkley",
     "first_name": "Ross",
     "second_name": "Barkley",
@@ -1681,6 +1737,7 @@
   },
   {
     "id": 56,
+    "code": 491287,
     "web_name": "Barrenechea",
     "first_name": "Enzo",
     "second_name": "Barrenechea",
@@ -1711,6 +1768,7 @@
   },
   {
     "id": 57,
+    "code": 461421,
     "web_name": "Dobbin",
     "first_name": "Lewis",
     "second_name": "Dobbin",
@@ -1741,6 +1799,7 @@
   },
   {
     "id": 58,
+    "code": 226944,
     "web_name": "Kamara",
     "first_name": "Boubacar",
     "second_name": "Kamara",
@@ -1771,6 +1830,7 @@
   },
   {
     "id": 59,
+    "code": 449871,
     "web_name": "Onana",
     "first_name": "Amadou",
     "second_name": "Onana",
@@ -1801,6 +1861,7 @@
   },
   {
     "id": 60,
+    "code": 577731,
     "web_name": "Broggio",
     "first_name": "Ben",
     "second_name": "Broggio",
@@ -1831,6 +1892,7 @@
   },
   {
     "id": 61,
+    "code": 151589,
     "web_name": "Dendoncker",
     "first_name": "Leander",
     "second_name": "Dendoncker",
@@ -1861,6 +1923,7 @@
   },
   {
     "id": 62,
+    "code": 559962,
     "web_name": "Jimoh-Aloba",
     "first_name": "Jamaldeen",
     "second_name": "Jimoh-Aloba",
@@ -1891,6 +1954,7 @@
   },
   {
     "id": 63,
+    "code": 537403,
     "web_name": "Young",
     "first_name": "Kadan",
     "second_name": "Young",
@@ -1921,13 +1985,14 @@
   },
   {
     "id": 64,
+    "code": 178301,
     "web_name": "Watkins",
     "first_name": "Ollie",
     "second_name": "Watkins",
     "element_type": 4,
     "team": 2,
     "now_cost": 90,
-    "selected_by_percent": "10.4",
+    "selected_by_percent": "10.9",
     "form": "0.0",
     "points_per_game": "4.9",
     "total_points": 186,
@@ -1951,6 +2016,7 @@
   },
   {
     "id": 65,
+    "code": 576756,
     "web_name": "Redmond",
     "first_name": "Z\u00e9piqueno",
     "second_name": "Redmond",
@@ -1981,13 +2047,14 @@
   },
   {
     "id": 182,
+    "code": 432720,
     "web_name": "Trafford",
     "first_name": "James",
     "second_name": "Trafford",
     "element_type": 1,
     "team": 3,
     "now_cost": 50,
-    "selected_by_percent": "4.2",
+    "selected_by_percent": "4.1",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2011,6 +2078,7 @@
   },
   {
     "id": 183,
+    "code": 518030,
     "web_name": "Weiss",
     "first_name": "Max",
     "second_name": "Wei\u00df",
@@ -2041,6 +2109,7 @@
   },
   {
     "id": 184,
+    "code": 489571,
     "web_name": "Green",
     "first_name": "Etienne",
     "second_name": "Green",
@@ -2071,6 +2140,7 @@
   },
   {
     "id": 185,
+    "code": 51943,
     "web_name": "Hladk\u00fd",
     "first_name": "V\u00e1clav",
     "second_name": "Hladk\u00fd",
@@ -2101,13 +2171,14 @@
   },
   {
     "id": 186,
+    "code": 192290,
     "web_name": "Roberts",
     "first_name": "Connor",
     "second_name": "Roberts",
     "element_type": 2,
     "team": 3,
     "now_cost": 45,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.1",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2131,13 +2202,14 @@
   },
   {
     "id": 187,
+    "code": 58621,
     "web_name": "Walker",
     "first_name": "Kyle",
     "second_name": "Walker",
     "element_type": 2,
     "team": 3,
     "now_cost": 45,
-    "selected_by_percent": "2.5",
+    "selected_by_percent": "2.4",
     "form": "0.0",
     "points_per_game": "0.9",
     "total_points": 13,
@@ -2161,6 +2233,7 @@
   },
   {
     "id": 188,
+    "code": 247245,
     "web_name": "Delcroix",
     "first_name": "Hannes",
     "second_name": "Delcroix",
@@ -2191,6 +2264,7 @@
   },
   {
     "id": 189,
+    "code": 461567,
     "web_name": "Dodgson",
     "first_name": "Owen",
     "second_name": "Dodgson",
@@ -2221,6 +2295,7 @@
   },
   {
     "id": 190,
+    "code": 478969,
     "web_name": "Ekdal",
     "first_name": "Hjalmar",
     "second_name": "Ekdal",
@@ -2251,13 +2326,14 @@
   },
   {
     "id": 191,
+    "code": 477717,
     "web_name": "Est\u00e8ve",
     "first_name": "Maxime",
     "second_name": "Est\u00e8ve",
     "element_type": 2,
     "team": 3,
     "now_cost": 40,
-    "selected_by_percent": "7.9",
+    "selected_by_percent": "8.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2281,6 +2357,7 @@
   },
   {
     "id": 192,
+    "code": 494960,
     "web_name": "Hartman",
     "first_name": "Quilindschy",
     "second_name": "Hartman",
@@ -2311,6 +2388,7 @@
   },
   {
     "id": 193,
+    "code": 461188,
     "web_name": "Humphreys",
     "first_name": "Bashir",
     "second_name": "Humphreys",
@@ -2341,6 +2419,7 @@
   },
   {
     "id": 194,
+    "code": 241231,
     "web_name": "Jordan",
     "first_name": "Jordan",
     "second_name": "Beyer",
@@ -2371,6 +2450,7 @@
   },
   {
     "id": 195,
+    "code": 549329,
     "web_name": "Lucas Pires",
     "first_name": "Lucas",
     "second_name": "Pires Silva",
@@ -2401,6 +2481,7 @@
   },
   {
     "id": 196,
+    "code": 450072,
     "web_name": "Sambo",
     "first_name": "Shurandy",
     "second_name": "Sambo",
@@ -2431,6 +2512,7 @@
   },
   {
     "id": 197,
+    "code": 519895,
     "web_name": "Sonne",
     "first_name": "Oliver",
     "second_name": "Sonne",
@@ -2461,13 +2543,14 @@
   },
   {
     "id": 198,
+    "code": 180804,
     "web_name": "Tuanzebe",
     "first_name": "Axel",
     "second_name": "Tuanzebe",
     "element_type": 2,
     "team": 3,
     "now_cost": 40,
-    "selected_by_percent": "4.6",
+    "selected_by_percent": "4.4",
     "form": "0.0",
     "points_per_game": "1.2",
     "total_points": 27,
@@ -2491,13 +2574,14 @@
   },
   {
     "id": 199,
+    "code": 208912,
     "web_name": "Worrall",
     "first_name": "Joe",
     "second_name": "Worrall",
     "element_type": 2,
     "team": 3,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2521,6 +2605,7 @@
   },
   {
     "id": 200,
+    "code": 444180,
     "web_name": "Anthony",
     "first_name": "Jaidon",
     "second_name": "Anthony",
@@ -2551,6 +2636,7 @@
   },
   {
     "id": 201,
+    "code": 183751,
     "web_name": "Benson",
     "first_name": "Manuel",
     "second_name": "Benson Hedilazio",
@@ -2581,6 +2667,7 @@
   },
   {
     "id": 202,
+    "code": 179458,
     "web_name": "Bruun Larsen",
     "first_name": "Jacob",
     "second_name": "Bruun Larsen",
@@ -2611,6 +2698,7 @@
   },
   {
     "id": 203,
+    "code": 578614,
     "web_name": "Boateng",
     "first_name": "Enock",
     "second_name": "Agyei",
@@ -2641,6 +2729,7 @@
   },
   {
     "id": 204,
+    "code": 250735,
     "web_name": "Churlinov",
     "first_name": "Darko",
     "second_name": "Churlinov",
@@ -2671,6 +2760,7 @@
   },
   {
     "id": 205,
+    "code": 172567,
     "web_name": "Cullen",
     "first_name": "Josh",
     "second_name": "Cullen",
@@ -2701,13 +2791,14 @@
   },
   {
     "id": 206,
+    "code": 174592,
     "web_name": "Edwards",
     "first_name": "Marcus",
     "second_name": "Edwards",
     "element_type": 3,
     "team": 3,
     "now_cost": 50,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.3",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2731,6 +2822,7 @@
   },
   {
     "id": 207,
+    "code": 465527,
     "web_name": "Hannibal",
     "first_name": "Hannibal",
     "second_name": "Mejbri",
@@ -2761,6 +2853,7 @@
   },
   {
     "id": 208,
+    "code": 487702,
     "web_name": "Koleosho",
     "first_name": "Luca",
     "second_name": "Koleosho",
@@ -2791,6 +2884,7 @@
   },
   {
     "id": 209,
+    "code": 167887,
     "web_name": "Laurent",
     "first_name": "Josh",
     "second_name": "Laurent",
@@ -2821,6 +2915,7 @@
   },
   {
     "id": 210,
+    "code": 469272,
     "web_name": "Tchaouna",
     "first_name": "Loum",
     "second_name": "Tchaouna",
@@ -2851,13 +2946,14 @@
   },
   {
     "id": 211,
+    "code": 447715,
     "web_name": "A.Ramsey",
     "first_name": "Aaron",
     "second_name": "Ramsey",
     "element_type": 3,
     "team": 3,
     "now_cost": 45,
-    "selected_by_percent": "11.6",
+    "selected_by_percent": "12.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -2881,6 +2977,7 @@
   },
   {
     "id": 212,
+    "code": 576323,
     "web_name": "Adewumi",
     "first_name": "Oluwaseun",
     "second_name": "Adewumi",
@@ -2911,6 +3008,7 @@
   },
   {
     "id": 213,
+    "code": 551206,
     "web_name": "Banel",
     "first_name": "Jaydon",
     "second_name": "Banel",
@@ -2941,6 +3039,7 @@
   },
   {
     "id": 214,
+    "code": 437748,
     "web_name": "Tr\u00e9sor",
     "first_name": "Mike",
     "second_name": "Tr\u00e9sor Ndayishimiye",
@@ -2971,6 +3070,7 @@
   },
   {
     "id": 215,
+    "code": 431639,
     "web_name": "Flemming",
     "first_name": "Zian",
     "second_name": "Flemming",
@@ -3001,6 +3101,7 @@
   },
   {
     "id": 216,
+    "code": 492831,
     "web_name": "Amdouni",
     "first_name": "Zeki",
     "second_name": "Amdouni",
@@ -3031,6 +3132,7 @@
   },
   {
     "id": 217,
+    "code": 435973,
     "web_name": "Foster",
     "first_name": "Lyle",
     "second_name": "Foster",
@@ -3061,6 +3163,7 @@
   },
   {
     "id": 218,
+    "code": 44699,
     "web_name": "Barnes",
     "first_name": "Ashley",
     "second_name": "Barnes",
@@ -3091,6 +3194,7 @@
   },
   {
     "id": 219,
+    "code": 220598,
     "web_name": "Obafemi",
     "first_name": "Michael",
     "second_name": "Obafemi",
@@ -3121,6 +3225,7 @@
   },
   {
     "id": 66,
+    "code": 69752,
     "web_name": "Neto",
     "first_name": "Norberto",
     "second_name": "Murara Neto",
@@ -3151,13 +3256,14 @@
   },
   {
     "id": 67,
+    "code": 457569,
     "web_name": "Petrovi\u0107",
     "first_name": "\u0110or\u0111e",
     "second_name": "Petrovi\u0107",
     "element_type": 1,
     "team": 4,
     "now_cost": 45,
-    "selected_by_percent": "5.1",
+    "selected_by_percent": "5.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -3181,6 +3287,7 @@
   },
   {
     "id": 68,
+    "code": 444172,
     "web_name": "Dennis",
     "first_name": "Will",
     "second_name": "Dennis",
@@ -3211,6 +3318,7 @@
   },
   {
     "id": 69,
+    "code": 568791,
     "web_name": "McKenna",
     "first_name": "Callan",
     "second_name": "McKenna",
@@ -3241,6 +3349,7 @@
   },
   {
     "id": 70,
+    "code": 495145,
     "web_name": "Paulsen",
     "first_name": "Alex",
     "second_name": "Paulsen",
@@ -3271,6 +3380,7 @@
   },
   {
     "id": 71,
+    "code": 477580,
     "web_name": "Zabarnyi",
     "first_name": "Illia",
     "second_name": "Zabarnyi",
@@ -3301,6 +3411,7 @@
   },
   {
     "id": 72,
+    "code": 221466,
     "web_name": "Senesi",
     "first_name": "Marcos",
     "second_name": "Senesi Bar\u00f3n",
@@ -3331,6 +3442,7 @@
   },
   {
     "id": 73,
+    "code": 54469,
     "web_name": "Smith",
     "first_name": "Adam",
     "second_name": "Smith",
@@ -3361,13 +3473,14 @@
   },
   {
     "id": 74,
+    "code": 494521,
     "web_name": "Truffert",
     "first_name": "Adrien",
     "second_name": "Truffert",
     "element_type": 2,
     "team": 4,
     "now_cost": 45,
-    "selected_by_percent": "2.0",
+    "selected_by_percent": "1.9",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -3391,6 +3504,7 @@
   },
   {
     "id": 75,
+    "code": 541462,
     "web_name": "Akinmboni",
     "first_name": "Matai",
     "second_name": "Akinmboni",
@@ -3421,6 +3535,7 @@
   },
   {
     "id": 76,
+    "code": 518906,
     "web_name": "Bevan",
     "first_name": "Owen",
     "second_name": "Bevan",
@@ -3451,13 +3566,14 @@
   },
   {
     "id": 77,
+    "code": 463981,
     "web_name": "Hill",
     "first_name": "James",
     "second_name": "Hill",
     "element_type": 2,
     "team": 4,
     "now_cost": 40,
-    "selected_by_percent": "0.6",
+    "selected_by_percent": "0.7",
     "form": "0.0",
     "points_per_game": "1.7",
     "total_points": 17,
@@ -3481,13 +3597,14 @@
   },
   {
     "id": 78,
+    "code": 436893,
     "web_name": "J.Araujo",
     "first_name": "Juli\u00e1n",
     "second_name": "Araujo Z\u00fa\u00f1iga",
     "element_type": 2,
     "team": 4,
     "now_cost": 40,
-    "selected_by_percent": "1.3",
+    "selected_by_percent": "1.2",
     "form": "0.0",
     "points_per_game": "1.0",
     "total_points": 12,
@@ -3511,6 +3628,7 @@
   },
   {
     "id": 79,
+    "code": 223911,
     "web_name": "Mepham",
     "first_name": "Chris",
     "second_name": "Mepham",
@@ -3541,6 +3659,7 @@
   },
   {
     "id": 80,
+    "code": 575901,
     "web_name": "Soler",
     "first_name": "Julio",
     "second_name": "Soler Barreto",
@@ -3571,13 +3690,14 @@
   },
   {
     "id": 81,
+    "code": 222683,
     "web_name": "Kluivert",
     "first_name": "Justin",
     "second_name": "Kluivert",
     "element_type": 3,
     "team": 4,
     "now_cost": 70,
-    "selected_by_percent": "5.2",
+    "selected_by_percent": "5.1",
     "form": "0.0",
     "points_per_game": "4.6",
     "total_points": 158,
@@ -3601,13 +3721,14 @@
   },
   {
     "id": 82,
+    "code": 437730,
     "web_name": "Semenyo",
     "first_name": "Antoine",
     "second_name": "Semenyo",
     "element_type": 3,
     "team": 4,
     "now_cost": 70,
-    "selected_by_percent": "5.5",
+    "selected_by_percent": "5.4",
     "form": "0.0",
     "points_per_game": "4.5",
     "total_points": 165,
@@ -3631,13 +3752,14 @@
   },
   {
     "id": 83,
+    "code": 533463,
     "web_name": "O.Dango",
     "first_name": "Dango",
     "second_name": "Ouattara",
     "element_type": 3,
     "team": 4,
     "now_cost": 60,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.3",
     "form": "0.0",
     "points_per_game": "3.5",
     "total_points": 111,
@@ -3661,13 +3783,14 @@
   },
   {
     "id": 84,
+    "code": 201658,
     "web_name": "Tavernier",
     "first_name": "Marcus",
     "second_name": "Tavernier",
     "element_type": 3,
     "team": 4,
     "now_cost": 55,
-    "selected_by_percent": "0.5",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "3.0",
     "total_points": 87,
@@ -3691,6 +3814,7 @@
   },
   {
     "id": 85,
+    "code": 200785,
     "web_name": "Adams",
     "first_name": "Tyler",
     "second_name": "Adams",
@@ -3721,6 +3845,7 @@
   },
   {
     "id": 86,
+    "code": 111317,
     "web_name": "Brooks",
     "first_name": "David",
     "second_name": "Brooks",
@@ -3751,13 +3876,14 @@
   },
   {
     "id": 87,
+    "code": 158499,
     "web_name": "Christie",
     "first_name": "Ryan",
     "second_name": "Christie",
     "element_type": 3,
     "team": 4,
     "now_cost": 50,
-    "selected_by_percent": "0.5",
+    "selected_by_percent": "0.6",
     "form": "0.0",
     "points_per_game": "2.6",
     "total_points": 76,
@@ -3781,6 +3907,7 @@
   },
   {
     "id": 88,
+    "code": 155408,
     "web_name": "Cook",
     "first_name": "Lewis",
     "second_name": "Cook",
@@ -3811,6 +3938,7 @@
   },
   {
     "id": 89,
+    "code": 168991,
     "web_name": "Philip",
     "first_name": "Philip",
     "second_name": "Billing",
@@ -3841,6 +3969,7 @@
   },
   {
     "id": 90,
+    "code": 503139,
     "web_name": "Scott",
     "first_name": "Alex",
     "second_name": "Scott",
@@ -3871,6 +4000,7 @@
   },
   {
     "id": 91,
+    "code": 224995,
     "web_name": "Sinisterra",
     "first_name": "Luis",
     "second_name": "Sinisterra Lucum\u00ed",
@@ -3901,6 +4031,7 @@
   },
   {
     "id": 92,
+    "code": 441240,
     "web_name": "Faivre",
     "first_name": "Romain",
     "second_name": "Faivre",
@@ -3931,6 +4062,7 @@
   },
   {
     "id": 93,
+    "code": 424044,
     "web_name": "H.Traor\u00e8",
     "first_name": "Hamed",
     "second_name": "Traor\u00e8",
@@ -3961,6 +4093,7 @@
   },
   {
     "id": 94,
+    "code": 550596,
     "web_name": "Sadi",
     "first_name": "Dominic",
     "second_name": "Sadi",
@@ -3991,6 +4124,7 @@
   },
   {
     "id": 95,
+    "code": 530121,
     "web_name": "Silcott-Duberry",
     "first_name": "Zain",
     "second_name": "Silcott-Duberry",
@@ -4021,6 +4155,7 @@
   },
   {
     "id": 96,
+    "code": 606775,
     "web_name": "Winterburn",
     "first_name": "Ben",
     "second_name": "Winterburn",
@@ -4051,13 +4186,14 @@
   },
   {
     "id": 97,
+    "code": 444102,
     "web_name": "Evanilson",
     "first_name": "Francisco Evanilson",
     "second_name": "de Lima Barbosa",
     "element_type": 4,
     "team": 4,
     "now_cost": 70,
-    "selected_by_percent": "2.9",
+    "selected_by_percent": "2.8",
     "form": "0.0",
     "points_per_game": "4.1",
     "total_points": 128,
@@ -4081,6 +4217,7 @@
   },
   {
     "id": 98,
+    "code": 168636,
     "web_name": "Enes \u00dcnal",
     "first_name": "Enes",
     "second_name": "\u00dcnal",
@@ -4111,13 +4248,14 @@
   },
   {
     "id": 99,
+    "code": 590760,
     "web_name": "Adu-Adjei",
     "first_name": "Daniel",
     "second_name": "Adu-Adjei",
     "element_type": 4,
     "team": 4,
     "now_cost": 45,
-    "selected_by_percent": "0.4",
+    "selected_by_percent": "0.5",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -4141,13 +4279,14 @@
   },
   {
     "id": 100,
+    "code": 560262,
     "web_name": "Kroupi.Jr",
     "first_name": "Eli Junior",
     "second_name": "Kroupi",
     "element_type": 4,
     "team": 4,
     "now_cost": 45,
-    "selected_by_percent": "2.1",
+    "selected_by_percent": "2.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -4171,6 +4310,7 @@
   },
   {
     "id": 101,
+    "code": 200720,
     "web_name": "Kelleher",
     "first_name": "Caoimh\u00edn",
     "second_name": "Kelleher",
@@ -4201,6 +4341,7 @@
   },
   {
     "id": 102,
+    "code": 235448,
     "web_name": "Balcombe",
     "first_name": "Ellery",
     "second_name": "Balcombe",
@@ -4231,6 +4372,7 @@
   },
   {
     "id": 103,
+    "code": 503300,
     "web_name": "Cox",
     "first_name": "Matthew",
     "second_name": "Cox",
@@ -4261,6 +4403,7 @@
   },
   {
     "id": 104,
+    "code": 535017,
     "web_name": "Eyestone",
     "first_name": "Julian",
     "second_name": "Eyestone",
@@ -4291,6 +4434,7 @@
   },
   {
     "id": 105,
+    "code": 507433,
     "web_name": "Valdimarsson",
     "first_name": "H\u00e1kon Rafn",
     "second_name": "Valdimarsson",
@@ -4321,13 +4465,14 @@
   },
   {
     "id": 106,
+    "code": 432830,
     "web_name": "Collins",
     "first_name": "Nathan",
     "second_name": "Collins",
     "element_type": 2,
     "team": 5,
     "now_cost": 50,
-    "selected_by_percent": "1.4",
+    "selected_by_percent": "1.5",
     "form": "0.0",
     "points_per_game": "3.3",
     "total_points": 127,
@@ -4351,6 +4496,7 @@
   },
   {
     "id": 107,
+    "code": 249231,
     "web_name": "Lewis-Potter",
     "first_name": "Keane",
     "second_name": "Lewis-Potter",
@@ -4381,6 +4527,7 @@
   },
   {
     "id": 108,
+    "code": 191866,
     "web_name": "Ajer",
     "first_name": "Kristoffer",
     "second_name": "Ajer",
@@ -4411,6 +4558,7 @@
   },
   {
     "id": 109,
+    "code": 194010,
     "web_name": "Henry",
     "first_name": "Rico",
     "second_name": "Henry",
@@ -4441,6 +4589,7 @@
   },
   {
     "id": 110,
+    "code": 607464,
     "web_name": "Kayode",
     "first_name": "Michael",
     "second_name": "Kayode",
@@ -4471,6 +4620,7 @@
   },
   {
     "id": 111,
+    "code": 231065,
     "web_name": "Pinnock",
     "first_name": "Ethan",
     "second_name": "Pinnock",
@@ -4501,6 +4651,7 @@
   },
   {
     "id": 112,
+    "code": 226956,
     "web_name": "Roerslev",
     "first_name": "Mads",
     "second_name": "Roerslev Rasmussen",
@@ -4531,6 +4682,7 @@
   },
   {
     "id": 113,
+    "code": 444765,
     "web_name": "Van den Berg",
     "first_name": "Sepp",
     "second_name": "van den Berg",
@@ -4561,6 +4713,7 @@
   },
   {
     "id": 114,
+    "code": 622536,
     "web_name": "Arthur",
     "first_name": "Benjamin",
     "second_name": "Arthur",
@@ -4591,6 +4744,7 @@
   },
   {
     "id": 115,
+    "code": 612534,
     "web_name": "Fredrick",
     "first_name": "Benjamin",
     "second_name": "Fredrick",
@@ -4621,6 +4775,7 @@
   },
   {
     "id": 116,
+    "code": 472713,
     "web_name": "Hickey",
     "first_name": "Aaron",
     "second_name": "Hickey",
@@ -4651,6 +4806,7 @@
   },
   {
     "id": 117,
+    "code": 570241,
     "web_name": "Ji-soo",
     "first_name": "Kim",
     "second_name": "Ji-soo",
@@ -4681,13 +4837,14 @@
   },
   {
     "id": 118,
+    "code": 499717,
     "web_name": "Meghoma",
     "first_name": "Jayden",
     "second_name": "Meghoma",
     "element_type": 2,
     "team": 5,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "1.0",
     "total_points": 1,
@@ -4711,13 +4868,14 @@
   },
   {
     "id": 120,
+    "code": 513418,
     "web_name": "Schade",
     "first_name": "Kevin",
     "second_name": "Schade",
     "element_type": 3,
     "team": 5,
     "now_cost": 70,
-    "selected_by_percent": "2.4",
+    "selected_by_percent": "2.3",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 149,
@@ -4741,6 +4899,7 @@
   },
   {
     "id": 121,
+    "code": 440089,
     "web_name": "Damsgaard",
     "first_name": "Mikkel",
     "second_name": "Damsgaard",
@@ -4771,6 +4930,7 @@
   },
   {
     "id": 122,
+    "code": 543295,
     "web_name": "Milambo",
     "first_name": "Antoni",
     "second_name": "Milambo",
@@ -4801,6 +4961,7 @@
   },
   {
     "id": 123,
+    "code": 244858,
     "web_name": "Carvalho",
     "first_name": "F\u00e1bio",
     "second_name": "Freitas Gouveia Carvalho",
@@ -4831,6 +4992,7 @@
   },
   {
     "id": 124,
+    "code": 56979,
     "web_name": "Henderson",
     "first_name": "Jordan",
     "second_name": "Henderson",
@@ -4861,6 +5023,7 @@
   },
   {
     "id": 125,
+    "code": 204580,
     "web_name": "Janelt",
     "first_name": "Vitaly",
     "second_name": "Janelt",
@@ -4891,6 +5054,7 @@
   },
   {
     "id": 126,
+    "code": 207283,
     "web_name": "Jensen",
     "first_name": "Mathias",
     "second_name": "Jensen",
@@ -4921,6 +5085,7 @@
   },
   {
     "id": 127,
+    "code": 626464,
     "web_name": "Nunes",
     "first_name": "Gustavo",
     "second_name": "Nunes Fernandes Gomes",
@@ -4951,6 +5116,7 @@
   },
   {
     "id": 128,
+    "code": 428580,
     "web_name": "Onyeka",
     "first_name": "Frank",
     "second_name": "Onyeka",
@@ -4981,6 +5147,7 @@
   },
   {
     "id": 129,
+    "code": 508395,
     "web_name": "Yarmoliuk",
     "first_name": "Yehor",
     "second_name": "Yarmoliuk",
@@ -5011,6 +5178,7 @@
   },
   {
     "id": 130,
+    "code": 606689,
     "web_name": "Donovan",
     "first_name": "Romelle",
     "second_name": "Donovan",
@@ -5041,6 +5209,7 @@
   },
   {
     "id": 131,
+    "code": 628204,
     "web_name": "Konak",
     "first_name": "Yunus Emre",
     "second_name": "Konak",
@@ -5071,6 +5240,7 @@
   },
   {
     "id": 132,
+    "code": 220695,
     "web_name": "Maghoma",
     "first_name": "Paris",
     "second_name": "Maghoma",
@@ -5101,6 +5271,7 @@
   },
   {
     "id": 133,
+    "code": 450539,
     "web_name": "Peart-Harris",
     "first_name": "Myles",
     "second_name": "Peart-Harris",
@@ -5131,6 +5302,7 @@
   },
   {
     "id": 134,
+    "code": 591357,
     "web_name": "Trevitt",
     "first_name": "Ryan",
     "second_name": "Trevitt",
@@ -5161,13 +5333,14 @@
   },
   {
     "id": 135,
+    "code": 216646,
     "web_name": "Wissa",
     "first_name": "Yoane",
     "second_name": "Wissa",
     "element_type": 4,
     "team": 5,
     "now_cost": 75,
-    "selected_by_percent": "9.4",
+    "selected_by_percent": "9.2",
     "form": "0.0",
     "points_per_game": "5.3",
     "total_points": 185,
@@ -5191,6 +5364,7 @@
   },
   {
     "id": 136,
+    "code": 502500,
     "web_name": "Thiago",
     "first_name": "Igor Thiago",
     "second_name": "Nascimento Rodrigues",
@@ -5221,6 +5395,7 @@
   },
   {
     "id": 137,
+    "code": 533710,
     "web_name": "Morgan",
     "first_name": "Iwan",
     "second_name": "Morgan",
@@ -5251,6 +5426,7 @@
   },
   {
     "id": 138,
+    "code": 49262,
     "web_name": "Steele",
     "first_name": "Jason",
     "second_name": "Steele",
@@ -5281,6 +5457,7 @@
   },
   {
     "id": 139,
+    "code": 489639,
     "web_name": "Verbruggen",
     "first_name": "Bart",
     "second_name": "Verbruggen",
@@ -5311,6 +5488,7 @@
   },
   {
     "id": 140,
+    "code": 209288,
     "web_name": "McGill",
     "first_name": "Tom",
     "second_name": "McGill",
@@ -5341,6 +5519,7 @@
   },
   {
     "id": 141,
+    "code": 472739,
     "web_name": "Rushworth",
     "first_name": "Carl",
     "second_name": "Rushworth",
@@ -5371,6 +5550,7 @@
   },
   {
     "id": 142,
+    "code": 240514,
     "web_name": "Scherpen",
     "first_name": "Kjell",
     "second_name": "Scherpen",
@@ -5401,6 +5581,7 @@
   },
   {
     "id": 143,
+    "code": 204120,
     "web_name": "Boscagli",
     "first_name": "Olivier",
     "second_name": "Boscagli",
@@ -5431,6 +5612,7 @@
   },
   {
     "id": 144,
+    "code": 550090,
     "web_name": "Coppola",
     "first_name": "Diego",
     "second_name": "Coppola",
@@ -5461,6 +5643,7 @@
   },
   {
     "id": 145,
+    "code": 465730,
     "web_name": "De Cuyper",
     "first_name": "Maxim",
     "second_name": "De Cuyper",
@@ -5491,6 +5674,7 @@
   },
   {
     "id": 146,
+    "code": 83299,
     "web_name": "Dunk",
     "first_name": "Lewis",
     "second_name": "Dunk",
@@ -5521,13 +5705,14 @@
   },
   {
     "id": 147,
+    "code": 204214,
     "web_name": "Estupi\u00f1an",
     "first_name": "Pervis",
     "second_name": "Estupi\u00f1\u00e1n Tenorio",
     "element_type": 2,
     "team": 6,
     "now_cost": 45,
-    "selected_by_percent": "1.1",
+    "selected_by_percent": "0.8",
     "form": "0.0",
     "points_per_game": "2.1",
     "total_points": 63,
@@ -5551,6 +5736,7 @@
   },
   {
     "id": 148,
+    "code": 231416,
     "web_name": "F.Kad\u0131o\u011flu",
     "first_name": "Ferdi",
     "second_name": "Kad\u0131o\u011flu",
@@ -5581,6 +5767,7 @@
   },
   {
     "id": 149,
+    "code": 223434,
     "web_name": "Igor",
     "first_name": "Igor Julio",
     "second_name": "dos Santos de Paulo",
@@ -5611,6 +5798,7 @@
   },
   {
     "id": 150,
+    "code": 232792,
     "web_name": "Lamptey",
     "first_name": "Tariq",
     "second_name": "Lamptey",
@@ -5641,6 +5829,7 @@
   },
   {
     "id": 151,
+    "code": 469142,
     "web_name": "Van Hecke",
     "first_name": "Jan Paul",
     "second_name": "van Hecke",
@@ -5671,13 +5860,14 @@
   },
   {
     "id": 152,
+    "code": 111478,
     "web_name": "Veltman",
     "first_name": "Jo\u00ebl",
     "second_name": "Veltman",
     "element_type": 2,
     "team": 6,
     "now_cost": 45,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.3",
     "form": "0.0",
     "points_per_game": "2.8",
     "total_points": 59,
@@ -5701,6 +5891,7 @@
   },
   {
     "id": 153,
+    "code": 110735,
     "web_name": "Webster",
     "first_name": "Adam",
     "second_name": "Webster",
@@ -5731,6 +5922,7 @@
   },
   {
     "id": 154,
+    "code": 439135,
     "web_name": "Cashin",
     "first_name": "Eiran",
     "second_name": "Cashin",
@@ -5761,6 +5953,7 @@
   },
   {
     "id": 155,
+    "code": 589100,
     "web_name": "Slater",
     "first_name": "Jacob",
     "second_name": "Slater",
@@ -5791,6 +5984,7 @@
   },
   {
     "id": 156,
+    "code": 547720,
     "web_name": "Tasker",
     "first_name": "Charlie",
     "second_name": "Tasker",
@@ -5821,13 +6015,14 @@
   },
   {
     "id": 157,
+    "code": 451340,
     "web_name": "Mitoma",
     "first_name": "Mitoma",
     "second_name": "Kaoru",
     "element_type": 3,
     "team": 6,
     "now_cost": 65,
-    "selected_by_percent": "5.6",
+    "selected_by_percent": "5.7",
     "form": "0.0",
     "points_per_game": "4.0",
     "total_points": 145,
@@ -5851,13 +6046,14 @@
   },
   {
     "id": 158,
+    "code": 463067,
     "web_name": "Georginio",
     "first_name": "Georginio",
     "second_name": "Rutter",
     "element_type": 3,
     "team": 6,
     "now_cost": 60,
-    "selected_by_percent": "0.6",
+    "selected_by_percent": "0.5",
     "form": "0.0",
     "points_per_game": "3.4",
     "total_points": 95,
@@ -5881,6 +6077,7 @@
   },
   {
     "id": 159,
+    "code": 109345,
     "web_name": "March",
     "first_name": "Solly",
     "second_name": "March",
@@ -5911,6 +6108,7 @@
   },
   {
     "id": 160,
+    "code": 592031,
     "web_name": "Minteh",
     "first_name": "Yankuba",
     "second_name": "Minteh",
@@ -5941,6 +6139,7 @@
   },
   {
     "id": 161,
+    "code": 474120,
     "web_name": "Enciso",
     "first_name": "Julio",
     "second_name": "Enciso Esp\u00ednola",
@@ -5971,6 +6170,7 @@
   },
   {
     "id": 162,
+    "code": 513433,
     "web_name": "Gruda",
     "first_name": "Brajan",
     "second_name": "Gruda",
@@ -6001,6 +6201,7 @@
   },
   {
     "id": 163,
+    "code": 532529,
     "web_name": "Hinshelwood",
     "first_name": "Jack",
     "second_name": "Hinshelwood",
@@ -6031,6 +6232,7 @@
   },
   {
     "id": 164,
+    "code": 219249,
     "web_name": "O'Riley",
     "first_name": "Matt",
     "second_name": "O'Riley",
@@ -6061,6 +6263,7 @@
   },
   {
     "id": 165,
+    "code": 516211,
     "web_name": "Sima",
     "first_name": "Abdallah",
     "second_name": "Sima",
@@ -6091,6 +6294,7 @@
   },
   {
     "id": 166,
+    "code": 509416,
     "web_name": "Ayari",
     "first_name": "Yasin",
     "second_name": "Ayari",
@@ -6121,13 +6325,14 @@
   },
   {
     "id": 167,
+    "code": 535301,
     "web_name": "Baleba",
     "first_name": "Carlos",
     "second_name": "Baleba",
     "element_type": 3,
     "team": 6,
     "now_cost": 50,
-    "selected_by_percent": "4.1",
+    "selected_by_percent": "4.2",
     "form": "0.0",
     "points_per_game": "2.6",
     "total_points": 87,
@@ -6151,6 +6356,7 @@
   },
   {
     "id": 168,
+    "code": 536916,
     "web_name": "Buonanotte",
     "first_name": "Facundo",
     "second_name": "Buonanotte",
@@ -6181,6 +6387,7 @@
   },
   {
     "id": 169,
+    "code": 514254,
     "web_name": "Gomez",
     "first_name": "Diego",
     "second_name": "G\u00f3mez Amarilla",
@@ -6211,6 +6418,7 @@
   },
   {
     "id": 170,
+    "code": 15157,
     "web_name": "Milner",
     "first_name": "James",
     "second_name": "Milner",
@@ -6241,6 +6449,7 @@
   },
   {
     "id": 171,
+    "code": 441192,
     "web_name": "Sarmiento",
     "first_name": "Jeremy",
     "second_name": "Sarmiento Morante",
@@ -6271,6 +6480,7 @@
   },
   {
     "id": 172,
+    "code": 549074,
     "web_name": "Watson",
     "first_name": "Tom",
     "second_name": "Watson",
@@ -6301,6 +6511,7 @@
   },
   {
     "id": 173,
+    "code": 467779,
     "web_name": "Wieffer",
     "first_name": "Mats",
     "second_name": "Wieffer",
@@ -6331,6 +6542,7 @@
   },
   {
     "id": 174,
+    "code": 611695,
     "web_name": "Yalcouye",
     "first_name": "Malick",
     "second_name": "Yalcouy\u00e9",
@@ -6361,6 +6573,7 @@
   },
   {
     "id": 175,
+    "code": 567121,
     "web_name": "Knight",
     "first_name": "Joe",
     "second_name": "Knight",
@@ -6391,6 +6604,7 @@
   },
   {
     "id": 176,
+    "code": 550141,
     "web_name": "Mazilu",
     "first_name": "Adrian",
     "second_name": "Mazilu",
@@ -6421,6 +6635,7 @@
   },
   {
     "id": 177,
+    "code": 513834,
     "web_name": "Moran",
     "first_name": "Andrew",
     "second_name": "Moran",
@@ -6451,13 +6666,14 @@
   },
   {
     "id": 178,
+    "code": 50175,
     "web_name": "Welbeck",
     "first_name": "Danny",
     "second_name": "Welbeck",
     "element_type": 4,
     "team": 6,
     "now_cost": 65,
-    "selected_by_percent": "8.5",
+    "selected_by_percent": "8.6",
     "form": "0.0",
     "points_per_game": "4.2",
     "total_points": 125,
@@ -6481,13 +6697,14 @@
   },
   {
     "id": 179,
+    "code": 487117,
     "web_name": "Ferguson",
     "first_name": "Evan",
     "second_name": "Ferguson",
     "element_type": 4,
     "team": 6,
     "now_cost": 55,
-    "selected_by_percent": "0.4",
+    "selected_by_percent": "0.3",
     "form": "0.0",
     "points_per_game": "1.3",
     "total_points": 28,
@@ -6511,6 +6728,7 @@
   },
   {
     "id": 180,
+    "code": 608181,
     "web_name": "Tzimas",
     "first_name": "Stefanos",
     "second_name": "Tzimas",
@@ -6541,6 +6759,7 @@
   },
   {
     "id": 181,
+    "code": 647850,
     "web_name": "Kostoulas",
     "first_name": "Charalampos",
     "second_name": "Kostoulas",
@@ -6571,13 +6790,14 @@
   },
   {
     "id": 220,
+    "code": 215059,
     "web_name": "S\u00e1nchez",
     "first_name": "Robert",
     "second_name": "Lynch S\u00e1nchez",
     "element_type": 1,
     "team": 7,
     "now_cost": 50,
-    "selected_by_percent": "12.9",
+    "selected_by_percent": "13.3",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 126,
@@ -6601,6 +6821,7 @@
   },
   {
     "id": 221,
+    "code": 508479,
     "web_name": "J\u00f6rgensen",
     "first_name": "Filip",
     "second_name": "J\u00f6rgensen",
@@ -6631,6 +6852,7 @@
   },
   {
     "id": 222,
+    "code": 549939,
     "web_name": "Penders",
     "first_name": "Mike",
     "second_name": "Penders",
@@ -6661,6 +6883,7 @@
   },
   {
     "id": 223,
+    "code": 471798,
     "web_name": "Slonina",
     "first_name": "Gabriel",
     "second_name": "S\u0142onina",
@@ -6691,13 +6914,14 @@
   },
   {
     "id": 224,
+    "code": 179268,
     "web_name": "Cucurella",
     "first_name": "Marc",
     "second_name": "Cucurella Saseta",
     "element_type": 2,
     "team": 7,
     "now_cost": 60,
-    "selected_by_percent": "20.5",
+    "selected_by_percent": "20.3",
     "form": "0.0",
     "points_per_game": "3.7",
     "total_points": 133,
@@ -6721,6 +6945,7 @@
   },
   {
     "id": 225,
+    "code": 225796,
     "web_name": "James",
     "first_name": "Reece",
     "second_name": "James",
@@ -6751,6 +6976,7 @@
   },
   {
     "id": 226,
+    "code": 180736,
     "web_name": "Chalobah",
     "first_name": "Trevoh",
     "second_name": "Chalobah",
@@ -6781,6 +7007,7 @@
   },
   {
     "id": 227,
+    "code": 460028,
     "web_name": "Colwill",
     "first_name": "Levi",
     "second_name": "Samuels Colwill",
@@ -6811,13 +7038,14 @@
   },
   {
     "id": 228,
+    "code": 482609,
     "web_name": "Gusto",
     "first_name": "Malo",
     "second_name": "Gusto",
     "element_type": 2,
     "team": 7,
     "now_cost": 50,
-    "selected_by_percent": "2.5",
+    "selected_by_percent": "2.4",
     "form": "0.0",
     "points_per_game": "1.9",
     "total_points": 60,
@@ -6841,6 +7069,7 @@
   },
   {
     "id": 229,
+    "code": 242880,
     "web_name": "B.Badiashile",
     "first_name": "Beno\u00eet",
     "second_name": "Badiashile Mukinayi",
@@ -6871,6 +7100,7 @@
   },
   {
     "id": 230,
+    "code": 444463,
     "web_name": "Fofana",
     "first_name": "Wesley",
     "second_name": "Fofana",
@@ -6901,6 +7131,7 @@
   },
   {
     "id": 231,
+    "code": 574458,
     "web_name": "M.Sarr",
     "first_name": "Mamadou",
     "second_name": "Sarr",
@@ -6931,6 +7162,7 @@
   },
   {
     "id": 232,
+    "code": 109646,
     "web_name": "Tosin",
     "first_name": "Tosin",
     "second_name": "Adarabioyo",
@@ -6961,6 +7193,7 @@
   },
   {
     "id": 233,
+    "code": 577016,
     "web_name": "Acheampong",
     "first_name": "Josh",
     "second_name": "Acheampong",
@@ -6991,6 +7224,7 @@
   },
   {
     "id": 234,
+    "code": 622758,
     "web_name": "Anselmino",
     "first_name": "Aar\u00f3n",
     "second_name": "Anselmino",
@@ -7021,13 +7255,14 @@
   },
   {
     "id": 235,
+    "code": 244851,
     "web_name": "Palmer",
     "first_name": "Cole",
     "second_name": "Palmer",
     "element_type": 3,
     "team": 7,
     "now_cost": 105,
-    "selected_by_percent": "50.5",
+    "selected_by_percent": "50.9",
     "form": "0.0",
     "points_per_game": "5.8",
     "total_points": 214,
@@ -7051,13 +7286,14 @@
   },
   {
     "id": 236,
+    "code": 247632,
     "web_name": "Neto",
     "first_name": "Pedro",
     "second_name": "Lomba Neto",
     "element_type": 3,
     "team": 7,
     "now_cost": 70,
-    "selected_by_percent": "5.1",
+    "selected_by_percent": "5.0",
     "form": "0.0",
     "points_per_game": "3.0",
     "total_points": 104,
@@ -7081,6 +7317,7 @@
   },
   {
     "id": 237,
+    "code": 448047,
     "web_name": "Enzo",
     "first_name": "Enzo",
     "second_name": "Fern\u00e1ndez",
@@ -7111,6 +7348,7 @@
   },
   {
     "id": 238,
+    "code": 624773,
     "web_name": "Est\u00eav\u00e3o",
     "first_name": "Est\u00eav\u00e3o",
     "second_name": "Almeida de Oliveira Gon\u00e7alves",
@@ -7141,6 +7379,7 @@
   },
   {
     "id": 239,
+    "code": 463936,
     "web_name": "Gittens",
     "first_name": "Jamie",
     "second_name": "Bynoe-Gittens",
@@ -7171,6 +7410,7 @@
   },
   {
     "id": 240,
+    "code": 213198,
     "web_name": "Nkunku",
     "first_name": "Christopher",
     "second_name": "Nkunku",
@@ -7201,13 +7441,14 @@
   },
   {
     "id": 241,
+    "code": 486672,
     "web_name": "Caicedo",
     "first_name": "Mois\u00e9s",
     "second_name": "Caicedo Corozo",
     "element_type": 3,
     "team": 7,
     "now_cost": 55,
-    "selected_by_percent": "7.7",
+    "selected_by_percent": "7.5",
     "form": "0.0",
     "points_per_game": "2.6",
     "total_points": 98,
@@ -7231,6 +7472,7 @@
   },
   {
     "id": 242,
+    "code": 215413,
     "web_name": "Dewsbury-Hall",
     "first_name": "Kiernan",
     "second_name": "Dewsbury-Hall",
@@ -7261,6 +7503,7 @@
   },
   {
     "id": 243,
+    "code": 550615,
     "web_name": "George",
     "first_name": "Tyrique",
     "second_name": "George",
@@ -7291,13 +7534,14 @@
   },
   {
     "id": 244,
+    "code": 514356,
     "web_name": "Lavia",
     "first_name": "Rom\u00e9o",
     "second_name": "Lavia",
     "element_type": 3,
     "team": 7,
     "now_cost": 50,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.1",
     "form": "0.0",
     "points_per_game": "1.6",
     "total_points": 26,
@@ -7321,6 +7565,7 @@
   },
   {
     "id": 245,
+    "code": 465920,
     "web_name": "Mudryk",
     "first_name": "Mykhailo",
     "second_name": "Mudryk",
@@ -7351,13 +7596,14 @@
   },
   {
     "id": 246,
+    "code": 532605,
     "web_name": "Andrey Santos",
     "first_name": "Andrey",
     "second_name": "Nascimento dos Santos",
     "element_type": 3,
     "team": 7,
     "now_cost": 45,
-    "selected_by_percent": "0.6",
+    "selected_by_percent": "0.5",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -7381,6 +7627,7 @@
   },
   {
     "id": 247,
+    "code": 491007,
     "web_name": "D.Essugo",
     "first_name": "D\u00e1rio",
     "second_name": "Lu\u00eds Essugo",
@@ -7411,6 +7658,7 @@
   },
   {
     "id": 248,
+    "code": 611134,
     "web_name": "Paez",
     "first_name": "Kendry",
     "second_name": "P\u00e1ez Andrade",
@@ -7441,13 +7689,14 @@
   },
   {
     "id": 249,
+    "code": 475168,
     "web_name": "Jo\u00e3o Pedro",
     "first_name": "Jo\u00e3o Pedro",
     "second_name": "Junqueira de Jesus",
     "element_type": 4,
     "team": 7,
     "now_cost": 75,
-    "selected_by_percent": "59.9",
+    "selected_by_percent": "59.4",
     "form": "0.0",
     "points_per_game": "4.7",
     "total_points": 126,
@@ -7471,13 +7720,14 @@
   },
   {
     "id": 250,
+    "code": 463034,
     "web_name": "Delap",
     "first_name": "Liam",
     "second_name": "Delap",
     "element_type": 4,
     "team": 7,
     "now_cost": 65,
-    "selected_by_percent": "4.9",
+    "selected_by_percent": "4.8",
     "form": "0.0",
     "points_per_game": "3.6",
     "total_points": 132,
@@ -7501,6 +7751,7 @@
   },
   {
     "id": 251,
+    "code": 517052,
     "web_name": "N.Jackson",
     "first_name": "Nicolas",
     "second_name": "Jackson",
@@ -7531,6 +7782,7 @@
   },
   {
     "id": 252,
+    "code": 499309,
     "web_name": "Marc Guiu",
     "first_name": "Marc",
     "second_name": "Guiu Paz",
@@ -7561,13 +7813,14 @@
   },
   {
     "id": 253,
+    "code": 172649,
     "web_name": "Henderson",
     "first_name": "Dean",
     "second_name": "Henderson",
     "element_type": 1,
     "team": 8,
     "now_cost": 50,
-    "selected_by_percent": "3.1",
+    "selected_by_percent": "3.2",
     "form": "0.0",
     "points_per_game": "3.6",
     "total_points": 135,
@@ -7591,13 +7844,14 @@
   },
   {
     "id": 254,
+    "code": 121709,
     "web_name": "Benitez",
     "first_name": "Walter",
     "second_name": "Ben\u00edtez",
     "element_type": 1,
     "team": 8,
     "now_cost": 40,
-    "selected_by_percent": "0.5",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -7621,6 +7875,7 @@
   },
   {
     "id": 255,
+    "code": 169593,
     "web_name": "Matthews",
     "first_name": "Remi",
     "second_name": "Matthews",
@@ -7651,13 +7906,14 @@
   },
   {
     "id": 256,
+    "code": 247348,
     "web_name": "Mu\u00f1oz",
     "first_name": "Daniel",
     "second_name": "Mu\u00f1oz Mej\u00eda",
     "element_type": 2,
     "team": 8,
     "now_cost": 55,
-    "selected_by_percent": "9.3",
+    "selected_by_percent": "9.2",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 142,
@@ -7681,6 +7937,7 @@
   },
   {
     "id": 257,
+    "code": 437499,
     "web_name": "Lacroix",
     "first_name": "Maxence",
     "second_name": "Lacroix",
@@ -7711,6 +7968,7 @@
   },
   {
     "id": 258,
+    "code": 244723,
     "web_name": "Mitchell",
     "first_name": "Tyrick",
     "second_name": "Mitchell",
@@ -7741,6 +7999,7 @@
   },
   {
     "id": 259,
+    "code": 218364,
     "web_name": "Sosa",
     "first_name": "Borna",
     "second_name": "Sosa",
@@ -7771,6 +8030,7 @@
   },
   {
     "id": 260,
+    "code": 209036,
     "web_name": "Gu\u00e9hi",
     "first_name": "Marc",
     "second_name": "Gu\u00e9hi",
@@ -7801,6 +8061,7 @@
   },
   {
     "id": 261,
+    "code": 427623,
     "web_name": "Richards",
     "first_name": "Chris",
     "second_name": "Richards",
@@ -7831,6 +8092,7 @@
   },
   {
     "id": 262,
+    "code": 515621,
     "web_name": "Chadi Riad",
     "first_name": "Chadi",
     "second_name": "Riad Dnanou",
@@ -7861,6 +8123,7 @@
   },
   {
     "id": 263,
+    "code": 57328,
     "web_name": "Clyne",
     "first_name": "Nathaniel",
     "second_name": "Clyne",
@@ -7891,6 +8154,7 @@
   },
   {
     "id": 264,
+    "code": 156074,
     "web_name": "Holding",
     "first_name": "Rob",
     "second_name": "Holding",
@@ -7921,6 +8185,7 @@
   },
   {
     "id": 265,
+    "code": 590012,
     "web_name": "Kporha",
     "first_name": "Caleb",
     "second_name": "Kporha",
@@ -7951,13 +8216,14 @@
   },
   {
     "id": 266,
+    "code": 232413,
     "web_name": "Eze",
     "first_name": "Eberechi",
     "second_name": "Eze",
     "element_type": 3,
     "team": 8,
     "now_cost": 75,
-    "selected_by_percent": "8.4",
+    "selected_by_percent": "8.5",
     "form": "0.0",
     "points_per_game": "4.4",
     "total_points": 148,
@@ -7981,6 +8247,7 @@
   },
   {
     "id": 267,
+    "code": 232185,
     "web_name": "Sarr",
     "first_name": "Isma\u00efla",
     "second_name": "Sarr",
@@ -8011,6 +8278,7 @@
   },
   {
     "id": 268,
+    "code": 438464,
     "web_name": "Doucour\u00e9",
     "first_name": "Cheick",
     "second_name": "Doucour\u00e9",
@@ -8041,6 +8309,7 @@
   },
   {
     "id": 269,
+    "code": 606921,
     "web_name": "Esse",
     "first_name": "Romain",
     "second_name": "Esse",
@@ -8071,6 +8340,7 @@
   },
   {
     "id": 270,
+    "code": 108413,
     "web_name": "Hughes",
     "first_name": "Will",
     "second_name": "Hughes",
@@ -8101,6 +8371,7 @@
   },
   {
     "id": 271,
+    "code": 209400,
     "web_name": "Kamada",
     "first_name": "Daichi",
     "second_name": "Kamada",
@@ -8131,6 +8402,7 @@
   },
   {
     "id": 272,
+    "code": 152551,
     "web_name": "Lerma",
     "first_name": "Jefferson",
     "second_name": "Lerma Sol\u00eds",
@@ -8161,6 +8433,7 @@
   },
   {
     "id": 273,
+    "code": 496221,
     "web_name": "Wharton",
     "first_name": "Adam",
     "second_name": "Wharton",
@@ -8191,6 +8464,7 @@
   },
   {
     "id": 274,
+    "code": 579075,
     "web_name": "Agbinone",
     "first_name": "Asher",
     "second_name": "Agbinone",
@@ -8221,6 +8495,7 @@
   },
   {
     "id": 275,
+    "code": 466117,
     "web_name": "Ahamada",
     "first_name": "Naouirou",
     "second_name": "Ahamada",
@@ -8251,6 +8526,7 @@
   },
   {
     "id": 276,
+    "code": 489706,
     "web_name": "Devenny",
     "first_name": "Justin",
     "second_name": "Devenny",
@@ -8281,6 +8557,7 @@
   },
   {
     "id": 277,
+    "code": 450535,
     "web_name": "Ebiowei",
     "first_name": "Malcolm",
     "second_name": "Ebiowei",
@@ -8311,6 +8588,7 @@
   },
   {
     "id": 278,
+    "code": 450542,
     "web_name": "J.Rak-Sakyi",
     "first_name": "Jesurun",
     "second_name": "Rak-Sakyi",
@@ -8341,6 +8619,7 @@
   },
   {
     "id": 279,
+    "code": 536694,
     "web_name": "M.Fran\u00e7a",
     "first_name": "Matheus",
     "second_name": "Fran\u00e7a de Oliveira",
@@ -8371,13 +8650,14 @@
   },
   {
     "id": 280,
+    "code": 531989,
     "web_name": "Ozoh",
     "first_name": "David",
     "second_name": "Ozoh",
     "element_type": 3,
     "team": 8,
     "now_cost": 45,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -8401,13 +8681,14 @@
   },
   {
     "id": 281,
+    "code": 530318,
     "web_name": "Rodney",
     "first_name": "Kaden",
     "second_name": "Rodney",
     "element_type": 3,
     "team": 8,
     "now_cost": 45,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -8431,13 +8712,14 @@
   },
   {
     "id": 282,
+    "code": 574398,
     "web_name": "Umeh",
     "first_name": "Franco",
     "second_name": "Umeh-Chibueze",
     "element_type": 3,
     "team": 8,
     "now_cost": 45,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -8461,13 +8743,14 @@
   },
   {
     "id": 283,
+    "code": 231747,
     "web_name": "Mateta",
     "first_name": "Jean-Philippe",
     "second_name": "Mateta",
     "element_type": 4,
     "team": 8,
     "now_cost": 75,
-    "selected_by_percent": "6.4",
+    "selected_by_percent": "6.3",
     "form": "0.0",
     "points_per_game": "4.1",
     "total_points": 150,
@@ -8491,6 +8774,7 @@
   },
   {
     "id": 284,
+    "code": 205533,
     "web_name": "Nketiah",
     "first_name": "Eddie",
     "second_name": "Nketiah",
@@ -8521,6 +8805,7 @@
   },
   {
     "id": 285,
+    "code": 199670,
     "web_name": "\u00c9douard",
     "first_name": "Odsonne",
     "second_name": "\u00c9douard",
@@ -8551,6 +8836,7 @@
   },
   {
     "id": 286,
+    "code": 576980,
     "web_name": "Marsh",
     "first_name": "Zach",
     "second_name": "Marsh",
@@ -8581,13 +8867,14 @@
   },
   {
     "id": 287,
+    "code": 111234,
     "web_name": "Pickford",
     "first_name": "Jordan",
     "second_name": "Pickford",
     "element_type": 1,
     "team": 9,
     "now_cost": 55,
-    "selected_by_percent": "13.8",
+    "selected_by_percent": "13.5",
     "form": "0.0",
     "points_per_game": "4.2",
     "total_points": 158,
@@ -8611,6 +8898,7 @@
   },
   {
     "id": 288,
+    "code": 229600,
     "web_name": "Travers",
     "first_name": "Mark",
     "second_name": "Travers",
@@ -8641,6 +8929,7 @@
   },
   {
     "id": 289,
+    "code": 447325,
     "web_name": "Tyrer",
     "first_name": "Harry",
     "second_name": "Tyrer",
@@ -8671,13 +8960,14 @@
   },
   {
     "id": 290,
+    "code": 480455,
     "web_name": "Branthwaite",
     "first_name": "Jarrad",
     "second_name": "Branthwaite",
     "element_type": 2,
     "team": 9,
     "now_cost": 55,
-    "selected_by_percent": "2.0",
+    "selected_by_percent": "1.9",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 88,
@@ -8701,13 +8991,14 @@
   },
   {
     "id": 291,
+    "code": 17761,
     "web_name": "Tarkowski",
     "first_name": "James",
     "second_name": "Tarkowski",
     "element_type": 2,
     "team": 9,
     "now_cost": 55,
-    "selected_by_percent": "5.0",
+    "selected_by_percent": "4.9",
     "form": "0.0",
     "points_per_game": "3.2",
     "total_points": 105,
@@ -8731,13 +9022,14 @@
   },
   {
     "id": 292,
+    "code": 224967,
     "web_name": "Mykolenko",
     "first_name": "Vitalii",
     "second_name": "Mykolenko",
     "element_type": 2,
     "team": 9,
     "now_cost": 50,
-    "selected_by_percent": "5.0",
+    "selected_by_percent": "4.9",
     "form": "0.0",
     "points_per_game": "3.5",
     "total_points": 121,
@@ -8761,6 +9053,7 @@
   },
   {
     "id": 293,
+    "code": 512462,
     "web_name": "O'Brien",
     "first_name": "Jake",
     "second_name": "O'Brien",
@@ -8791,6 +9084,7 @@
   },
   {
     "id": 294,
+    "code": 59949,
     "web_name": "Coleman",
     "first_name": "S\u00e9amus",
     "second_name": "Coleman",
@@ -8821,6 +9115,7 @@
   },
   {
     "id": 295,
+    "code": 106611,
     "web_name": "Keane",
     "first_name": "Michael",
     "second_name": "Keane",
@@ -8851,6 +9146,7 @@
   },
   {
     "id": 296,
+    "code": 243571,
     "web_name": "Patterson",
     "first_name": "Nathan",
     "second_name": "Patterson",
@@ -8881,6 +9177,7 @@
   },
   {
     "id": 297,
+    "code": 496178,
     "web_name": "Dixon",
     "first_name": "Roman",
     "second_name": "Dixon",
@@ -8911,13 +9208,14 @@
   },
   {
     "id": 298,
+    "code": 474907,
     "web_name": "Welch",
     "first_name": "Reece",
     "second_name": "Welch",
     "element_type": 2,
     "team": 9,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -8941,6 +9239,7 @@
   },
   {
     "id": 299,
+    "code": 440993,
     "web_name": "Ndiaye",
     "first_name": "Iliman",
     "second_name": "Ndiaye",
@@ -8971,6 +9270,7 @@
   },
   {
     "id": 300,
+    "code": 433154,
     "web_name": "McNeil",
     "first_name": "Dwight",
     "second_name": "McNeil",
@@ -9001,6 +9301,7 @@
   },
   {
     "id": 301,
+    "code": 502697,
     "web_name": "Alcaraz",
     "first_name": "Carlos",
     "second_name": "Alcaraz Dur\u00e1n",
@@ -9031,6 +9332,7 @@
   },
   {
     "id": 302,
+    "code": 80801,
     "web_name": "Gana",
     "first_name": "Idrissa Gana",
     "second_name": "Gueye",
@@ -9061,6 +9363,7 @@
   },
   {
     "id": 303,
+    "code": 232928,
     "web_name": "Garner",
     "first_name": "James",
     "second_name": "Garner",
@@ -9091,6 +9394,7 @@
   },
   {
     "id": 304,
+    "code": 490094,
     "web_name": "Iroegbunam",
     "first_name": "Tim",
     "second_name": "Iroegbunam",
@@ -9121,6 +9425,7 @@
   },
   {
     "id": 305,
+    "code": 609873,
     "web_name": "Armstrong",
     "first_name": "Harrison",
     "second_name": "Armstrong",
@@ -9151,6 +9456,7 @@
   },
   {
     "id": 306,
+    "code": 547801,
     "web_name": "Bates",
     "first_name": "Callum",
     "second_name": "Bates",
@@ -9181,13 +9487,14 @@
   },
   {
     "id": 307,
+    "code": 504296,
     "web_name": "Ebere",
     "first_name": "Coby",
     "second_name": "Ebere",
     "element_type": 3,
     "team": 9,
     "now_cost": 45,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -9211,6 +9518,7 @@
   },
   {
     "id": 308,
+    "code": 496279,
     "web_name": "Heath",
     "first_name": "Isaac",
     "second_name": "Heath",
@@ -9241,6 +9549,7 @@
   },
   {
     "id": 309,
+    "code": 491557,
     "web_name": "Metcalfe",
     "first_name": "Jenson",
     "second_name": "Metcalfe",
@@ -9271,13 +9580,14 @@
   },
   {
     "id": 310,
+    "code": 586309,
     "web_name": "Barry",
     "first_name": "Thierno",
     "second_name": "Barry",
     "element_type": 4,
     "team": 9,
     "now_cost": 60,
-    "selected_by_percent": "1.8",
+    "selected_by_percent": "1.7",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -9301,13 +9611,14 @@
   },
   {
     "id": 311,
+    "code": 486385,
     "web_name": "Beto",
     "first_name": "Norberto Bercique",
     "second_name": "Gomes Betuncal",
     "element_type": 4,
     "team": 9,
     "now_cost": 55,
-    "selected_by_percent": "16.3",
+    "selected_by_percent": "16.2",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 87,
@@ -9331,6 +9642,7 @@
   },
   {
     "id": 312,
+    "code": 491012,
     "web_name": "Y.Chermiti",
     "first_name": "Youssef",
     "second_name": "Ramalho Chermiti",
@@ -9361,6 +9673,7 @@
   },
   {
     "id": 313,
+    "code": 536241,
     "web_name": "Sherif",
     "first_name": "Martin",
     "second_name": "Sherif",
@@ -9391,6 +9704,7 @@
   },
   {
     "id": 314,
+    "code": 80201,
     "web_name": "Leno",
     "first_name": "Bernd",
     "second_name": "Leno",
@@ -9421,6 +9735,7 @@
   },
   {
     "id": 315,
+    "code": 428971,
     "web_name": "Benda",
     "first_name": "Steven",
     "second_name": "Benda",
@@ -9451,6 +9766,7 @@
   },
   {
     "id": 316,
+    "code": 169528,
     "web_name": "Robinson",
     "first_name": "Antonee",
     "second_name": "Robinson",
@@ -9481,6 +9797,7 @@
   },
   {
     "id": 317,
+    "code": 174874,
     "web_name": "Andersen",
     "first_name": "Joachim",
     "second_name": "Andersen",
@@ -9511,6 +9828,7 @@
   },
   {
     "id": 318,
+    "code": 232892,
     "web_name": "Bassey",
     "first_name": "Calvin",
     "second_name": "Bassey",
@@ -9541,6 +9859,7 @@
   },
   {
     "id": 319,
+    "code": 166477,
     "web_name": "Castagne",
     "first_name": "Timothy",
     "second_name": "Castagne",
@@ -9571,6 +9890,7 @@
   },
   {
     "id": 320,
+    "code": 219924,
     "web_name": "Diop",
     "first_name": "Issa",
     "second_name": "Diop",
@@ -9601,6 +9921,7 @@
   },
   {
     "id": 321,
+    "code": 246301,
     "web_name": "J.Cuenca",
     "first_name": "Jorge",
     "second_name": "Cuenca Barreno",
@@ -9631,6 +9952,7 @@
   },
   {
     "id": 322,
+    "code": 167074,
     "web_name": "Tete",
     "first_name": "Kenny",
     "second_name": "Tete",
@@ -9661,6 +9983,7 @@
   },
   {
     "id": 323,
+    "code": 591385,
     "web_name": "Amissah",
     "first_name": "Samuel",
     "second_name": "Amissah",
@@ -9691,6 +10014,7 @@
   },
   {
     "id": 324,
+    "code": 153133,
     "web_name": "Iwobi",
     "first_name": "Alex",
     "second_name": "Iwobi",
@@ -9721,6 +10045,7 @@
   },
   {
     "id": 325,
+    "code": 209289,
     "web_name": "Smith Rowe",
     "first_name": "Emile",
     "second_name": "Smith Rowe",
@@ -9751,6 +10076,7 @@
   },
   {
     "id": 326,
+    "code": 159533,
     "web_name": "Adama",
     "first_name": "Adama",
     "second_name": "Traor\u00e9 Diarra",
@@ -9781,6 +10107,7 @@
   },
   {
     "id": 327,
+    "code": 156689,
     "web_name": "Andreas",
     "first_name": "Andreas",
     "second_name": "Hoelgebaum Pereira",
@@ -9811,6 +10138,7 @@
   },
   {
     "id": 328,
+    "code": 184349,
     "web_name": "Sessegnon",
     "first_name": "Ryan",
     "second_name": "Sessegnon",
@@ -9841,13 +10169,14 @@
   },
   {
     "id": 329,
+    "code": 153682,
     "web_name": "Wilson",
     "first_name": "Harry",
     "second_name": "Wilson",
     "element_type": 3,
     "team": 10,
     "now_cost": 55,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "3.1",
     "total_points": 78,
@@ -9871,6 +10200,7 @@
   },
   {
     "id": 330,
+    "code": 207189,
     "web_name": "Berge",
     "first_name": "Sander",
     "second_name": "Berge",
@@ -9901,6 +10231,7 @@
   },
   {
     "id": 331,
+    "code": 76357,
     "web_name": "Cairney",
     "first_name": "Tom",
     "second_name": "Cairney",
@@ -9931,6 +10262,7 @@
   },
   {
     "id": 332,
+    "code": 212314,
     "web_name": "Luki\u0107",
     "first_name": "Sa\u0161a",
     "second_name": "Luki\u0107",
@@ -9961,6 +10293,7 @@
   },
   {
     "id": 333,
+    "code": 573062,
     "web_name": "Godo",
     "first_name": "Martial",
     "second_name": "Godo",
@@ -9991,6 +10324,7 @@
   },
   {
     "id": 334,
+    "code": 515024,
     "web_name": "Harris",
     "first_name": "Luke",
     "second_name": "Harris",
@@ -10021,6 +10355,7 @@
   },
   {
     "id": 335,
+    "code": 577725,
     "web_name": "King",
     "first_name": "Josh",
     "second_name": "King",
@@ -10051,6 +10386,7 @@
   },
   {
     "id": 336,
+    "code": 153366,
     "web_name": "Reed",
     "first_name": "Harrison",
     "second_name": "Reed",
@@ -10081,13 +10417,14 @@
   },
   {
     "id": 337,
+    "code": 102057,
     "web_name": "Ra\u00fal",
     "first_name": "Ra\u00fal",
     "second_name": "Jim\u00e9nez Rodr\u00edguez",
     "element_type": 4,
     "team": 10,
     "now_cost": 65,
-    "selected_by_percent": "2.4",
+    "selected_by_percent": "2.5",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 147,
@@ -10111,6 +10448,7 @@
   },
   {
     "id": 338,
+    "code": 244042,
     "web_name": "Muniz",
     "first_name": "Rodrigo",
     "second_name": "Muniz Carvalho",
@@ -10141,13 +10479,14 @@
   },
   {
     "id": 339,
+    "code": 437495,
     "web_name": "Meslier",
     "first_name": "Illan",
     "second_name": "Meslier",
     "element_type": 1,
     "team": 11,
     "now_cost": 45,
-    "selected_by_percent": "1.4",
+    "selected_by_percent": "1.3",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10171,6 +10510,7 @@
   },
   {
     "id": 340,
+    "code": 97846,
     "web_name": "Cairns",
     "first_name": "Alex",
     "second_name": "Cairns",
@@ -10201,13 +10541,14 @@
   },
   {
     "id": 341,
+    "code": 59735,
     "web_name": "Darlow",
     "first_name": "Karl",
     "second_name": "Darlow",
     "element_type": 1,
     "team": 11,
     "now_cost": 40,
-    "selected_by_percent": "8.6",
+    "selected_by_percent": "8.5",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10231,13 +10572,14 @@
   },
   {
     "id": 342,
+    "code": 226182,
     "web_name": "Bogle",
     "first_name": "Jayden",
     "second_name": "Bogle",
     "element_type": 2,
     "team": 11,
     "now_cost": 45,
-    "selected_by_percent": "1.0",
+    "selected_by_percent": "0.9",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10261,6 +10603,7 @@
   },
   {
     "id": 343,
+    "code": 222694,
     "web_name": "Struijk",
     "first_name": "Pascal",
     "second_name": "Struijk",
@@ -10291,13 +10634,14 @@
   },
   {
     "id": 344,
+    "code": 434752,
     "web_name": "Bijol",
     "first_name": "Jaka",
     "second_name": "Bijol",
     "element_type": 2,
     "team": 11,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10321,6 +10665,7 @@
   },
   {
     "id": 345,
+    "code": 437738,
     "web_name": "Bornauw",
     "first_name": "Sebastiaan",
     "second_name": "Bornauw",
@@ -10351,6 +10696,7 @@
   },
   {
     "id": 346,
+    "code": 113564,
     "web_name": "Byram",
     "first_name": "Sam",
     "second_name": "Byram",
@@ -10381,6 +10727,7 @@
   },
   {
     "id": 347,
+    "code": 243526,
     "web_name": "Gudmundsson",
     "first_name": "Gabriel",
     "second_name": "Gudmundsson",
@@ -10411,13 +10758,14 @@
   },
   {
     "id": 348,
+    "code": 214225,
     "web_name": "Rodon",
     "first_name": "Joe",
     "second_name": "Rodon",
     "element_type": 2,
     "team": 11,
     "now_cost": 40,
-    "selected_by_percent": "1.9",
+    "selected_by_percent": "1.8",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10441,6 +10789,7 @@
   },
   {
     "id": 349,
+    "code": 492368,
     "web_name": "Schmidt",
     "first_name": "Isaac",
     "second_name": "Schmidt",
@@ -10471,6 +10820,7 @@
   },
   {
     "id": 350,
+    "code": 427637,
     "web_name": "Aaronson",
     "first_name": "Brenden",
     "second_name": "Aaronson",
@@ -10501,6 +10851,7 @@
   },
   {
     "id": 351,
+    "code": 492859,
     "web_name": "Gnonto",
     "first_name": "Wilfried",
     "second_name": "Gnonto",
@@ -10531,6 +10882,7 @@
   },
   {
     "id": 352,
+    "code": 221399,
     "web_name": "Harrison",
     "first_name": "Jack",
     "second_name": "Harrison",
@@ -10561,6 +10913,7 @@
   },
   {
     "id": 353,
+    "code": 200617,
     "web_name": "James",
     "first_name": "Daniel",
     "second_name": "James",
@@ -10591,6 +10944,7 @@
   },
   {
     "id": 354,
+    "code": 199598,
     "web_name": "Ampadu",
     "first_name": "Ethan",
     "second_name": "Ampadu",
@@ -10621,6 +10975,7 @@
   },
   {
     "id": 355,
+    "code": 248937,
     "web_name": "Greenwood",
     "first_name": "Sam",
     "second_name": "Greenwood",
@@ -10651,6 +11006,7 @@
   },
   {
     "id": 356,
+    "code": 486520,
     "web_name": "Gruev",
     "first_name": "Ilia",
     "second_name": "Gruev",
@@ -10681,6 +11037,7 @@
   },
   {
     "id": 357,
+    "code": 433952,
     "web_name": "Ramazani",
     "first_name": "Largie",
     "second_name": "Ramazani",
@@ -10711,6 +11068,7 @@
   },
   {
     "id": 358,
+    "code": 248056,
     "web_name": "Tanaka",
     "first_name": "Tanaka",
     "second_name": "Ao",
@@ -10741,6 +11099,7 @@
   },
   {
     "id": 359,
+    "code": 536119,
     "web_name": "Crew",
     "first_name": "Charlie",
     "second_name": "Crew",
@@ -10771,6 +11130,7 @@
   },
   {
     "id": 360,
+    "code": 462635,
     "web_name": "Gelhardt",
     "first_name": "Joe",
     "second_name": "Gelhardt",
@@ -10801,6 +11161,7 @@
   },
   {
     "id": 361,
+    "code": 470294,
     "web_name": "Gyabi",
     "first_name": "Darko",
     "second_name": "Gyabi",
@@ -10831,13 +11192,14 @@
   },
   {
     "id": 362,
+    "code": 235826,
     "web_name": "Piroe",
     "first_name": "Jo\u00ebl",
     "second_name": "Piroe",
     "element_type": 4,
     "team": 11,
     "now_cost": 55,
-    "selected_by_percent": "3.7",
+    "selected_by_percent": "3.8",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -10861,6 +11223,7 @@
   },
   {
     "id": 363,
+    "code": 106617,
     "web_name": "Bamford",
     "first_name": "Patrick",
     "second_name": "Bamford",
@@ -10891,6 +11254,7 @@
   },
   {
     "id": 364,
+    "code": 565297,
     "web_name": "Mateo Joseph",
     "first_name": "Mateo",
     "second_name": "Joseph Fern\u00e1ndez-Regatillo",
@@ -10921,6 +11285,7 @@
   },
   {
     "id": 365,
+    "code": 174594,
     "web_name": "Nmecha",
     "first_name": "Lukas",
     "second_name": "Nmecha",
@@ -10951,6 +11316,7 @@
   },
   {
     "id": 493,
+    "code": 180135,
     "web_name": "Longstaff",
     "first_name": "Sean",
     "second_name": "Longstaff",
@@ -10981,6 +11347,7 @@
   },
   {
     "id": 660,
+    "code": 466525,
     "web_name": "Stach",
     "first_name": "Anton",
     "second_name": "Stach",
@@ -11011,6 +11378,7 @@
   },
   {
     "id": 366,
+    "code": 116535,
     "web_name": "A.Becker",
     "first_name": "Alisson",
     "second_name": "Becker",
@@ -11041,6 +11409,7 @@
   },
   {
     "id": 367,
+    "code": 449027,
     "web_name": "Mamardashvili",
     "first_name": "Giorgi",
     "second_name": "Mamardashvili",
@@ -11071,6 +11440,7 @@
   },
   {
     "id": 368,
+    "code": 586268,
     "web_name": "P\u00e9csi",
     "first_name": "\u00c1rmin",
     "second_name": "P\u00e9csi",
@@ -11101,6 +11471,7 @@
   },
   {
     "id": 369,
+    "code": 155503,
     "web_name": "Woodman",
     "first_name": "Freddie",
     "second_name": "Woodman",
@@ -11131,13 +11502,14 @@
   },
   {
     "id": 370,
+    "code": 216094,
     "web_name": "Frimpong",
     "first_name": "Jeremie",
     "second_name": "Frimpong",
     "element_type": 2,
     "team": 12,
     "now_cost": 60,
-    "selected_by_percent": "28.7",
+    "selected_by_percent": "28.3",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -11161,13 +11533,14 @@
   },
   {
     "id": 371,
+    "code": 544877,
     "web_name": "Kerkez",
     "first_name": "Milos",
     "second_name": "Kerkez",
     "element_type": 2,
     "team": 12,
     "now_cost": 60,
-    "selected_by_percent": "13.5",
+    "selected_by_percent": "12.9",
     "form": "0.0",
     "points_per_game": "3.5",
     "total_points": 134,
@@ -11191,13 +11564,14 @@
   },
   {
     "id": 372,
+    "code": 122798,
     "web_name": "Robertson",
     "first_name": "Andrew",
     "second_name": "Robertson",
     "element_type": 2,
     "team": 12,
     "now_cost": 60,
-    "selected_by_percent": "2.5",
+    "selected_by_percent": "2.4",
     "form": "0.0",
     "points_per_game": "2.8",
     "total_points": 91,
@@ -11221,13 +11595,14 @@
   },
   {
     "id": 373,
+    "code": 97032,
     "web_name": "Virgil",
     "first_name": "Virgil",
     "second_name": "van Dijk",
     "element_type": 2,
     "team": 12,
     "now_cost": 60,
-    "selected_by_percent": "18.6",
+    "selected_by_percent": "19.0",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 143,
@@ -11251,13 +11626,14 @@
   },
   {
     "id": 374,
+    "code": 204716,
     "web_name": "Konat\u00e9",
     "first_name": "Ibrahima",
     "second_name": "Konat\u00e9",
     "element_type": 2,
     "team": 12,
     "now_cost": 55,
-    "selected_by_percent": "2.5",
+    "selected_by_percent": "2.6",
     "form": "0.0",
     "points_per_game": "3.4",
     "total_points": 106,
@@ -11281,6 +11657,7 @@
   },
   {
     "id": 375,
+    "code": 492777,
     "web_name": "Bradley",
     "first_name": "Conor",
     "second_name": "Bradley",
@@ -11311,6 +11688,7 @@
   },
   {
     "id": 376,
+    "code": 171287,
     "web_name": "Gomez",
     "first_name": "Joe",
     "second_name": "Gomez",
@@ -11341,6 +11719,7 @@
   },
   {
     "id": 377,
+    "code": 214285,
     "web_name": "Tsimikas",
     "first_name": "Konstantinos",
     "second_name": "Tsimikas",
@@ -11371,6 +11750,7 @@
   },
   {
     "id": 378,
+    "code": 611926,
     "web_name": "Nallo",
     "first_name": "Amara",
     "second_name": "Nallo",
@@ -11401,6 +11781,7 @@
   },
   {
     "id": 379,
+    "code": 219937,
     "web_name": "R.Williams",
     "first_name": "Rhys",
     "second_name": "Williams",
@@ -11431,13 +11812,14 @@
   },
   {
     "id": 380,
+    "code": 489580,
     "web_name": "Ramsay",
     "first_name": "Calvin",
     "second_name": "Ramsay",
     "element_type": 2,
     "team": 12,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -11461,13 +11843,14 @@
   },
   {
     "id": 381,
+    "code": 118748,
     "web_name": "M.Salah",
     "first_name": "Mohamed",
     "second_name": "Salah",
     "element_type": 3,
     "team": 12,
     "now_cost": 145,
-    "selected_by_percent": "57.5",
+    "selected_by_percent": "57.2",
     "form": "0.0",
     "points_per_game": "9.1",
     "total_points": 344,
@@ -11491,13 +11874,14 @@
   },
   {
     "id": 382,
+    "code": 494595,
     "web_name": "Wirtz",
     "first_name": "Florian",
     "second_name": "Wirtz",
     "element_type": 3,
     "team": 12,
     "now_cost": 85,
-    "selected_by_percent": "37.0",
+    "selected_by_percent": "35.8",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -11521,13 +11905,14 @@
   },
   {
     "id": 383,
+    "code": 244731,
     "web_name": "Luis D\u00edaz",
     "first_name": "Luis",
     "second_name": "D\u00edaz Marulanda",
     "element_type": 3,
     "team": 12,
     "now_cost": 80,
-    "selected_by_percent": "2.4",
+    "selected_by_percent": "2.2",
     "form": "0.0",
     "points_per_game": "5.1",
     "total_points": 183,
@@ -11551,13 +11936,14 @@
   },
   {
     "id": 384,
+    "code": 243298,
     "web_name": "Gakpo",
     "first_name": "Cody",
     "second_name": "Gakpo",
     "element_type": 3,
     "team": 12,
     "now_cost": 75,
-    "selected_by_percent": "1.8",
+    "selected_by_percent": "1.9",
     "form": "0.0",
     "points_per_game": "3.6",
     "total_points": 127,
@@ -11581,6 +11967,7 @@
   },
   {
     "id": 385,
+    "code": 223541,
     "web_name": "Chiesa",
     "first_name": "Federico",
     "second_name": "Chiesa",
@@ -11611,6 +11998,7 @@
   },
   {
     "id": 386,
+    "code": 243016,
     "web_name": "Mac Allister",
     "first_name": "Alexis",
     "second_name": "Mac Allister",
@@ -11641,13 +12029,14 @@
   },
   {
     "id": 387,
+    "code": 424876,
     "web_name": "Szoboszlai",
     "first_name": "Dominik",
     "second_name": "Szoboszlai",
     "element_type": 3,
     "team": 12,
     "now_cost": 65,
-    "selected_by_percent": "1.3",
+    "selected_by_percent": "1.5",
     "form": "0.0",
     "points_per_game": "4.0",
     "total_points": 143,
@@ -11671,6 +12060,7 @@
   },
   {
     "id": 388,
+    "code": 206915,
     "web_name": "C.Jones",
     "first_name": "Curtis",
     "second_name": "Jones",
@@ -11701,6 +12091,7 @@
   },
   {
     "id": 389,
+    "code": 444884,
     "web_name": "Elliott",
     "first_name": "Harvey",
     "second_name": "Elliott",
@@ -11731,6 +12122,7 @@
   },
   {
     "id": 390,
+    "code": 441266,
     "web_name": "Gravenberch",
     "first_name": "Ryan",
     "second_name": "Gravenberch",
@@ -11761,6 +12153,7 @@
   },
   {
     "id": 391,
+    "code": 496208,
     "web_name": "Doak",
     "first_name": "Ben",
     "second_name": "Doak",
@@ -11791,6 +12184,7 @@
   },
   {
     "id": 392,
+    "code": 158983,
     "web_name": "Endo",
     "first_name": "Endo",
     "second_name": "Wataru",
@@ -11821,6 +12215,7 @@
   },
   {
     "id": 393,
+    "code": 535928,
     "web_name": "Bajcetic",
     "first_name": "Stefan",
     "second_name": "Baj\u010deti\u0107 Maquieira",
@@ -11851,6 +12246,7 @@
   },
   {
     "id": 394,
+    "code": 491501,
     "web_name": "McConnell",
     "first_name": "James",
     "second_name": "McConnell",
@@ -11881,6 +12277,7 @@
   },
   {
     "id": 395,
+    "code": 440148,
     "web_name": "Morton",
     "first_name": "Tyler",
     "second_name": "Morton",
@@ -11911,6 +12308,7 @@
   },
   {
     "id": 396,
+    "code": 591386,
     "web_name": "Nyoni",
     "first_name": "Trey",
     "second_name": "Nyoni",
@@ -11941,13 +12339,14 @@
   },
   {
     "id": 397,
+    "code": 447203,
     "web_name": "Darwin",
     "first_name": "Darwin",
     "second_name": "N\u00fa\u00f1ez Ribeiro",
     "element_type": 4,
     "team": 12,
     "now_cost": 65,
-    "selected_by_percent": "2.3",
+    "selected_by_percent": "2.1",
     "form": "0.0",
     "points_per_game": "2.2",
     "total_points": 66,
@@ -11971,6 +12370,7 @@
   },
   {
     "id": 398,
+    "code": 500058,
     "web_name": "Danns",
     "first_name": "Jayden",
     "second_name": "Danns",
@@ -12001,13 +12401,14 @@
   },
   {
     "id": 661,
+    "code": 510663,
     "web_name": "Ekitik\u00e9",
     "first_name": "Hugo",
     "second_name": "Ekitik\u00e9",
     "element_type": 4,
     "team": 12,
     "now_cost": 85,
-    "selected_by_percent": "4.1",
+    "selected_by_percent": "4.8",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -12031,13 +12432,14 @@
   },
   {
     "id": 399,
+    "code": 121160,
     "web_name": "Ederson M.",
     "first_name": "Ederson",
     "second_name": "Santana de Moraes",
     "element_type": 1,
     "team": 13,
     "now_cost": 55,
-    "selected_by_percent": "3.8",
+    "selected_by_percent": "3.7",
     "form": "0.0",
     "points_per_game": "4.3",
     "total_points": 111,
@@ -12061,6 +12463,7 @@
   },
   {
     "id": 400,
+    "code": 88248,
     "web_name": "Ortega Moreno",
     "first_name": "Stefan",
     "second_name": "Ortega Moreno",
@@ -12091,6 +12494,7 @@
   },
   {
     "id": 401,
+    "code": 122074,
     "web_name": "Bettinelli",
     "first_name": "Marcus",
     "second_name": "Bettinelli",
@@ -12121,13 +12525,14 @@
   },
   {
     "id": 402,
+    "code": 448514,
     "web_name": "A\u00eft-Nouri",
     "first_name": "Rayan",
     "second_name": "A\u00eft-Nouri",
     "element_type": 2,
     "team": 13,
     "now_cost": 60,
-    "selected_by_percent": "27.7",
+    "selected_by_percent": "27.3",
     "form": "0.0",
     "points_per_game": "3.4",
     "total_points": 125,
@@ -12151,13 +12556,14 @@
   },
   {
     "id": 403,
+    "code": 477424,
     "web_name": "Gvardiol",
     "first_name": "Jo\u0161ko",
     "second_name": "Gvardiol",
     "element_type": 2,
     "team": 13,
     "now_cost": 60,
-    "selected_by_percent": "17.4",
+    "selected_by_percent": "17.5",
     "form": "0.0",
     "points_per_game": "4.1",
     "total_points": 153,
@@ -12181,6 +12587,7 @@
   },
   {
     "id": 404,
+    "code": 211975,
     "web_name": "Akanji",
     "first_name": "Manuel",
     "second_name": "Akanji",
@@ -12211,6 +12618,7 @@
   },
   {
     "id": 405,
+    "code": 126184,
     "web_name": "Ak\u00e9",
     "first_name": "Nathan",
     "second_name": "Ak\u00e9",
@@ -12241,6 +12649,7 @@
   },
   {
     "id": 406,
+    "code": 578153,
     "web_name": "Khusanov",
     "first_name": "Abdukodir",
     "second_name": "Khusanov",
@@ -12271,6 +12680,7 @@
   },
   {
     "id": 407,
+    "code": 465351,
     "web_name": "Matheus N.",
     "first_name": "Matheus",
     "second_name": "Nunes",
@@ -12301,6 +12711,7 @@
   },
   {
     "id": 408,
+    "code": 171314,
     "web_name": "R\u00faben",
     "first_name": "R\u00faben",
     "second_name": "dos Santos Gato Alves Dias",
@@ -12331,6 +12742,7 @@
   },
   {
     "id": 409,
+    "code": 97299,
     "web_name": "Stones",
     "first_name": "John",
     "second_name": "Stones",
@@ -12361,6 +12773,7 @@
   },
   {
     "id": 410,
+    "code": 477064,
     "web_name": "Lewis",
     "first_name": "Rico",
     "second_name": "Lewis",
@@ -12391,6 +12804,7 @@
   },
   {
     "id": 411,
+    "code": 472769,
     "web_name": "O\u2019Reilly",
     "first_name": "Nico",
     "second_name": "O'Reilly",
@@ -12421,6 +12835,7 @@
   },
   {
     "id": 412,
+    "code": 616222,
     "web_name": "Vitor Reis",
     "first_name": "Vitor",
     "second_name": "de Oliveira Nunes dos Reis",
@@ -12451,13 +12866,14 @@
   },
   {
     "id": 413,
+    "code": 438234,
     "web_name": "Marmoush",
     "first_name": "Omar",
     "second_name": "Marmoush",
     "element_type": 3,
     "team": 13,
     "now_cost": 85,
-    "selected_by_percent": "15.9",
+    "selected_by_percent": "15.6",
     "form": "0.0",
     "points_per_game": "4.6",
     "total_points": 73,
@@ -12481,6 +12897,7 @@
   },
   {
     "id": 414,
+    "code": 209244,
     "web_name": "Foden",
     "first_name": "Phil",
     "second_name": "Foden",
@@ -12511,13 +12928,14 @@
   },
   {
     "id": 415,
+    "code": 510281,
     "web_name": "Savinho",
     "first_name": "S\u00e1vio",
     "second_name": "Moreira de Oliveira",
     "element_type": 3,
     "team": 13,
     "now_cost": 70,
-    "selected_by_percent": "2.1",
+    "selected_by_percent": "2.0",
     "form": "0.0",
     "points_per_game": "3.7",
     "total_points": 106,
@@ -12541,6 +12959,7 @@
   },
   {
     "id": 416,
+    "code": 165809,
     "web_name": "Bernardo",
     "first_name": "Bernardo",
     "second_name": "Mota Veiga de Carvalho e Silva",
@@ -12571,13 +12990,14 @@
   },
   {
     "id": 417,
+    "code": 466052,
     "web_name": "Cherki",
     "first_name": "Rayan",
     "second_name": "Cherki",
     "element_type": 3,
     "team": 13,
     "now_cost": 65,
-    "selected_by_percent": "11.0",
+    "selected_by_percent": "10.7",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -12601,6 +13021,7 @@
   },
   {
     "id": 418,
+    "code": 248875,
     "web_name": "Doku",
     "first_name": "J\u00e9r\u00e9my",
     "second_name": "Doku",
@@ -12631,6 +13052,7 @@
   },
   {
     "id": 419,
+    "code": 114283,
     "web_name": "Grealish",
     "first_name": "Jack",
     "second_name": "Grealish",
@@ -12661,6 +13083,7 @@
   },
   {
     "id": 420,
+    "code": 59859,
     "web_name": "G\u00fcndo\u011fan",
     "first_name": "\u0130lkay",
     "second_name": "G\u00fcndo\u011fan",
@@ -12691,6 +13114,7 @@
   },
   {
     "id": 421,
+    "code": 220566,
     "web_name": "Rodrigo",
     "first_name": "Rodrigo 'Rodri'",
     "second_name": "Hernandez Cascante",
@@ -12721,6 +13145,7 @@
   },
   {
     "id": 422,
+    "code": 91651,
     "web_name": "Kova\u010di\u0107",
     "first_name": "Mateo",
     "second_name": "Kova\u010di\u0107",
@@ -12751,6 +13176,7 @@
   },
   {
     "id": 423,
+    "code": 465694,
     "web_name": "N.Gonzalez",
     "first_name": "Nico",
     "second_name": "Gonz\u00e1lez Iglesias",
@@ -12781,13 +13207,14 @@
   },
   {
     "id": 424,
+    "code": 477555,
     "web_name": "Bobb",
     "first_name": "Oscar",
     "second_name": "Bobb",
     "element_type": 3,
     "team": 13,
     "now_cost": 55,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.1",
     "form": "0.0",
     "points_per_game": "1.0",
     "total_points": 3,
@@ -12811,6 +13238,7 @@
   },
   {
     "id": 425,
+    "code": 575204,
     "web_name": "Echeverri",
     "first_name": "Claudio",
     "second_name": "Echeverri",
@@ -12841,6 +13269,7 @@
   },
   {
     "id": 426,
+    "code": 432714,
     "web_name": "McAtee",
     "first_name": "James",
     "second_name": "McAtee",
@@ -12871,6 +13300,7 @@
   },
   {
     "id": 427,
+    "code": 433036,
     "web_name": "Reijnders",
     "first_name": "Tijjani",
     "second_name": "Reijnders",
@@ -12901,6 +13331,7 @@
   },
   {
     "id": 428,
+    "code": 566164,
     "web_name": "Nypan",
     "first_name": "Sverre",
     "second_name": "Nypan",
@@ -12931,6 +13362,7 @@
   },
   {
     "id": 429,
+    "code": 155405,
     "web_name": "Phillips",
     "first_name": "Kalvin",
     "second_name": "Phillips",
@@ -12961,13 +13393,14 @@
   },
   {
     "id": 430,
+    "code": 223094,
     "web_name": "Haaland",
     "first_name": "Erling",
     "second_name": "Haaland",
     "element_type": 4,
     "team": 13,
     "now_cost": 140,
-    "selected_by_percent": "18.4",
+    "selected_by_percent": "18.5",
     "form": "0.0",
     "points_per_game": "5.8",
     "total_points": 181,
@@ -12991,13 +13424,14 @@
   },
   {
     "id": 119,
+    "code": 446008,
     "web_name": "Mbeumo",
     "first_name": "Bryan",
     "second_name": "Mbeumo",
     "element_type": 3,
     "team": 14,
     "now_cost": 80,
-    "selected_by_percent": "19.4",
+    "selected_by_percent": "18.9",
     "form": "0.0",
     "points_per_game": "6.2",
     "total_points": 236,
@@ -13021,13 +13455,14 @@
   },
   {
     "id": 431,
+    "code": 451302,
     "web_name": "Bayindir",
     "first_name": "Altay",
     "second_name": "Bay\u0131nd\u0131r",
     "element_type": 1,
     "team": 14,
     "now_cost": 50,
-    "selected_by_percent": "0.6",
+    "selected_by_percent": "0.5",
     "form": "0.0",
     "points_per_game": "2.0",
     "total_points": 8,
@@ -13051,6 +13486,7 @@
   },
   {
     "id": 432,
+    "code": 202641,
     "web_name": "Onana",
     "first_name": "Andr\u00e9",
     "second_name": "Onana",
@@ -13081,6 +13517,7 @@
   },
   {
     "id": 433,
+    "code": 588555,
     "web_name": "Harrison",
     "first_name": "Elyh",
     "second_name": "Harrison",
@@ -13111,6 +13548,7 @@
   },
   {
     "id": 434,
+    "code": 21205,
     "web_name": "Heaton",
     "first_name": "Tom",
     "second_name": "Heaton",
@@ -13141,6 +13579,7 @@
   },
   {
     "id": 435,
+    "code": 461537,
     "web_name": "Mee",
     "first_name": "Dermot",
     "second_name": "Mee",
@@ -13171,13 +13610,14 @@
   },
   {
     "id": 436,
+    "code": 209365,
     "web_name": "De Ligt",
     "first_name": "Matthijs",
     "second_name": "de Ligt",
     "element_type": 2,
     "team": 14,
     "now_cost": 50,
-    "selected_by_percent": "0.8",
+    "selected_by_percent": "0.9",
     "form": "0.0",
     "points_per_game": "2.3",
     "total_points": 68,
@@ -13201,6 +13641,7 @@
   },
   {
     "id": 437,
+    "code": 221820,
     "web_name": "Martinez",
     "first_name": "Lisandro",
     "second_name": "Mart\u00ednez",
@@ -13231,6 +13672,7 @@
   },
   {
     "id": 438,
+    "code": 230001,
     "web_name": "Mazraoui",
     "first_name": "Noussair",
     "second_name": "Mazraoui",
@@ -13261,6 +13703,7 @@
   },
   {
     "id": 439,
+    "code": 661712,
     "web_name": "D.Leon",
     "first_name": "Diego",
     "second_name": "Le\u00f3n Blanco",
@@ -13291,6 +13734,7 @@
   },
   {
     "id": 440,
+    "code": 216051,
     "web_name": "Dalot",
     "first_name": "Diogo",
     "second_name": "Dalot Teixeira",
@@ -13321,13 +13765,14 @@
   },
   {
     "id": 441,
+    "code": 596777,
     "web_name": "Dorgu",
     "first_name": "Patrick",
     "second_name": "Dorgu",
     "element_type": 2,
     "team": 14,
     "now_cost": 45,
-    "selected_by_percent": "1.6",
+    "selected_by_percent": "1.7",
     "form": "0.0",
     "points_per_game": "1.5",
     "total_points": 18,
@@ -13351,6 +13796,7 @@
   },
   {
     "id": 442,
+    "code": 95658,
     "web_name": "Maguire",
     "first_name": "Harry",
     "second_name": "Maguire",
@@ -13381,6 +13827,7 @@
   },
   {
     "id": 443,
+    "code": 106760,
     "web_name": "Shaw",
     "first_name": "Luke",
     "second_name": "Shaw",
@@ -13411,6 +13858,7 @@
   },
   {
     "id": 444,
+    "code": 550864,
     "web_name": "Yoro",
     "first_name": "Leny",
     "second_name": "Yoro",
@@ -13441,6 +13889,7 @@
   },
   {
     "id": 445,
+    "code": 577974,
     "web_name": "Amass",
     "first_name": "Harry",
     "second_name": "Amass",
@@ -13471,6 +13920,7 @@
   },
   {
     "id": 446,
+    "code": 547676,
     "web_name": "Fredricson",
     "first_name": "Tyler",
     "second_name": "Fredricson",
@@ -13501,6 +13951,7 @@
   },
   {
     "id": 447,
+    "code": 606745,
     "web_name": "Heaven",
     "first_name": "Ayden",
     "second_name": "Heaven",
@@ -13531,6 +13982,7 @@
   },
   {
     "id": 448,
+    "code": 222690,
     "web_name": "Malacia",
     "first_name": "Tyrell",
     "second_name": "Malacia",
@@ -13561,13 +14013,14 @@
   },
   {
     "id": 449,
+    "code": 141746,
     "web_name": "B.Fernandes",
     "first_name": "Bruno",
     "second_name": "Borges Fernandes",
     "element_type": 3,
     "team": 14,
     "now_cost": 90,
-    "selected_by_percent": "8.4",
+    "selected_by_percent": "10.0",
     "form": "0.0",
     "points_per_game": "4.8",
     "total_points": 174,
@@ -13591,13 +14044,14 @@
   },
   {
     "id": 450,
+    "code": 430871,
     "web_name": "Cunha",
     "first_name": "Matheus",
     "second_name": "Santos Carneiro da Cunha",
     "element_type": 3,
     "team": 14,
     "now_cost": 80,
-    "selected_by_percent": "13.3",
+    "selected_by_percent": "12.9",
     "form": "0.0",
     "points_per_game": "5.4",
     "total_points": 178,
@@ -13621,13 +14075,14 @@
   },
   {
     "id": 451,
+    "code": 176297,
     "web_name": "Rashford",
     "first_name": "Marcus",
     "second_name": "Rashford",
     "element_type": 3,
     "team": 14,
     "now_cost": 70,
-    "selected_by_percent": "1.1",
+    "selected_by_percent": "1.0",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 95,
@@ -13651,13 +14106,14 @@
   },
   {
     "id": 452,
+    "code": 493250,
     "web_name": "Amad",
     "first_name": "Amad",
     "second_name": "Diallo",
     "element_type": 3,
     "team": 14,
     "now_cost": 65,
-    "selected_by_percent": "3.6",
+    "selected_by_percent": "3.5",
     "form": "0.0",
     "points_per_game": "5.0",
     "total_points": 129,
@@ -13681,13 +14137,14 @@
   },
   {
     "id": 453,
+    "code": 493105,
     "web_name": "Garnacho",
     "first_name": "Alejandro",
     "second_name": "Garnacho Ferreyra",
     "element_type": 3,
     "team": 14,
     "now_cost": 65,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 106,
@@ -13711,6 +14168,7 @@
   },
   {
     "id": 454,
+    "code": 467169,
     "web_name": "Antony",
     "first_name": "Antony",
     "second_name": "dos Santos",
@@ -13741,6 +14199,7 @@
   },
   {
     "id": 455,
+    "code": 184341,
     "web_name": "Mount",
     "first_name": "Mason",
     "second_name": "Mount",
@@ -13771,6 +14230,7 @@
   },
   {
     "id": 456,
+    "code": 209243,
     "web_name": "Sancho",
     "first_name": "Jadon",
     "second_name": "Sancho",
@@ -13801,6 +14261,7 @@
   },
   {
     "id": 457,
+    "code": 61256,
     "web_name": "Casemiro",
     "first_name": "Carlos Henrique",
     "second_name": "Casimiro",
@@ -13831,6 +14292,7 @@
   },
   {
     "id": 458,
+    "code": 516895,
     "web_name": "Mainoo",
     "first_name": "Kobbie",
     "second_name": "Mainoo",
@@ -13861,6 +14323,7 @@
   },
   {
     "id": 459,
+    "code": 232112,
     "web_name": "Ugarte",
     "first_name": "Manuel",
     "second_name": "Ugarte Ribeiro",
@@ -13891,13 +14354,14 @@
   },
   {
     "id": 460,
+    "code": 490881,
     "web_name": "Collyer",
     "first_name": "Toby",
     "second_name": "Collyer",
     "element_type": 3,
     "team": 14,
     "now_cost": 45,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "1.0",
     "total_points": 6,
@@ -13921,6 +14385,7 @@
   },
   {
     "id": 461,
+    "code": 556639,
     "web_name": "Fitzgerald",
     "first_name": "Jayce",
     "second_name": "Fitzgerald",
@@ -13951,13 +14416,14 @@
   },
   {
     "id": 462,
+    "code": 547037,
     "web_name": "J.Fletcher",
     "first_name": "Jack",
     "second_name": "Fletcher",
     "element_type": 3,
     "team": 14,
     "now_cost": 45,
-    "selected_by_percent": "0.0",
+    "selected_by_percent": "0.1",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -13981,6 +14447,7 @@
   },
   {
     "id": 463,
+    "code": 618873,
     "web_name": "Kone",
     "first_name": "S\u00e9kou",
     "second_name": "Kon\u00e9",
@@ -14011,6 +14478,7 @@
   },
   {
     "id": 464,
+    "code": 559684,
     "web_name": "Moorhouse",
     "first_name": "Jack",
     "second_name": "Moorhouse",
@@ -14041,6 +14509,7 @@
   },
   {
     "id": 465,
+    "code": 497894,
     "web_name": "H\u00f8jlund",
     "first_name": "Rasmus",
     "second_name": "H\u00f8jlund",
@@ -14071,6 +14540,7 @@
   },
   {
     "id": 466,
+    "code": 458249,
     "web_name": "Zirkzee",
     "first_name": "Joshua",
     "second_name": "Zirkzee",
@@ -14101,13 +14571,14 @@
   },
   {
     "id": 467,
+    "code": 596047,
     "web_name": "Obi",
     "first_name": "Chido",
     "second_name": "Obi",
     "element_type": 4,
     "team": 14,
     "now_cost": 45,
-    "selected_by_percent": "6.6",
+    "selected_by_percent": "6.5",
     "form": "0.0",
     "points_per_game": "1.0",
     "total_points": 7,
@@ -14131,13 +14602,14 @@
   },
   {
     "id": 468,
+    "code": 575034,
     "web_name": "Wheatley",
     "first_name": "Ethan",
     "second_name": "Wheatley",
     "element_type": 4,
     "team": 14,
     "now_cost": 45,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -14161,13 +14633,14 @@
   },
   {
     "id": 469,
+    "code": 98747,
     "web_name": "Pope",
     "first_name": "Nick",
     "second_name": "Pope",
     "element_type": 1,
     "team": 15,
     "now_cost": 50,
-    "selected_by_percent": "3.9",
+    "selected_by_percent": "4.0",
     "form": "0.0",
     "points_per_game": "3.6",
     "total_points": 102,
@@ -14191,13 +14664,14 @@
   },
   {
     "id": 470,
+    "code": 67089,
     "web_name": "D\u00fabravka",
     "first_name": "Martin",
     "second_name": "D\u00fabravka",
     "element_type": 1,
     "team": 15,
     "now_cost": 40,
-    "selected_by_percent": "11.1",
+    "selected_by_percent": "11.2",
     "form": "0.0",
     "points_per_game": "4.4",
     "total_points": 44,
@@ -14221,6 +14695,7 @@
   },
   {
     "id": 471,
+    "code": 81441,
     "web_name": "Gillespie",
     "first_name": "Mark",
     "second_name": "Gillespie",
@@ -14251,6 +14726,7 @@
   },
   {
     "id": 472,
+    "code": 111452,
     "web_name": "Odysseas",
     "first_name": "Odysseas",
     "second_name": "Vlachodimos",
@@ -14281,13 +14757,14 @@
   },
   {
     "id": 473,
+    "code": 487838,
     "web_name": "Hall",
     "first_name": "Lewis",
     "second_name": "Hall",
     "element_type": 2,
     "team": 15,
     "now_cost": 55,
-    "selected_by_percent": "3.3",
+    "selected_by_percent": "3.2",
     "form": "0.0",
     "points_per_game": "3.8",
     "total_points": 102,
@@ -14311,6 +14788,7 @@
   },
   {
     "id": 474,
+    "code": 119471,
     "web_name": "Sch\u00e4r",
     "first_name": "Fabian",
     "second_name": "Sch\u00e4r",
@@ -14341,6 +14819,7 @@
   },
   {
     "id": 475,
+    "code": 220237,
     "web_name": "Botman",
     "first_name": "Sven",
     "second_name": "Botman",
@@ -14371,13 +14850,14 @@
   },
   {
     "id": 476,
+    "code": 78916,
     "web_name": "Burn",
     "first_name": "Dan",
     "second_name": "Burn",
     "element_type": 2,
     "team": 15,
     "now_cost": 50,
-    "selected_by_percent": "3.0",
+    "selected_by_percent": "3.1",
     "form": "0.0",
     "points_per_game": "3.1",
     "total_points": 115,
@@ -14401,13 +14881,14 @@
   },
   {
     "id": 477,
+    "code": 441191,
     "web_name": "Livramento",
     "first_name": "Tino",
     "second_name": "Livramento",
     "element_type": 2,
     "team": 15,
     "now_cost": 50,
-    "selected_by_percent": "5.1",
+    "selected_by_percent": "5.0",
     "form": "0.0",
     "points_per_game": "2.8",
     "total_points": 105,
@@ -14431,13 +14912,14 @@
   },
   {
     "id": 478,
+    "code": 77794,
     "web_name": "Trippier",
     "first_name": "Kieran",
     "second_name": "Trippier",
     "element_type": 2,
     "team": 15,
     "now_cost": 50,
-    "selected_by_percent": "1.2",
+    "selected_by_percent": "1.3",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 72,
@@ -14461,6 +14943,7 @@
   },
   {
     "id": 479,
+    "code": 111773,
     "web_name": "Krafth",
     "first_name": "Emil",
     "second_name": "Krafth",
@@ -14491,6 +14974,7 @@
   },
   {
     "id": 480,
+    "code": 101148,
     "web_name": "Lascelles",
     "first_name": "Jamaal",
     "second_name": "Lascelles",
@@ -14521,6 +15005,7 @@
   },
   {
     "id": 481,
+    "code": 545477,
     "web_name": "A.Murphy",
     "first_name": "Alex",
     "second_name": "Murphy",
@@ -14551,6 +15036,7 @@
   },
   {
     "id": 482,
+    "code": 441024,
     "web_name": "Ashby",
     "first_name": "Harrison",
     "second_name": "Ashby",
@@ -14581,6 +15067,7 @@
   },
   {
     "id": 483,
+    "code": 578512,
     "web_name": "Pivas",
     "first_name": "Miodrag",
     "second_name": "Piva\u0161",
@@ -14611,6 +15098,7 @@
   },
   {
     "id": 484,
+    "code": 169359,
     "web_name": "Targett",
     "first_name": "Matt",
     "second_name": "Targett",
@@ -14641,6 +15129,7 @@
   },
   {
     "id": 485,
+    "code": 232826,
     "web_name": "Gordon",
     "first_name": "Anthony",
     "second_name": "Gordon",
@@ -14671,13 +15160,14 @@
   },
   {
     "id": 486,
+    "code": 449434,
     "web_name": "Elanga",
     "first_name": "Anthony",
     "second_name": "Elanga",
     "element_type": 3,
     "team": 15,
     "now_cost": 70,
-    "selected_by_percent": "9.5",
+    "selected_by_percent": "10.1",
     "form": "0.0",
     "points_per_game": "4.0",
     "total_points": 153,
@@ -14701,6 +15191,7 @@
   },
   {
     "id": 487,
+    "code": 201666,
     "web_name": "Barnes",
     "first_name": "Harvey",
     "second_name": "Barnes",
@@ -14731,6 +15222,7 @@
   },
   {
     "id": 488,
+    "code": 208706,
     "web_name": "Bruno G.",
     "first_name": "Bruno",
     "second_name": "Guimar\u00e3es Rodriguez Moura",
@@ -14761,13 +15253,14 @@
   },
   {
     "id": 489,
+    "code": 114243,
     "web_name": "J.Murphy",
     "first_name": "Jacob",
     "second_name": "Murphy",
     "element_type": 3,
     "team": 15,
     "now_cost": 65,
-    "selected_by_percent": "2.6",
+    "selected_by_percent": "2.8",
     "form": "0.0",
     "points_per_game": "4.5",
     "total_points": 159,
@@ -14791,6 +15284,7 @@
   },
   {
     "id": 490,
+    "code": 180974,
     "web_name": "Joelinton",
     "first_name": "Joelinton C\u00e1ssio",
     "second_name": "Apolin\u00e1rio de Lira",
@@ -14821,6 +15315,7 @@
   },
   {
     "id": 491,
+    "code": 432422,
     "web_name": "Tonali",
     "first_name": "Sandro",
     "second_name": "Tonali",
@@ -14851,6 +15346,7 @@
   },
   {
     "id": 492,
+    "code": 640108,
     "web_name": "Anto\u00f1ito C.",
     "first_name": "Anto\u00f1ito",
     "second_name": "Cordero Campillo",
@@ -14881,6 +15377,7 @@
   },
   {
     "id": 494,
+    "code": 200089,
     "web_name": "Willock",
     "first_name": "Joe",
     "second_name": "Willock",
@@ -14911,6 +15408,7 @@
   },
   {
     "id": 495,
+    "code": 153127,
     "web_name": "Hayden",
     "first_name": "Isaac",
     "second_name": "Hayden",
@@ -14941,6 +15439,7 @@
   },
   {
     "id": 496,
+    "code": 564510,
     "web_name": "Kuol",
     "first_name": "Garang",
     "second_name": "Kuol",
@@ -14971,6 +15470,7 @@
   },
   {
     "id": 497,
+    "code": 547719,
     "web_name": "L.Miley",
     "first_name": "Lewis",
     "second_name": "Miley",
@@ -15001,6 +15501,7 @@
   },
   {
     "id": 498,
+    "code": 461484,
     "web_name": "White",
     "first_name": "Joe",
     "second_name": "White",
@@ -15031,13 +15532,14 @@
   },
   {
     "id": 499,
+    "code": 219168,
     "web_name": "Isak",
     "first_name": "Alexander",
     "second_name": "Isak",
     "element_type": 4,
     "team": 15,
     "now_cost": 105,
-    "selected_by_percent": "36.5",
+    "selected_by_percent": "35.9",
     "form": "0.0",
     "points_per_game": "6.2",
     "total_points": 211,
@@ -15061,13 +15563,14 @@
   },
   {
     "id": 500,
+    "code": 538207,
     "web_name": "Osula",
     "first_name": "William",
     "second_name": "Osula",
     "element_type": 4,
     "team": 15,
     "now_cost": 55,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "1.4",
     "total_points": 19,
@@ -15091,6 +15594,7 @@
   },
   {
     "id": 501,
+    "code": 599303,
     "web_name": "Neave",
     "first_name": "Sean",
     "second_name": "Neave",
@@ -15121,13 +15625,14 @@
   },
   {
     "id": 502,
+    "code": 85633,
     "web_name": "Sels",
     "first_name": "Matz",
     "second_name": "Sels",
     "element_type": 1,
     "team": 16,
     "now_cost": 50,
-    "selected_by_percent": "17.7",
+    "selected_by_percent": "17.8",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 150,
@@ -15151,6 +15656,7 @@
   },
   {
     "id": 503,
+    "code": 475123,
     "web_name": "C.Miguel",
     "first_name": "Carlos Miguel",
     "second_name": "dos Santos Pereira",
@@ -15181,6 +15687,7 @@
   },
   {
     "id": 504,
+    "code": 224068,
     "web_name": "Turner",
     "first_name": "Matt",
     "second_name": "Turner",
@@ -15211,13 +15718,14 @@
   },
   {
     "id": 505,
+    "code": 227444,
     "web_name": "Milenkovi\u0107",
     "first_name": "Nikola",
     "second_name": "Milenkovi\u0107",
     "element_type": 2,
     "team": 16,
     "now_cost": 55,
-    "selected_by_percent": "6.9",
+    "selected_by_percent": "7.1",
     "form": "0.0",
     "points_per_game": "3.9",
     "total_points": 145,
@@ -15241,13 +15749,14 @@
   },
   {
     "id": 506,
+    "code": 575476,
     "web_name": "Murillo",
     "first_name": "Murillo",
     "second_name": "Costa dos Santos",
     "element_type": 2,
     "team": 16,
     "now_cost": 55,
-    "selected_by_percent": "3.2",
+    "selected_by_percent": "3.3",
     "form": "0.0",
     "points_per_game": "3.6",
     "total_points": 130,
@@ -15271,13 +15780,14 @@
   },
   {
     "id": 507,
+    "code": 159506,
     "web_name": "Aina",
     "first_name": "Ola",
     "second_name": "Aina",
     "element_type": 2,
     "team": 16,
     "now_cost": 50,
-    "selected_by_percent": "17.7",
+    "selected_by_percent": "18.0",
     "form": "0.0",
     "points_per_game": "3.7",
     "total_points": 128,
@@ -15301,13 +15811,14 @@
   },
   {
     "id": 508,
+    "code": 215136,
     "web_name": "N.Williams",
     "first_name": "Neco",
     "second_name": "Williams",
     "element_type": 2,
     "team": 16,
     "now_cost": 50,
-    "selected_by_percent": "1.4",
+    "selected_by_percent": "1.7",
     "form": "0.0",
     "points_per_game": "3.1",
     "total_points": 109,
@@ -15331,6 +15842,7 @@
   },
   {
     "id": 509,
+    "code": 451432,
     "web_name": "David Carmo",
     "first_name": "David",
     "second_name": "Mota Veiga Teixeira do Carmo",
@@ -15361,6 +15873,7 @@
   },
   {
     "id": 510,
+    "code": 575458,
     "web_name": "Jair Cunha",
     "first_name": "Jair",
     "second_name": "Paula da Cunha Filho",
@@ -15391,6 +15904,7 @@
   },
   {
     "id": 511,
+    "code": 485047,
     "web_name": "Morato",
     "first_name": "Felipe",
     "second_name": "Rodrigues da Silva",
@@ -15421,6 +15935,7 @@
   },
   {
     "id": 512,
+    "code": 204822,
     "web_name": "O.Richards",
     "first_name": "Omar",
     "second_name": "Richards",
@@ -15451,6 +15966,7 @@
   },
   {
     "id": 513,
+    "code": 549067,
     "web_name": "Abbott",
     "first_name": "Zach",
     "second_name": "Abbott",
@@ -15481,6 +15997,7 @@
   },
   {
     "id": 514,
+    "code": 90585,
     "web_name": "Boly",
     "first_name": "Willy",
     "second_name": "Boly",
@@ -15511,13 +16028,14 @@
   },
   {
     "id": 515,
+    "code": 222531,
     "web_name": "Gibbs-White",
     "first_name": "Morgan",
     "second_name": "Gibbs-White",
     "element_type": 3,
     "team": 16,
     "now_cost": 75,
-    "selected_by_percent": "3.8",
+    "selected_by_percent": "4.1",
     "form": "0.0",
     "points_per_game": "4.5",
     "total_points": 154,
@@ -15541,13 +16059,14 @@
   },
   {
     "id": 516,
+    "code": 209046,
     "web_name": "Hudson-Odoi",
     "first_name": "Callum",
     "second_name": "Hudson-Odoi",
     "element_type": 3,
     "team": 16,
     "now_cost": 60,
-    "selected_by_percent": "2.4",
+    "selected_by_percent": "2.3",
     "form": "0.0",
     "points_per_game": "3.3",
     "total_points": 103,
@@ -15571,13 +16090,14 @@
   },
   {
     "id": 517,
+    "code": 215379,
     "web_name": "Anderson",
     "first_name": "Elliot",
     "second_name": "Anderson",
     "element_type": 3,
     "team": 16,
     "now_cost": 55,
-    "selected_by_percent": "1.9",
+    "selected_by_percent": "2.0",
     "form": "0.0",
     "points_per_game": "2.9",
     "total_points": 107,
@@ -15601,6 +16121,7 @@
   },
   {
     "id": 518,
+    "code": 510500,
     "web_name": "Jota",
     "first_name": "Jo\u00e3o Pedro",
     "second_name": "Ferreira da Silva",
@@ -15631,6 +16152,7 @@
   },
   {
     "id": 519,
+    "code": 250199,
     "web_name": "Dominguez",
     "first_name": "Nicol\u00e1s",
     "second_name": "Dom\u00ednguez",
@@ -15661,6 +16183,7 @@
   },
   {
     "id": 520,
+    "code": 243345,
     "web_name": "O'Brien",
     "first_name": "Lewis",
     "second_name": "O'Brien",
@@ -15691,6 +16214,7 @@
   },
   {
     "id": 521,
+    "code": 210462,
     "web_name": "Sangar\u00e9",
     "first_name": "Ibrahim",
     "second_name": "Sangar\u00e9",
@@ -15721,6 +16245,7 @@
   },
   {
     "id": 522,
+    "code": 204968,
     "web_name": "Yates",
     "first_name": "Ryan",
     "second_name": "Yates",
@@ -15751,6 +16276,7 @@
   },
   {
     "id": 523,
+    "code": 569014,
     "web_name": "Da Silva Moreira",
     "first_name": "Eric",
     "second_name": "da Silva Moreira",
@@ -15781,6 +16307,7 @@
   },
   {
     "id": 524,
+    "code": 495161,
     "web_name": "Stamenic",
     "first_name": "Marko",
     "second_name": "Stameni\u0107",
@@ -15811,13 +16338,14 @@
   },
   {
     "id": 525,
+    "code": 60689,
     "web_name": "Wood",
     "first_name": "Chris",
     "second_name": "Wood",
     "element_type": 4,
     "team": 16,
     "now_cost": 75,
-    "selected_by_percent": "14.7",
+    "selected_by_percent": "15.3",
     "form": "0.0",
     "points_per_game": "5.6",
     "total_points": 200,
@@ -15841,6 +16369,7 @@
   },
   {
     "id": 526,
+    "code": 482973,
     "web_name": "Igor Jesus",
     "first_name": "Igor Jesus",
     "second_name": "Maciel da Cruz",
@@ -15871,13 +16400,14 @@
   },
   {
     "id": 527,
+    "code": 210156,
     "web_name": "Awoniyi",
     "first_name": "Taiwo",
     "second_name": "Awoniyi",
     "element_type": 4,
     "team": 16,
     "now_cost": 55,
-    "selected_by_percent": "0.7",
+    "selected_by_percent": "0.8",
     "form": "0.0",
     "points_per_game": "1.2",
     "total_points": 32,
@@ -15901,6 +16431,7 @@
   },
   {
     "id": 528,
+    "code": 232571,
     "web_name": "Patterson",
     "first_name": "Anthony",
     "second_name": "Patterson",
@@ -15931,13 +16462,14 @@
   },
   {
     "id": 529,
+    "code": 74854,
     "web_name": "Moore",
     "first_name": "Simon",
     "second_name": "Moore",
     "element_type": 1,
     "team": 17,
     "now_cost": 40,
-    "selected_by_percent": "0.7",
+    "selected_by_percent": "0.6",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -15961,6 +16493,7 @@
   },
   {
     "id": 530,
+    "code": 490000,
     "web_name": "Nna Noukeu",
     "first_name": "Blondy",
     "second_name": "Nna Noukeu",
@@ -15991,6 +16524,7 @@
   },
   {
     "id": 531,
+    "code": 223827,
     "web_name": "Ballard",
     "first_name": "Daniel",
     "second_name": "Ballard",
@@ -16021,13 +16555,14 @@
   },
   {
     "id": 532,
+    "code": 487676,
     "web_name": "Hume",
     "first_name": "Trai",
     "second_name": "Hume",
     "element_type": 2,
     "team": 17,
     "now_cost": 45,
-    "selected_by_percent": "0.4",
+    "selected_by_percent": "0.3",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -16051,6 +16586,7 @@
   },
   {
     "id": 533,
+    "code": 220684,
     "web_name": "Alese",
     "first_name": "Aji",
     "second_name": "Alese",
@@ -16081,6 +16617,7 @@
   },
   {
     "id": 534,
+    "code": 232820,
     "web_name": "Anderson",
     "first_name": "Joe",
     "second_name": "Anderson",
@@ -16111,13 +16648,14 @@
   },
   {
     "id": 535,
+    "code": 461195,
     "web_name": "Cirkin",
     "first_name": "Dennis",
     "second_name": "Cirkin",
     "element_type": 2,
     "team": 17,
     "now_cost": 40,
-    "selected_by_percent": "0.5",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -16141,6 +16679,7 @@
   },
   {
     "id": 536,
+    "code": 477547,
     "web_name": "Hjelde",
     "first_name": "Leo Fuhr",
     "second_name": "Hjelde",
@@ -16171,6 +16710,7 @@
   },
   {
     "id": 537,
+    "code": 492066,
     "web_name": "Huggins",
     "first_name": "Niall",
     "second_name": "Huggins",
@@ -16201,6 +16741,7 @@
   },
   {
     "id": 538,
+    "code": 514613,
     "web_name": "Johnson",
     "first_name": "Zak",
     "second_name": "Johnson",
@@ -16231,13 +16772,14 @@
   },
   {
     "id": 539,
+    "code": 167512,
     "web_name": "O'Nien",
     "first_name": "Luke",
     "second_name": "O'Nien",
     "element_type": 2,
     "team": 17,
     "now_cost": 40,
-    "selected_by_percent": "0.1",
+    "selected_by_percent": "0.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -16261,6 +16803,7 @@
   },
   {
     "id": 540,
+    "code": 465702,
     "web_name": "Pembele",
     "first_name": "Timoth\u00e9e",
     "second_name": "Pemb\u00e9l\u00e9",
@@ -16291,13 +16834,14 @@
   },
   {
     "id": 541,
+    "code": 434399,
     "web_name": "Reinildo",
     "first_name": "Reinildo",
     "second_name": "Mandava",
     "element_type": 2,
     "team": 17,
     "now_cost": 40,
-    "selected_by_percent": "8.5",
+    "selected_by_percent": "8.6",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -16321,6 +16865,7 @@
   },
   {
     "id": 542,
+    "code": 519634,
     "web_name": "Seelt",
     "first_name": "Jenson",
     "second_name": "Seelt",
@@ -16351,13 +16896,14 @@
   },
   {
     "id": 543,
+    "code": 535818,
     "web_name": "Adingra",
     "first_name": "Simon",
     "second_name": "Adingra",
     "element_type": 3,
     "team": 17,
     "now_cost": 55,
-    "selected_by_percent": "3.1",
+    "selected_by_percent": "2.9",
     "form": "0.0",
     "points_per_game": "2.1",
     "total_points": 60,
@@ -16381,6 +16927,7 @@
   },
   {
     "id": 544,
+    "code": 547027,
     "web_name": "Diarra",
     "first_name": "Habib",
     "second_name": "Diarra",
@@ -16411,6 +16958,7 @@
   },
   {
     "id": 545,
+    "code": 124165,
     "web_name": "Roberts",
     "first_name": "Patrick",
     "second_name": "Roberts",
@@ -16441,6 +16989,7 @@
   },
   {
     "id": 546,
+    "code": 626844,
     "web_name": "Aleksi\u0107",
     "first_name": "Milan",
     "second_name": "Aleksi\u0107",
@@ -16471,13 +17020,14 @@
   },
   {
     "id": 547,
+    "code": 484420,
     "web_name": "E.Le F\u00e9e",
     "first_name": "Enzo",
     "second_name": "Le F\u00e9e",
     "element_type": 3,
     "team": 17,
     "now_cost": 50,
-    "selected_by_percent": "1.7",
+    "selected_by_percent": "1.6",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -16501,6 +17051,7 @@
   },
   {
     "id": 548,
+    "code": 461199,
     "web_name": "Mundle",
     "first_name": "Romaine",
     "second_name": "Mundle",
@@ -16531,6 +17082,7 @@
   },
   {
     "id": 549,
+    "code": 223336,
     "web_name": "Neil",
     "first_name": "Dan",
     "second_name": "Neil",
@@ -16561,6 +17113,7 @@
   },
   {
     "id": 550,
+    "code": 215460,
     "web_name": "Poveda",
     "first_name": "Ian",
     "second_name": "Poveda-Ocampo",
@@ -16591,6 +17144,7 @@
   },
   {
     "id": 551,
+    "code": 554197,
     "web_name": "Rigg",
     "first_name": "Chris",
     "second_name": "Rigg",
@@ -16621,6 +17175,7 @@
   },
   {
     "id": 552,
+    "code": 577669,
     "web_name": "Sadiki",
     "first_name": "Noah",
     "second_name": "Sadiki",
@@ -16651,6 +17206,7 @@
   },
   {
     "id": 553,
+    "code": 549912,
     "web_name": "Talbi",
     "first_name": "Chemsdine",
     "second_name": "Talbi",
@@ -16681,6 +17237,7 @@
   },
   {
     "id": 554,
+    "code": 477851,
     "web_name": "Ba",
     "first_name": "Abdoullah",
     "second_name": "Ba",
@@ -16711,6 +17268,7 @@
   },
   {
     "id": 555,
+    "code": 171422,
     "web_name": "Browne",
     "first_name": "Alan",
     "second_name": "Browne",
@@ -16741,6 +17299,7 @@
   },
   {
     "id": 556,
+    "code": 458297,
     "web_name": "Ekwah",
     "first_name": "Pierre",
     "second_name": "Ekwah Elimby",
@@ -16771,6 +17330,7 @@
   },
   {
     "id": 557,
+    "code": 547410,
     "web_name": "H.Jones",
     "first_name": "Harrison",
     "second_name": "Jones",
@@ -16801,6 +17361,7 @@
   },
   {
     "id": 558,
+    "code": 493837,
     "web_name": "Matete",
     "first_name": "Jay",
     "second_name": "Matete",
@@ -16831,6 +17392,7 @@
   },
   {
     "id": 559,
+    "code": 500696,
     "web_name": "Triantis",
     "first_name": "Nectarios",
     "second_name": "Triantis",
@@ -16861,6 +17423,7 @@
   },
   {
     "id": 560,
+    "code": 437505,
     "web_name": "Isidor",
     "first_name": "Wilson",
     "second_name": "Isidor",
@@ -16891,6 +17454,7 @@
   },
   {
     "id": 561,
+    "code": 564406,
     "web_name": "Mayenda",
     "first_name": "Eliezer",
     "second_name": "Mayenda Dossou",
@@ -16921,6 +17485,7 @@
   },
   {
     "id": 562,
+    "code": 611975,
     "web_name": "Abdullahi",
     "first_name": "Ahmed",
     "second_name": "Abdullahi",
@@ -16951,6 +17516,7 @@
   },
   {
     "id": 563,
+    "code": 551153,
     "web_name": "Lu\u00eds Hemir",
     "first_name": "Lu\u00eds Hemir",
     "second_name": "Silva Semedo",
@@ -16981,6 +17547,7 @@
   },
   {
     "id": 564,
+    "code": 440955,
     "web_name": "Rusyn",
     "first_name": "Nazarii",
     "second_name": "Rusyn",
@@ -17011,13 +17578,14 @@
   },
   {
     "id": 565,
+    "code": 184254,
     "web_name": "Vicario",
     "first_name": "Guglielmo",
     "second_name": "Vicario",
     "element_type": 1,
     "team": 18,
     "now_cost": 50,
-    "selected_by_percent": "3.5",
+    "selected_by_percent": "3.4",
     "form": "0.0",
     "points_per_game": "2.8",
     "total_points": 66,
@@ -17041,6 +17609,7 @@
   },
   {
     "id": 566,
+    "code": 214572,
     "web_name": "Austin",
     "first_name": "Brandon",
     "second_name": "Austin",
@@ -17071,6 +17640,7 @@
   },
   {
     "id": 567,
+    "code": 485055,
     "web_name": "Kinsky",
     "first_name": "Anton\u00edn",
     "second_name": "Kinsk\u00fd",
@@ -17101,6 +17671,7 @@
   },
   {
     "id": 568,
+    "code": 441164,
     "web_name": "Pedro Porro",
     "first_name": "Pedro",
     "second_name": "Porro Sauceda",
@@ -17131,6 +17702,7 @@
   },
   {
     "id": 569,
+    "code": 221632,
     "web_name": "Romero",
     "first_name": "Cristian",
     "second_name": "Romero",
@@ -17161,6 +17733,7 @@
   },
   {
     "id": 570,
+    "code": 135720,
     "web_name": "Danso",
     "first_name": "Kevin",
     "second_name": "Danso",
@@ -17191,6 +17764,7 @@
   },
   {
     "id": 571,
+    "code": 115556,
     "web_name": "Davies",
     "first_name": "Ben",
     "second_name": "Davies",
@@ -17221,6 +17795,7 @@
   },
   {
     "id": 572,
+    "code": 493125,
     "web_name": "Dragusin",
     "first_name": "Radu",
     "second_name": "Dr\u0103gu\u0219in",
@@ -17251,6 +17826,7 @@
   },
   {
     "id": 573,
+    "code": 232859,
     "web_name": "Spence",
     "first_name": "Djed",
     "second_name": "Spence",
@@ -17281,6 +17857,7 @@
   },
   {
     "id": 574,
+    "code": 487053,
     "web_name": "Udogie",
     "first_name": "Destiny",
     "second_name": "Udogie",
@@ -17311,6 +17888,7 @@
   },
   {
     "id": 575,
+    "code": 491279,
     "web_name": "Van de Ven",
     "first_name": "Micky",
     "second_name": "van de Ven",
@@ -17341,13 +17919,14 @@
   },
   {
     "id": 576,
+    "code": 548308,
     "web_name": "Phillips",
     "first_name": "Ashley",
     "second_name": "Phillips",
     "element_type": 2,
     "team": 18,
     "now_cost": 40,
-    "selected_by_percent": "0.5",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -17371,6 +17950,7 @@
   },
   {
     "id": 577,
+    "code": 553299,
     "web_name": "Takai",
     "first_name": "Takai",
     "second_name": "K\u014dta",
@@ -17401,13 +17981,14 @@
   },
   {
     "id": 578,
+    "code": 610799,
     "web_name": "Vuskovic",
     "first_name": "Luka",
     "second_name": "Vu\u0161kovi\u0107",
     "element_type": 2,
     "team": 18,
     "now_cost": 40,
-    "selected_by_percent": "3.3",
+    "selected_by_percent": "3.1",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -17431,6 +18012,7 @@
   },
   {
     "id": 579,
+    "code": 85971,
     "web_name": "Son",
     "first_name": "Son",
     "second_name": "Heung-min",
@@ -17461,13 +18043,14 @@
   },
   {
     "id": 580,
+    "code": 242898,
     "web_name": "Johnson",
     "first_name": "Brennan",
     "second_name": "Johnson",
     "element_type": 3,
     "team": 18,
     "now_cost": 70,
-    "selected_by_percent": "3.4",
+    "selected_by_percent": "3.3",
     "form": "0.0",
     "points_per_game": "4.2",
     "total_points": 137,
@@ -17491,6 +18074,7 @@
   },
   {
     "id": 581,
+    "code": 172780,
     "web_name": "Maddison",
     "first_name": "James",
     "second_name": "Maddison",
@@ -17521,13 +18105,14 @@
   },
   {
     "id": 582,
+    "code": 460842,
     "web_name": "Kudus",
     "first_name": "Mohammed",
     "second_name": "Kudus",
     "element_type": 3,
     "team": 18,
     "now_cost": 65,
-    "selected_by_percent": "27.8",
+    "selected_by_percent": "27.3",
     "form": "0.0",
     "points_per_game": "3.3",
     "total_points": 106,
@@ -17551,6 +18136,7 @@
   },
   {
     "id": 583,
+    "code": 445044,
     "web_name": "Kulusevski",
     "first_name": "Dejan",
     "second_name": "Kulusevski",
@@ -17581,6 +18167,7 @@
   },
   {
     "id": 584,
+    "code": 511499,
     "web_name": "Tel",
     "first_name": "Mathys",
     "second_name": "Tel",
@@ -17611,6 +18198,7 @@
   },
   {
     "id": 585,
+    "code": 202993,
     "web_name": "Bentancur",
     "first_name": "Rodrigo",
     "second_name": "Bentancur",
@@ -17641,6 +18229,7 @@
   },
   {
     "id": 586,
+    "code": 570526,
     "web_name": "Bergvall",
     "first_name": "Lucas",
     "second_name": "Bergvall",
@@ -17671,6 +18260,7 @@
   },
   {
     "id": 587,
+    "code": 227127,
     "web_name": "Bissouma",
     "first_name": "Yves",
     "second_name": "Bissouma",
@@ -17701,6 +18291,7 @@
   },
   {
     "id": 588,
+    "code": 550839,
     "web_name": "Odobert",
     "first_name": "Wilson",
     "second_name": "Odobert",
@@ -17731,6 +18322,7 @@
   },
   {
     "id": 589,
+    "code": 235674,
     "web_name": "Solomon",
     "first_name": "Manor",
     "second_name": "Solomon",
@@ -17761,6 +18353,7 @@
   },
   {
     "id": 590,
+    "code": 436234,
     "web_name": "Bryan",
     "first_name": "Bryan",
     "second_name": "Gil Salvatierra",
@@ -17791,6 +18384,7 @@
   },
   {
     "id": 591,
+    "code": 547701,
     "web_name": "Gray",
     "first_name": "Archie",
     "second_name": "Gray",
@@ -17821,6 +18415,7 @@
   },
   {
     "id": 592,
+    "code": 499721,
     "web_name": "Moore",
     "first_name": "Mikey",
     "second_name": "Moore",
@@ -17851,6 +18446,7 @@
   },
   {
     "id": 593,
+    "code": 482442,
     "web_name": "P.M.Sarr",
     "first_name": "Pape Matar",
     "second_name": "Sarr",
@@ -17881,6 +18477,7 @@
   },
   {
     "id": 594,
+    "code": 623095,
     "web_name": "Min-hyeok",
     "first_name": "Yang",
     "second_name": "Min-hyeok",
@@ -17911,6 +18508,7 @@
   },
   {
     "id": 595,
+    "code": 499726,
     "web_name": "Olusesi",
     "first_name": "Callum",
     "second_name": "Olusesi",
@@ -17941,13 +18539,14 @@
   },
   {
     "id": 596,
+    "code": 154566,
     "web_name": "Solanke",
     "first_name": "Dominic",
     "second_name": "Solanke-Mitchell",
     "element_type": 4,
     "team": 18,
     "now_cost": 75,
-    "selected_by_percent": "18.1",
+    "selected_by_percent": "17.6",
     "form": "0.0",
     "points_per_game": "4.0",
     "total_points": 108,
@@ -17971,13 +18570,14 @@
   },
   {
     "id": 597,
+    "code": 212319,
     "web_name": "Richarlison",
     "first_name": "Richarlison",
     "second_name": "de Andrade",
     "element_type": 4,
     "team": 18,
     "now_cost": 65,
-    "selected_by_percent": "0.9",
+    "selected_by_percent": "1.0",
     "form": "0.0",
     "points_per_game": "2.3",
     "total_points": 35,
@@ -18001,6 +18601,7 @@
   },
   {
     "id": 598,
+    "code": 552427,
     "web_name": "Lankshear",
     "first_name": "Will",
     "second_name": "Lankshear",
@@ -18031,6 +18632,7 @@
   },
   {
     "id": 599,
+    "code": 490145,
     "web_name": "Scarlett",
     "first_name": "Dane",
     "second_name": "Scarlett",
@@ -18061,13 +18663,14 @@
   },
   {
     "id": 600,
+    "code": 84182,
     "web_name": "Areola",
     "first_name": "Alphonse",
     "second_name": "Areola",
     "element_type": 1,
     "team": 19,
     "now_cost": 45,
-    "selected_by_percent": "6.3",
+    "selected_by_percent": "6.2",
     "form": "0.0",
     "points_per_game": "2.7",
     "total_points": 69,
@@ -18091,13 +18694,14 @@
   },
   {
     "id": 601,
+    "code": 82143,
     "web_name": "Foderingham",
     "first_name": "Wes",
     "second_name": "Foderingham",
     "element_type": 1,
     "team": 19,
     "now_cost": 40,
-    "selected_by_percent": "1.1",
+    "selected_by_percent": "1.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -18121,6 +18725,7 @@
   },
   {
     "id": 602,
+    "code": 483364,
     "web_name": "Hegyi",
     "first_name": "Kriszti\u00e1n",
     "second_name": "Hegyi",
@@ -18151,6 +18756,7 @@
   },
   {
     "id": 603,
+    "code": 613804,
     "web_name": "Diouf",
     "first_name": "El Hadji Malick",
     "second_name": "Diouf",
@@ -18181,6 +18787,7 @@
   },
   {
     "id": 604,
+    "code": 109533,
     "web_name": "Emerson",
     "first_name": "Emerson",
     "second_name": "Palmieri dos Santos",
@@ -18211,6 +18818,7 @@
   },
   {
     "id": 605,
+    "code": 214048,
     "web_name": "Kilman",
     "first_name": "Maximilian",
     "second_name": "Kilman",
@@ -18241,6 +18849,7 @@
   },
   {
     "id": 606,
+    "code": 233963,
     "web_name": "Mavropanos",
     "first_name": "Konstantinos",
     "second_name": "Mavropanos",
@@ -18271,6 +18880,7 @@
   },
   {
     "id": 607,
+    "code": 210494,
     "web_name": "N.Aguerd",
     "first_name": "Nayef",
     "second_name": "Aguerd",
@@ -18301,6 +18911,7 @@
   },
   {
     "id": 608,
+    "code": 536109,
     "web_name": "Scarles",
     "first_name": "Ollie",
     "second_name": "Scarles",
@@ -18331,6 +18942,7 @@
   },
   {
     "id": 609,
+    "code": 462116,
     "web_name": "Todibo",
     "first_name": "Jean-Clair",
     "second_name": "Todibo",
@@ -18361,13 +18973,14 @@
   },
   {
     "id": 610,
+    "code": 214590,
     "web_name": "Wan-Bissaka",
     "first_name": "Aaron",
     "second_name": "Wan-Bissaka",
     "element_type": 2,
     "team": 19,
     "now_cost": 45,
-    "selected_by_percent": "30.9",
+    "selected_by_percent": "31.7",
     "form": "0.0",
     "points_per_game": "3.3",
     "total_points": 118,
@@ -18391,6 +19004,7 @@
   },
   {
     "id": 611,
+    "code": 518438,
     "web_name": "Casey",
     "first_name": "Kaelan",
     "second_name": "Casey",
@@ -18421,6 +19035,7 @@
   },
   {
     "id": 612,
+    "code": 224024,
     "web_name": "L.Paquet\u00e1",
     "first_name": "Lucas",
     "second_name": "Tolentino Coelho de Lima",
@@ -18451,6 +19066,7 @@
   },
   {
     "id": 613,
+    "code": 215439,
     "web_name": "Sou\u010dek",
     "first_name": "Tom\u00e1\u0161",
     "second_name": "Sou\u010dek",
@@ -18481,6 +19097,7 @@
   },
   {
     "id": 614,
+    "code": 101178,
     "web_name": "Ward-Prowse",
     "first_name": "James",
     "second_name": "Ward-Prowse",
@@ -18511,6 +19128,7 @@
   },
   {
     "id": 615,
+    "code": 450070,
     "web_name": "Summerville",
     "first_name": "Crysencio",
     "second_name": "Summerville",
@@ -18541,6 +19159,7 @@
   },
   {
     "id": 616,
+    "code": 213999,
     "web_name": "\u00c1lvarez",
     "first_name": "Edson",
     "second_name": "\u00c1lvarez Vel\u00e1zquez",
@@ -18571,6 +19190,7 @@
   },
   {
     "id": 617,
+    "code": 149519,
     "web_name": "Cornet",
     "first_name": "Maxwel",
     "second_name": "Cornet",
@@ -18601,6 +19221,7 @@
   },
   {
     "id": 618,
+    "code": 197024,
     "web_name": "G.Rodriguez",
     "first_name": "Guido",
     "second_name": "Rodr\u00edguez",
@@ -18631,6 +19252,7 @@
   },
   {
     "id": 619,
+    "code": 577114,
     "web_name": "L.Guilherme",
     "first_name": "Luis Guilherme",
     "second_name": "Lira dos Santos",
@@ -18661,6 +19283,7 @@
   },
   {
     "id": 620,
+    "code": 490885,
     "web_name": "Earthy",
     "first_name": "George",
     "second_name": "Earthy",
@@ -18691,6 +19314,7 @@
   },
   {
     "id": 621,
+    "code": 229384,
     "web_name": "Irving",
     "first_name": "Andy",
     "second_name": "Irving",
@@ -18721,6 +19345,7 @@
   },
   {
     "id": 622,
+    "code": 518442,
     "web_name": "Orford",
     "first_name": "Lewis",
     "second_name": "Orford",
@@ -18751,6 +19376,7 @@
   },
   {
     "id": 623,
+    "code": 490142,
     "web_name": "Potts",
     "first_name": "Freddie",
     "second_name": "Potts",
@@ -18781,13 +19407,14 @@
   },
   {
     "id": 624,
+    "code": 178186,
     "web_name": "Bowen",
     "first_name": "Jarrod",
     "second_name": "Bowen",
     "element_type": 4,
     "team": 19,
     "now_cost": 80,
-    "selected_by_percent": "20.6",
+    "selected_by_percent": "21.1",
     "form": "0.0",
     "points_per_game": "5.7",
     "total_points": 193,
@@ -18811,13 +19438,14 @@
   },
   {
     "id": 625,
+    "code": 91889,
     "web_name": "F\u00fcllkrug",
     "first_name": "Niclas",
     "second_name": "F\u00fcllkrug",
     "element_type": 4,
     "team": 19,
     "now_cost": 60,
-    "selected_by_percent": "1.2",
+    "selected_by_percent": "1.3",
     "form": "0.0",
     "points_per_game": "2.3",
     "total_points": 42,
@@ -18841,6 +19469,7 @@
   },
   {
     "id": 626,
+    "code": 565431,
     "web_name": "Marshall",
     "first_name": "Callum",
     "second_name": "Marshall",
@@ -18871,13 +19500,14 @@
   },
   {
     "id": 659,
+    "code": 158534,
     "web_name": "Walker-Peters",
     "first_name": "Kyle",
     "second_name": "Walker-Peters",
     "element_type": 2,
     "team": 19,
     "now_cost": 45,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -18901,6 +19531,7 @@
   },
   {
     "id": 627,
+    "code": 101982,
     "web_name": "Johnstone",
     "first_name": "Sam",
     "second_name": "Johnstone",
@@ -18931,6 +19562,7 @@
   },
   {
     "id": 628,
+    "code": 149065,
     "web_name": "Jos\u00e9 S\u00e1",
     "first_name": "Jos\u00e9",
     "second_name": "Malheiro de S\u00e1",
@@ -18961,6 +19593,7 @@
   },
   {
     "id": 629,
+    "code": 79602,
     "web_name": "Bentley",
     "first_name": "Daniel",
     "second_name": "Bentley",
@@ -18991,6 +19624,7 @@
   },
   {
     "id": 630,
+    "code": 138001,
     "web_name": "King",
     "first_name": "Tom",
     "second_name": "King",
@@ -19021,6 +19655,7 @@
   },
   {
     "id": 631,
+    "code": 516939,
     "web_name": "Agbadou",
     "first_name": "Emmanuel",
     "second_name": "Agbadou",
@@ -19051,6 +19686,7 @@
   },
   {
     "id": 632,
+    "code": 87835,
     "web_name": "Doherty",
     "first_name": "Matt",
     "second_name": "Doherty",
@@ -19081,6 +19717,7 @@
   },
   {
     "id": 633,
+    "code": 490721,
     "web_name": "H.Bueno",
     "first_name": "Hugo",
     "second_name": "Bueno L\u00f3pez",
@@ -19111,6 +19748,7 @@
   },
   {
     "id": 634,
+    "code": 501837,
     "web_name": "Mosquera",
     "first_name": "Yerson",
     "second_name": "Mosquera Valdelamar",
@@ -19141,6 +19779,7 @@
   },
   {
     "id": 635,
+    "code": 483081,
     "web_name": "R.Gomes",
     "first_name": "Rodrigo",
     "second_name": "Martins Gomes",
@@ -19171,6 +19810,7 @@
   },
   {
     "id": 636,
+    "code": 231480,
     "web_name": "S.Bueno",
     "first_name": "Santiago",
     "second_name": "Ignacio Bueno",
@@ -19201,6 +19841,7 @@
   },
   {
     "id": 637,
+    "code": 510362,
     "web_name": "Toti",
     "first_name": "Toti",
     "second_name": "Gomes",
@@ -19231,6 +19872,7 @@
   },
   {
     "id": 638,
+    "code": 441271,
     "web_name": "Hoever",
     "first_name": "Ki-Jana",
     "second_name": "Hoever",
@@ -19261,13 +19903,14 @@
   },
   {
     "id": 639,
+    "code": 560248,
     "web_name": "Meupiyou",
     "first_name": "Bastien",
     "second_name": "Meupiyou Menadjou",
     "element_type": 2,
     "team": 20,
     "now_cost": 40,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.2",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -19291,6 +19934,7 @@
   },
   {
     "id": 640,
+    "code": 641221,
     "web_name": "Pedro Lima",
     "first_name": "Pedro",
     "second_name": "Cardoso de Lima",
@@ -19321,6 +19965,7 @@
   },
   {
     "id": 641,
+    "code": 517179,
     "web_name": "Pond",
     "first_name": "Alfie",
     "second_name": "Pond",
@@ -19351,6 +19996,7 @@
   },
   {
     "id": 642,
+    "code": 184754,
     "web_name": "Hee Chan",
     "first_name": "Hwang",
     "second_name": "Hee-chan",
@@ -19381,6 +20027,7 @@
   },
   {
     "id": 643,
+    "code": 509291,
     "web_name": "Andr\u00e9",
     "first_name": "Andr\u00e9",
     "second_name": "Trindade da Costa Neto",
@@ -19411,6 +20058,7 @@
   },
   {
     "id": 644,
+    "code": 231057,
     "web_name": "Bellegarde",
     "first_name": "Jean-Ricner",
     "second_name": "Bellegarde",
@@ -19441,6 +20089,7 @@
   },
   {
     "id": 645,
+    "code": 643135,
     "web_name": "Fer L\u00f3pez",
     "first_name": "Fer",
     "second_name": "L\u00f3pez Gonz\u00e1lez",
@@ -19471,13 +20120,14 @@
   },
   {
     "id": 646,
+    "code": 448089,
     "web_name": "Gomes",
     "first_name": "Jo\u00e3o Victor",
     "second_name": "Gomes da Silva",
     "element_type": 3,
     "team": 20,
     "now_cost": 55,
-    "selected_by_percent": "0.2",
+    "selected_by_percent": "0.1",
     "form": "0.0",
     "points_per_game": "2.4",
     "total_points": 87,
@@ -19501,6 +20151,7 @@
   },
   {
     "id": 647,
+    "code": 181284,
     "web_name": "Guedes",
     "first_name": "Gon\u00e7alo Manuel",
     "second_name": "Ganchinho Guedes",
@@ -19531,6 +20182,7 @@
   },
   {
     "id": 648,
+    "code": 433312,
     "web_name": "Munetsi",
     "first_name": "Marshall",
     "second_name": "Munetsi",
@@ -19561,6 +20213,7 @@
   },
   {
     "id": 649,
+    "code": 476502,
     "web_name": "B.Traore",
     "first_name": "Boubacar",
     "second_name": "Traor\u00e9",
@@ -19591,6 +20244,7 @@
   },
   {
     "id": 650,
+    "code": 497606,
     "web_name": "Chirewa",
     "first_name": "Tawanda",
     "second_name": "Chirewa",
@@ -19621,13 +20275,14 @@
   },
   {
     "id": 651,
+    "code": 596054,
     "web_name": "Edozie",
     "first_name": "Tom",
     "second_name": "Edozie",
     "element_type": 3,
     "team": 20,
     "now_cost": 45,
-    "selected_by_percent": "0.3",
+    "selected_by_percent": "0.4",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -19651,13 +20306,14 @@
   },
   {
     "id": 652,
+    "code": 593001,
     "web_name": "Gonzalez",
     "first_name": "Enso",
     "second_name": "Gonz\u00e1lez Medina",
     "element_type": 3,
     "team": 20,
     "now_cost": 45,
-    "selected_by_percent": "0.8",
+    "selected_by_percent": "0.9",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -19681,13 +20337,14 @@
   },
   {
     "id": 653,
+    "code": 240299,
     "web_name": "Hodge",
     "first_name": "Joe",
     "second_name": "Hodge",
     "element_type": 3,
     "team": 20,
     "now_cost": 45,
-    "selected_by_percent": "1.1",
+    "selected_by_percent": "0.9",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,
@@ -19711,6 +20368,7 @@
   },
   {
     "id": 654,
+    "code": 247412,
     "web_name": "Strand Larsen",
     "first_name": "J\u00f8rgen",
     "second_name": "Strand Larsen",
@@ -19741,6 +20399,7 @@
   },
   {
     "id": 655,
+    "code": 449988,
     "web_name": "F\u00e1bio Silva",
     "first_name": "F\u00e1bio",
     "second_name": "Soares Silva",
@@ -19771,6 +20430,7 @@
   },
   {
     "id": 656,
+    "code": 429414,
     "web_name": "Kalajd\u017ei\u0107",
     "first_name": "Sa\u0161a",
     "second_name": "Kalajd\u017ei\u0107",
@@ -19801,6 +20461,7 @@
   },
   {
     "id": 657,
+    "code": 589507,
     "web_name": "Chiwome",
     "first_name": "Leon",
     "second_name": "Chiwome",
@@ -19831,6 +20492,7 @@
   },
   {
     "id": 658,
+    "code": 531363,
     "web_name": "Fraser",
     "first_name": "Nathan",
     "second_name": "Fraser",
@@ -19861,13 +20523,14 @@
   },
   {
     "id": 663,
+    "code": 230376,
     "web_name": "J.Arias",
     "first_name": "Jhon",
     "second_name": "Arias",
     "element_type": 3,
     "team": 20,
     "now_cost": 55,
-    "selected_by_percent": "0.8",
+    "selected_by_percent": "1.0",
     "form": "0.0",
     "points_per_game": "0.0",
     "total_points": 0,

@@ -70,7 +70,7 @@ predictions = engine.generate_gameweek_predictions(19)
 
 ## 📊 Data Dependencies
 
-- **Historical Data**: `/Data/raw/parsed_gw_with_opponent_strength.csv`
+- **Historical Data**: `/Data/raw/parsed_gw.csv`
 - **Player Data**: `/Data/database/players.json`
 - **Team Data**: `/Data/database/teams.json` 
 - **Feature Engineering**: `/Data/feature_engineering/player_features.py`

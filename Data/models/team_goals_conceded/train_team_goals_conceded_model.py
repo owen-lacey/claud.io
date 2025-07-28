@@ -20,6 +20,10 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import PoissonRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 from feature_engineering.player_features import PlayerFeatureEngine, load_historical_data, load_teams_data
 
@@ -68,7 +72,7 @@ def load_data():
     print("📊 Loading training data...")
     
     # Load the parsed GW data with features
-    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw.csv', low_memory=False)
+    historical_df = pd.read_csv('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv', low_memory=False)
     
     # Convert data types safely
     # Handle was_home column which has mixed string/numeric values
@@ -113,7 +117,7 @@ def load_data():
     
     return historical_df, players_data, teams_data, fixtures_data
 
-def create_team_defensive_stats(historical_df, teams_data):
+def create_team_defensive_stats(historical_df, teams_data, feature_engine):
     """
     Create comprehensive team defensive statistics from historical data
     """
@@ -160,6 +164,9 @@ def create_team_defensive_stats(historical_df, teams_data):
     
     print(f"✅ Team defensive stats created: {len(team_df)} team-gameweek records")
     
+    # Add opponent strength features using shared feature engine
+    team_df = feature_engine.add_opponent_strength_features_to_team_data(team_df, historical_df)
+    
     return team_df
 
 def engineer_defensive_features(team_df, feature_engine):
@@ -175,57 +182,53 @@ def engineer_defensive_features(team_df, feature_engine):
     """
     return feature_engine.calculate_team_rolling_features(team_df)
 
-def fit_poisson_models(team_df, feature_cols):
+def fit_poisson_models(team_df, feature_engine):
     """
-    Fit Poisson regression models for goals conceded prediction
-    
-    Args:
-        team_df: Team data with engineered features
-        feature_cols: List of feature column names from shared engine
+    Train Poisson regression model for goals conceded prediction using shared feature engineering
     """
-    print("\n📈 Fitting Poisson models for goals conceded...")
+    print("\n🎯 Training Poisson regression model...")
     
-    from sklearn.model_selection import train_test_split
-    from sklearn.linear_model import PoissonRegressor
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.metrics import mean_squared_error, mean_absolute_error
+    # Prepare data for modeling
+    model_df = team_df.copy()
     
-    # Remove rows with NaN values
-    model_df = team_df.dropna().copy()
+    # Ensure we have the target variable
+    if 'goals_conceded' not in model_df.columns:
+        raise ValueError("goals_conceded column not found in team_df")
     
-    # Add opponent strength features to the dataframe
-    if 'opponent_attack_strength' in model_df.columns:
-        model_df['opponent_attack_strength_normalized'] = model_df['opponent_attack_strength'] / 1400.0
-        print("✅ Added normalized opponent attack strength")
-    else:
-        model_df['opponent_attack_strength_normalized'] = 0.82  # Default ~1150/1400
-        print("⚠️ Using default opponent attack strength")
+    # Get feature columns from shared method (single source of truth)
+    feature_cols = feature_engine.get_team_goals_conceded_feature_columns()
     
-    if 'fixture_attractiveness' in model_df.columns:
-        # For goals conceded, we use fixture difficulty - harder fixtures = more goals conceded
-        model_df['fixture_difficulty'] = 1.0 - model_df['fixture_attractiveness']
-        print("✅ Added fixture difficulty (harder fixtures = more goals conceded)")
-    else:
-        model_df['fixture_difficulty'] = 0.5  # Default neutral
-        print("⚠️ Using default fixture difficulty")
-    
-    # Add was_home to features if not already included
-    model_features = feature_cols.copy()
-    if 'was_home' not in model_features:
-        model_features.append('was_home')
-    
-    # Add opponent strength features to the feature list
-    enhanced_feature_cols = model_features + [
-        'opponent_attack_strength_normalized',
-        'fixture_difficulty'
-    ]
+    print(f"🎯 Using shared feature definition: {len(feature_cols)} features")
+    print(f"   Features: {', '.join(feature_cols[:5])}... (showing first 5)")
     
     # Prepare features and target
-    X = model_df[enhanced_feature_cols].copy()
+    X = model_df[feature_cols].copy()
     y = model_df['goals_conceded'].copy()
     
     print(f"✅ Training samples: {len(X):,}")
-    print(f"✅ Features: {len(enhanced_feature_cols)} (including {len(enhanced_feature_cols) - len(model_features)} opponent strength features)")
+    print(f"✅ Features: {len(feature_cols)}")
+    
+    # Check for missing values and clean data
+    print(f"🔍 Checking for missing values...")
+    missing_counts = X.isnull().sum()
+    if missing_counts.any():
+        print("   Missing values found:")
+        for col, count in missing_counts[missing_counts > 0].items():
+            print(f"     {col}: {count} missing")
+        
+        # Fill missing values with appropriate defaults
+        X = X.fillna(0)
+        print("   ✅ Missing values filled with 0")
+    
+    # Also check target variable
+    if y.isnull().any():
+        print(f"   Target variable has {y.isnull().sum()} missing values")
+        # Remove rows where target is missing
+        valid_mask = ~y.isnull()
+        X = X[valid_mask]
+        y = y[valid_mask]
+        print(f"   ✅ Removed rows with missing target, {len(X)} samples remaining")
+    
     print(f"✅ Goals conceded distribution:")
     print(y.describe())
     
@@ -234,24 +237,16 @@ def fit_poisson_models(team_df, feature_cols):
         X, y, test_size=0.2, random_state=42, stratify=None
     )
     
-    print(f"✅ Training set: {len(X_train):,}")
-    print(f"✅ Test set: {len(X_test):,}")
-    
     # Scale features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Fit Poisson regression
-    poisson_model = PoissonRegressor(
-        alpha=1.0,  # L2 regularization
-        max_iter=1000,
-        fit_intercept=True
-    )
-    
+    # Train Poisson regression model
+    poisson_model = PoissonRegressor(alpha=1.0, fit_intercept=True, max_iter=1000)
     poisson_model.fit(X_train_scaled, y_train)
     
-    # Predictions
+    # Make predictions
     y_train_pred = poisson_model.predict(X_train_scaled)
     y_test_pred = poisson_model.predict(X_test_scaled)
     
@@ -269,7 +264,7 @@ def fit_poisson_models(team_df, feature_cols):
     
     # Feature importance
     feature_importance = pd.DataFrame({
-        'feature': enhanced_feature_cols,
+        'feature': feature_cols,
         'coefficient': poisson_model.coef_
     }).sort_values('coefficient', key=abs, ascending=False)
     
@@ -278,39 +273,32 @@ def fit_poisson_models(team_df, feature_cols):
         print(f"  {row['feature']}: {row['coefficient']:.3f}")
     
     # Highlight opponent strength features
-    print(f"\n🏆 Opponent Strength Feature Impact:")
-    opponent_attack_coef = None
-    fixture_difficulty_coef = None
+    opp_strength_coef = poisson_model.coef_[feature_cols.index('opponent_attack_strength_normalized')]
+    fixture_difficulty_coef = poisson_model.coef_[feature_cols.index('fixture_difficulty')]
     
-    for _, row in feature_importance.iterrows():
-        if row['feature'] == 'opponent_attack_strength_normalized':
-            opponent_attack_coef = row['coefficient']
-            print(f"   opponent_attack_strength_normalized = {opponent_attack_coef:.4f}")
-        elif row['feature'] == 'fixture_difficulty':
-            fixture_difficulty_coef = row['coefficient']
-            print(f"   fixture_difficulty                   = {fixture_difficulty_coef:.4f}")
+    print(f"\n🎯 Opponent Strength Impact:")
+    print(f"  Opponent attack strength coefficient: {opp_strength_coef:.3f}")
+    if opp_strength_coef > 0:
+        print(f"   ✅ Stronger opponents increase goals conceded (expected behavior)")
+    else:
+        print(f"   ⚠️ Unexpected: stronger opponents reduce goals conceded")
+        
+    print(f"  Fixture difficulty coefficient: {fixture_difficulty_coef:.3f}")
+    if fixture_difficulty_coef > 0:
+        print(f"   ✅ Harder fixtures increase goals conceded (expected behavior)")
+    else:
+        print(f"   ⚠️ Unexpected: harder fixtures reduce goals conceded")
     
-    if opponent_attack_coef is not None:
-        if opponent_attack_coef > 0:
-            print(f"   ✅ Stronger attacks increase goals conceded (expected behavior)")
-        else:
-            print(f"   ⚠️ Unexpected: stronger attacks reduce goals conceded")
-            
-    if fixture_difficulty_coef is not None:
-        if fixture_difficulty_coef > 0:
-            print(f"   ✅ Harder fixtures increase goals conceded (expected behavior)")
-        else:
-            print(f"   ⚠️ Unexpected: harder fixtures reduce goals conceded")
-    
-    return poisson_model, scaler, enhanced_feature_cols
+    return poisson_model, scaler, feature_cols
 
-def create_prediction_functions(poisson_model, scaler, feature_cols, teams_data):
+def create_prediction_functions(poisson_model, scaler, feature_cols, teams_data, feature_engine):
     """
-    Create functions to predict goals conceded for any team
+    Create functions to predict goals conceded for any team using shared feature engineering
     """
-    print("\n🎯 Creating prediction functions...")
+    print("\n🎯 Creating prediction functions with shared feature engineering...")
     
-    def predict_goals_conceded_distribution(team_id, is_home, recent_stats, max_goals=5):
+    def predict_goals_conceded_distribution(team_id, is_home, recent_stats, max_goals=5, 
+                                           opponent_attack_strength=1100.0, fixture_attractiveness=0.5):
         """
         Predict probability distribution of goals conceded for a team
         
@@ -319,40 +307,20 @@ def create_prediction_functions(poisson_model, scaler, feature_cols, teams_data)
             is_home: 1 if home, 0 if away
             recent_stats: Dict with recent team stats
             max_goals: Maximum goals to calculate probabilities for
+            opponent_attack_strength: Opponent's attacking strength
+            fixture_attractiveness: Fixture difficulty (0-1, higher = easier)
             
         Returns:
             Dict with probabilities for 0, 1, 2, ... max_goals
         """
         
-        # Prepare features in the same order as training
-        feature_values = []
-        for col in feature_cols:
-            if col == 'was_home':
-                feature_values.append(is_home)
-            elif col == 'opponent_attack_strength_normalized':
-                feature_values.append(recent_stats.get('opponent_attack_strength_normalized', 0.82))  # Default ~1150/1400
-            elif col == 'fixture_difficulty':
-                feature_values.append(recent_stats.get('fixture_difficulty', 0.5))  # Default neutral
-            else:
-                # Use appropriate defaults for each feature type
-                if 'goals_conceded' in col:
-                    default_val = 1.0
-                elif 'clean_sheets' in col:
-                    default_val = 0.3
-                elif 'goals_scored' in col:
-                    default_val = 1.0
-                elif 'total_points' in col:
-                    default_val = 20.0
-                elif col == 'defensive_strength':
-                    default_val = 1.0
-                elif col == 'recent_form':
-                    default_val = 20.0
-                elif col == 'season_progress':
-                    default_val = 15
-                else:
-                    default_val = 0.0
-                    
-                feature_values.append(recent_stats.get(col, default_val))
+        # Use shared feature preparation method for consistency
+        feature_values = feature_engine.prepare_team_goals_conceded_features(
+            team_stats=recent_stats,
+            was_home=is_home,
+            opponent_attack_strength=opponent_attack_strength,
+            fixture_attractiveness=fixture_attractiveness
+        )
         
         features = np.array([feature_values])
         
@@ -449,25 +417,22 @@ def main(feature_engine=None):
     if feature_engine is None:
         feature_engine = PlayerFeatureEngine(teams_data)
     
-    # Create team defensive statistics
-    team_df = create_team_defensive_stats(historical_df, teams_data)
+    # Create team defensive statistics with opponent strength features
+    team_df = create_team_defensive_stats(historical_df, teams_data, feature_engine)
     
     # Engineer features using shared engine
     team_df = engineer_defensive_features(team_df, feature_engine)
     
-    # Get feature columns from shared engine
-    feature_cols = feature_engine.get_team_feature_columns()
-    
-    # Fit Poisson models
-    poisson_model, scaler, enhanced_feature_cols = fit_poisson_models(team_df, feature_cols)
+    # Fit Poisson models using shared feature definition
+    poisson_model, scaler, feature_cols = fit_poisson_models(team_df, feature_engine)
     
     # Create prediction functions
     predict_fn, get_team_name_fn = create_prediction_functions(
-        poisson_model, scaler, enhanced_feature_cols, teams_data
+        poisson_model, scaler, feature_cols, teams_data, feature_engine
     )
     
     # Save model with shared feature engine
-    save_model(poisson_model, scaler, enhanced_feature_cols, feature_engine)
+    save_model(poisson_model, scaler, feature_cols, feature_engine)
     
     # Demonstrate predictions
     demonstrate_predictions(predict_fn, get_team_name_fn, teams_data)

@@ -105,14 +105,14 @@ class FPLPredictionEngine:
         
         # Load historical data for proper rolling averages (enhanced with opponent strength)
         try:
-            historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_with_opponent_strength.csv")
+            historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
             self.historical_data = load_historical_data(historical_path)
             print(f"✅ Loaded enhanced historical data: {len(self.historical_data):,} gameweek records with opponent strength")
         except Exception as e:
             print(f"⚠️ Could not load enhanced historical data: {e}")
             try:
                 # Fallback to original data
-                historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw.csv")
+                historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
                 self.historical_data = load_historical_data(historical_path)
                 print(f"✅ Loaded fallback historical data: {len(self.historical_data):,} gameweek records (no opponent strength)")
             except Exception as e2:
@@ -483,9 +483,12 @@ class FPLPredictionEngine:
         
         # Get historical context for proper rolling averages
         historical_context = None
-        if self.historical_data is not None and 'web_name' in player_data:
+        if self.historical_data is not None:
+            if 'code' not in player_data:
+                raise ValueError(f"❌ CRITICAL: Player data missing 'code' field for {player_data.get('web_name', 'Unknown')}. Player codes are required for reliable cross-season matching.")
+            
             historical_context = self.feature_engine.get_historical_context(
-                player_data['web_name'], 
+                str(player_data['code']), 
                 self.historical_data
             )
         
@@ -507,9 +510,13 @@ class FPLPredictionEngine:
     def _predict_goals(self, player_data: Dict, gameweek: int, expected_minutes: float) -> float:
         """Predict expected goals using our trained goals model"""
         
+        # Goalkeepers extremely rarely score goals - return minimal prediction
+        position = self._get_position_name(player_data.get('element_type', 4))
+        if position == 'GK':
+            return 0.001  # Extremely rare but not impossible (penalties/corners)
+        
         if not self.models.get('goals'):
             player_name = player_data.get('web_name', 'Unknown')
-            position = self._get_position_name(player_data.get('element_type', 4))
             print(f"❌ GOALS MODEL NOT LOADED for {player_name} ({position})")
             return None
         
@@ -1150,10 +1157,6 @@ class FPLPredictionEngine:
         # Saves points (GK only)
         if position == 'GK':
             points += (saves / 3) * 1  # 1 point per 3 saves
-        
-        # Clean sheet points (GK and DEF only)
-        if position in ['GK', 'DEF']:
-            points += clean_sheet_prob * 4
         
         return max(0, points)
     
