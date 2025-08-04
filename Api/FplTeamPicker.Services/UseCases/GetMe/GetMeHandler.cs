@@ -6,9 +6,9 @@ namespace FplTeamPicker.Services.UseCases.GetMe;
 
 public class GetMeHandler : IRequestHandler<GetMeRequest, User>
 {
-    private readonly IFplRepository _repository;
+    private readonly IUserRepository _repository;
 
-    public GetMeHandler(IFplRepository repository)
+    public GetMeHandler(IUserRepository repository)
     {
         _repository = repository;
     }

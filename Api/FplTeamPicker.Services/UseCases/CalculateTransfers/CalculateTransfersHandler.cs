@@ -11,15 +11,17 @@ namespace FplTeamPicker.Services.UseCases.CalculateTransfers;
 public class CalculateTransfersHandler
     : IRequestHandler<CalculateTransfersRequest, Transfers>
 {
-    public CalculateTransfersHandler(IFplRepository repository)
+    public CalculateTransfersHandler(IReferenceDataRepository repository, IUserRepository userRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
-    private readonly IFplRepository _repository;
+    private readonly IReferenceDataRepository _repository;
+    private readonly IUserRepository _userRepository;
 
     public async Task<Transfers> Handle(CalculateTransfersRequest request, CancellationToken cancellationToken)
     {
-        var currentTeam = await _repository.GetMyTeamAsync(cancellationToken);
+        var currentTeam = await _userRepository.GetMyTeamAsync(cancellationToken);
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);
@@ -53,11 +55,11 @@ public class CalculateTransfersHandler
             PlayersOut = playersOut,
             StartingXi = transfers.StartingXi
                 .OrderBy(p => p.Player.Position)
-                .ThenByDescending(p => p.Player.XpNext)
+                .ThenByDescending(p => p.Player.Xp)
                 .ToList(),
             Bench = transfers.Bench
                 .OrderBy(p => p.Player.Position)
-                .ThenByDescending(p => p.Player.XpNext)
+                .ThenByDescending(p => p.Player.Xp)
                 .ToList(),
             FreeTransfers = currentTeam.FreeTransfers - playersIn.Count,
             Bank = currentTeam.Bank + currentTeam.SelectedSquad.SquadCost - transfers.SquadCost

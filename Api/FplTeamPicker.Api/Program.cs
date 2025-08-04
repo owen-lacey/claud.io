@@ -8,7 +8,6 @@ using FplTeamPicker.Services.UseCases.CalculateTransfers;
 using FplTeamPicker.Services.UseCases.CalculateWildcard;
 using FplTeamPicker.Services.UseCases.GetCurrentTeam;
 using FplTeamPicker.Services.UseCases.GetLeagues;
-using FplTeamPicker.Services.UseCases.GetManagers;
 using FplTeamPicker.Services.UseCases.GetMe;
 using FplTeamPicker.Services.UseCases.GetMyTeam;
 using FplTeamPicker.Services.UseCases.GetPlayers;
@@ -103,13 +102,6 @@ app.MapGet("/teams", async ([FromServices] IMediator mediator, CancellationToken
 app.MapGet("/players", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
     var result = await mediator.Send(new GetPlayersRequest(), cancellationToken);
-
-    return TypedResults.Ok(result);
-});
-
-app.MapGet("/managers", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
-{
-    var result = await mediator.Send(new GetManagersRequest(), cancellationToken);
 
     return TypedResults.Ok(result);
 });

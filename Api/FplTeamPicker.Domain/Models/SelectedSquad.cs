@@ -8,7 +8,7 @@ public record SelectedSquad
 
     public int SquadCost => StartingXi.Sum(p => p.SellingPrice) + Bench.Sum(p => p.SellingPrice);
 
-    public decimal PredictedPoints => StartingXi.Sum(p => p.Player.XpNext);
+    public decimal PredictedPoints => StartingXi.Sum(p => p.Player.Xp ?? 0);
 
-    public decimal BenchBoostPredictedPoints => PredictedPoints + Bench.Sum(p => p.Player.XpNext);
+    public decimal BenchBoostPredictedPoints => PredictedPoints + Bench.Sum(p => p.Player.Xp ?? 0);
 }

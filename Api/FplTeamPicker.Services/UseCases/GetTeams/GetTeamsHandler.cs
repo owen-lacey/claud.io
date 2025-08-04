@@ -6,16 +6,16 @@ namespace FplTeamPicker.Services.UseCases.GetTeams;
 
 public class GetTeamsHandler : IRequestHandler<GetTeamsRequest, List<Team>>
 {
-    private readonly IFplRepository _fplRepository;
+    private readonly IReferenceDataRepository _referenceDataRepository;
 
-    public GetTeamsHandler(IFplRepository fplRepository)
+    public GetTeamsHandler(IReferenceDataRepository referenceDataRepository)
     {
-        _fplRepository = fplRepository;
+        _referenceDataRepository = referenceDataRepository;
     }
 
     public async Task<List<Team>> Handle(GetTeamsRequest request, CancellationToken cancellationToken)
     {
-        var teams = await _fplRepository.GetTeamsAsync(cancellationToken);
+        var teams = await _referenceDataRepository.GetTeamsAsync(cancellationToken);
         
         return teams;
     }

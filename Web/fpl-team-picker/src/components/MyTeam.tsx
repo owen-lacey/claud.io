@@ -4,14 +4,12 @@ import { useContext, useState } from "react";
 import { playerBg } from "../helpers/styles";
 import { lookupTeam } from "../helpers/lookups";
 import RivalSelectionCount from "./players/RivalSelectionCount";
-import CalculateModal from "./team/CalculateModal";
 import { LoadingCard } from "./utils/Loading";
 import { DataContext, RivalTeamsContext } from "@/lib/contexts";
 
 function MyTeam() {
   const allData = useContext(DataContext);
   const rivalTeams = useContext(RivalTeamsContext);
-  const [showCalculateModal, setShowCalculateModal] = useState(false);
 
   if (!allData?.myTeam.output || !allData?.teams.output) {
     return <LoadingCard />;
@@ -67,10 +65,6 @@ function MyTeam() {
       <div>XP (bench boost):&nbsp;</div>
       <div className="font-mono">{myTeam.output!.selectedSquad!.predictedPoints?.toFixed(1)} ({myTeam.output!.selectedSquad!.benchBoostPredictedPoints?.toFixed(1)})</div>
     </div>
-    <div className="flex justify-end mb-2">
-      <button onClick={() => setShowCalculateModal(true)} className="border text-sm border-border p-2 bg-gradient-to-r from-[rgb(10,229,255)] to-[rgb(66,162,255)] text-white rounded-md hover:opacity-90">&#x1F916; Calculate transfers</button>
-    </div>
-    <CalculateModal open={showCalculateModal} onClose={() => setShowCalculateModal(false)} />
   </div>
 }
 

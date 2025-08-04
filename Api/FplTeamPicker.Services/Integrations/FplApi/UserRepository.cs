@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Claudio.Infrastructure;
 using FplTeamPicker.Domain.Contracts;
 using FplTeamPicker.Domain.Models;
 using FplTeamPicker.Services.Caching.Constants;
@@ -8,28 +9,30 @@ using FplTeamPicker.Services.Integrations.FplApi.Exceptions;
 using FplTeamPicker.Services.Integrations.FplApi.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace FplTeamPicker.Services.Integrations.FplApi;
 
-public class FplRepository : IFplRepository, IDisposable
+public class UserRepository : IUserRepository, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _serializerOptions;
-    private readonly IFplUserProvider _fplUserProvider;
-    private readonly ILogger<FplRepository> _logger;
+    private readonly ILogger<ReferenceDataRepository> _logger;
+    private readonly ClaudioContext _claudioContext;
     private readonly IMemoryCache _memoryCache;
 
-    public FplRepository(
+    public UserRepository(
         HttpClient httpClient,
         JsonSerializerOptions serializerOptions,
-        IFplUserProvider fplUserProvider,
-        ILogger<FplRepository> logger,
+        ILogger<ReferenceDataRepository> logger,
+        ClaudioContext claudioContext,
         IMemoryCache memoryCache)
     {
         _httpClient = httpClient;
         _serializerOptions = serializerOptions;
-        _fplUserProvider = fplUserProvider;
         _logger = logger;
+        _claudioContext = claudioContext;
         _memoryCache = memoryCache;
     }
 
@@ -158,46 +161,6 @@ public class FplRepository : IFplRepository, IDisposable
         return leagues;
     }
 
-    public async Task<List<Player>> GetPlayersAsync(CancellationToken cancellationToken)
-    {
-        if (!_memoryCache.TryGetValue(CacheKeys.Players, out _))
-        {
-            await DoBulkDataLoadAsync(cancellationToken);
-        }
-
-        return _memoryCache.Get<List<Player>>(CacheKeys.Players)!;
-    }
-
-    public async Task<List<Manager>> GetManagersAsync(CancellationToken cancellationToken)
-    {
-        if (!_memoryCache.TryGetValue(CacheKeys.Managers, out _))
-        {
-            await DoBulkDataLoadAsync(cancellationToken);
-        }
-
-        return _memoryCache.Get<List<Manager>>(CacheKeys.Managers)!;
-    }
-
-    public async Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken)
-    {
-        if (!_memoryCache.TryGetValue(CacheKeys.Teams, out _))
-        {
-            await DoBulkDataLoadAsync(cancellationToken);
-        }
-
-        return _memoryCache.Get<List<Team>>(CacheKeys.Teams)!;
-    }
-
-    public async Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken)
-    {
-        if (!_memoryCache.TryGetValue(CacheKeys.CurrentGameweek, out _))
-        {
-            await DoBulkDataLoadAsync(cancellationToken);
-        }
-
-        return _memoryCache.Get<int>(CacheKeys.CurrentGameweek);
-    }
-
     private async Task<int> GetManagerIdAsync(CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "api/me");
@@ -209,15 +172,11 @@ public class FplRepository : IFplRepository, IDisposable
 
     private async Task<Player> LookupPlayerAsync(int playerId, CancellationToken cancellationToken)
     {
-        var cacheKey = CacheKeys.PlayerLookup(playerId);
-        if (!_memoryCache.TryGetValue(cacheKey, out Player? playerDetails))
-        {
-            await DoBulkDataLoadAsync(cancellationToken);
-        }
-
-        return _memoryCache.TryGetValue(cacheKey, out playerDetails)
-            ? playerDetails!
-            : throw new Exception($"Player not found {playerId}");
+        var currentGameweek = await GetCurrentGameweekAsync(cancellationToken);
+        var player = await _claudioContext.Players
+            .AsQueryable()
+            .SingleOrDefaultAsync(p => p.Id == playerId, cancellationToken);
+        return player.ToPlayer(currentGameweek);
     }
 
     private async Task<TApiModel> MakeRequestAsync<TApiModel>(HttpRequestMessage request,
@@ -237,62 +196,26 @@ public class FplRepository : IFplRepository, IDisposable
         return result!;
     }
 
+    private async Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken)
+    {
+        if (!_memoryCache.TryGetValue(CacheKeys.CurrentGameweek, out _))
+        {
+            await DoBulkDataLoadAsync(cancellationToken);
+        }
+
+        return _memoryCache.Get<int>(CacheKeys.CurrentGameweek);
+    }
+
     private async Task DoBulkDataLoadAsync(CancellationToken cancellationToken)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "api/bootstrap-static");
         var result = await MakeRequestAsync<ApiDataDump>(request, cancellationToken);
 
-        CacheTeams(result);
-        CachePlayers(result);
-        CacheManagers(result);
-
         var currentGameweek = result.Events.SingleOrDefault(e => e.IsCurrent)
-            ?? result.Events.Single(e => e.IsNext);
+                              ?? result.Events.Single(e => e.IsNext);
         _memoryCache.Set(CacheKeys.CurrentGameweek, currentGameweek.Id);
     }
 
-    private void CacheManagers(ApiDataDump result)
-    {
-        var managers = new List<Manager>();
-        foreach (var player in result.Elements
-                     .Where(p => p.Position == ApiPosition.Manager)
-                     .Select(p => p.ToManager())
-                     .OrderBy(p => p.Id))
-        {
-            managers.Add(player);
-        }
-
-        _memoryCache.Set(CacheKeys.Managers, managers);
-    }
-
-    private void CachePlayers(ApiDataDump result)
-    {
-        var players = new List<Player>();
-        foreach (var player in result.Elements
-                     .Where(p => p.Position != ApiPosition.Manager)
-                     .Select(p => p.ToPlayer())
-                     .OrderBy(p => p.Id))
-        {
-            _memoryCache.Set(CacheKeys.PlayerLookup(player.Id), player);
-            players.Add(player);
-        }
-
-        _memoryCache.Set(CacheKeys.Players, players);
-    }
-
-    private void CacheTeams(ApiDataDump result)
-    {
-        var teams = new List<Team>();
-        foreach (var team in result.Teams
-                     .Select(p => p.ToTeam())
-                     .OrderBy(p => p.ShortName))
-        {
-            _memoryCache.Set(CacheKeys.TeamLookup(team.Code), team);
-            teams.Add(team);
-        }
-
-        _memoryCache.Set(CacheKeys.Teams, teams);
-    }
 
     public void Dispose()
     {

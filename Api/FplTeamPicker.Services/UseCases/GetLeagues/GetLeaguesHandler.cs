@@ -6,16 +6,16 @@ namespace FplTeamPicker.Services.UseCases.GetLeagues;
 
 public class GetLeaguesHandler : IRequestHandler<GetLeaguesRequest, List<League>>
 {
-    private readonly IFplRepository _fplRepository;
+    private readonly IUserRepository _userRepository;
 
-    public GetLeaguesHandler(IFplRepository fplRepository)
+    public GetLeaguesHandler(IUserRepository userRepository)
     {
-        _fplRepository = fplRepository;
+        _userRepository = userRepository;
     }
 
     public async Task<List<League>> Handle(GetLeaguesRequest request, CancellationToken cancellationToken)
     {
-        var leagues = await _fplRepository.GetLeaguesAsync(cancellationToken);
+        var leagues = await _userRepository.GetLeaguesAsync(cancellationToken);
         return leagues;
     }
 }

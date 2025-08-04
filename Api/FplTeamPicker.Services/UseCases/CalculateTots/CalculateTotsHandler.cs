@@ -7,9 +7,9 @@ using MediatR;
 
 namespace FplTeamPicker.Services.UseCases.CalculateTots;
 
-public class CalculateTotsHandler(IFplRepository repository) : IRequestHandler<CalculateTotsRequest, SelectedTeam>
+public class CalculateTotsHandler(IReferenceDataRepository repository) : IRequestHandler<CalculateTotsRequest, SelectedTeam>
 {
-    private readonly IFplRepository _repository = repository;
+    private readonly IReferenceDataRepository _repository = repository;
 
     public async Task<SelectedTeam> Handle(CalculateTotsRequest request, CancellationToken cancellationToken)
     {

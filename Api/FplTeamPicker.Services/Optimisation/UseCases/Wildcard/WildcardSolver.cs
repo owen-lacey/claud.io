@@ -62,7 +62,7 @@ public class WildcardSolver
             }
         }
 
-        var bestPlayers = output.StartingXi.OrderByDescending(p => p.Player.XpNext).Take(2).ToList();
+        var bestPlayers = output.StartingXi.OrderByDescending(p => p.Player.Xp).Take(2).ToList();
         bestPlayers[0].IsCaptain = true;
         bestPlayers[1].IsViceCaptain = true;
 
@@ -90,7 +90,7 @@ public class WildcardSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         var allPlayerPredictedPoints =
-            _input.Players.Select(p => (int)Math.Round(p.XpNext * 1000)).ToList();
+            _input.Players.Select(p => (int)Math.Round((p.Xp ?? 0) * 1000)).ToList();
         var allPlayerCosts = _input.Players.Select(p => p.Cost).ToList();
         var teamCost = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
         var budgetRemaining = _input.Budget - teamCost;

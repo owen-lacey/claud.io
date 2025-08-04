@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Services", "F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FplTeamPicker.Domain", "FplTeamPicker.Domain\FplTeamPicker.Domain.csproj", "{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Claudio.Infrastructure", "Claudio.Infrastructure\Claudio.Infrastructure.csproj", "{55DE23F1-C3EF-4EEF-BE18-3F0F287622D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{395FDDCC-6CFD-4D0C-8F22-7AFAE2B472B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DE23F1-C3EF-4EEF-BE18-3F0F287622D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DE23F1-C3EF-4EEF-BE18-3F0F287622D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DE23F1-C3EF-4EEF-BE18-3F0F287622D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DE23F1-C3EF-4EEF-BE18-3F0F287622D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

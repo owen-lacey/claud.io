@@ -4,5 +4,5 @@ public class ApiEntry
 {
     public required ApiLeagues Leagues { get; set; }
 
-    public int SummaryOverallPoints { get; set; }
+    public int? SummaryOverallPoints { get; set; }
 }

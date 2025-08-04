@@ -98,7 +98,7 @@ public class TransfersSolver
     {
         // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
         const int multiplier = 100;
-        var allPlayerPredictedPoints = _input.AllPlayers.Select(p => (int)Math.Round(p.XpNext * multiplier)).ToList();
+        var allPlayerPredictedPoints = _input.AllPlayers.Select(p => (int)Math.Round((p.Xp ?? 0)* multiplier)).ToList();
         var predictedPointsForTeam = LinearExpr.WeightedSum(model.Selections.Select(p => p.TeamSelected), allPlayerPredictedPoints);
 
         // (# transfers - free transfers) * op

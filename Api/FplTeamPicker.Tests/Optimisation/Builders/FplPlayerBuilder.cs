@@ -45,7 +45,7 @@ public class FplPlayerBuilder
             Cost = _cost,
             Team = _team,
             Position = _position,
-            XpNext = _xpNext,
+            Xp = _xpNext,
             SeasonPoints = _seasonPoints
         };
     }

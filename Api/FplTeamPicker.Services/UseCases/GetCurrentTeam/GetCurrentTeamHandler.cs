@@ -6,17 +6,19 @@ namespace FplTeamPicker.Services.UseCases.GetCurrentTeam;
 
 public class GetCurrentTeamHandler : IRequestHandler<GetCurrentTeamRequest, SelectedSquad>
 {
-    private readonly IFplRepository _repository;
+    private readonly IUserRepository _userRepository;
+    private readonly IReferenceDataRepository _repository;
 
-    public GetCurrentTeamHandler(IFplRepository repository)
+    public GetCurrentTeamHandler(IReferenceDataRepository repository, IUserRepository userRepository)
     {
         _repository = repository;
+        _userRepository = userRepository;
     }
 
     public async Task<SelectedSquad> Handle(GetCurrentTeamRequest request, CancellationToken cancellationToken)
     {
         var gameweek = await _repository.GetCurrentGameweekAsync(cancellationToken);
-        var selectedTeam = await _repository.GetSelectedTeamAsync(request.UserId, gameweek, cancellationToken);
+        var selectedTeam = await _userRepository.GetSelectedTeamAsync(request.UserId, gameweek, cancellationToken);
         return selectedTeam;
     }
 }

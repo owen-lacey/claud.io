@@ -14,9 +14,7 @@ public record Player
 
     public string SecondName { get; set; } = null!;
 
-    public decimal XpNext { get; set; }
-
-    public decimal XpThis { get; set; }
+    public decimal? Xp { get; set; }
 
     public decimal SelectedByPercent { get; set; }
 
@@ -35,4 +33,6 @@ public record Player
     public string Name => $"{FirstName} {SecondName}";
 
     public bool IsAvailable => ChanceOfPlayingNextRound == null || ChanceOfPlayingNextRound == 100;
+
+    public Dictionary<int, decimal> Predictions { get; set; } = new();
 }

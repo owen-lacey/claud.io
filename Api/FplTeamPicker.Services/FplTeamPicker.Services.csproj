@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Claudio.Infrastructure\Claudio.Infrastructure.csproj" />
       <ProjectReference Include="..\FplTeamPicker.Domain\FplTeamPicker.Domain.csproj" />
     </ItemGroup>
 

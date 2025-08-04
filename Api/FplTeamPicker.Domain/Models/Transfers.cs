@@ -18,5 +18,5 @@ public record Transfers
 
     public int Budget => Bank + SquadCost;
 
-    public decimal PredictedPoints => StartingXi.Sum(p => p.Player.XpNext);
+    public decimal PredictedPoints => StartingXi.Sum(p => p.Player.Xp ?? 0);
 }

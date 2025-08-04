@@ -17,7 +17,7 @@ public class SquadSelectionVar
         Position = player.Position;
         Team = player.Team;
         Cost = player.Cost;
-        PredictedPoints = player.XpNext;
+        PredictedPoints = player.Xp ?? 0;
     }
 
     public int Id { get; init; }
