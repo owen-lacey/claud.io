@@ -112,14 +112,13 @@ def load_data():
     else:
         print(f"✅ Opponent strength features available")
     
-    # Load current players
-    with open('/Users/owen/src/Personal/fpl-team-picker/Data/database/players.json', 'r') as f:
-        players_data = json.load(f)
+    # Load current players from MongoDB
+    from database.mongo.mongo_data_loader import load_players_data, load_teams_data
+    players_data = load_players_data()
     print(f"✅ Current players: {len(players_data)}")
-    
-    # Load teams
-    with open('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json', 'r') as f:
-        teams_data = json.load(f)
+
+    # Load teams from MongoDB
+    teams_data = load_teams_data()
     print(f"✅ Teams: {len(teams_data)}")
     
     return historical_df, players_data, teams_data

@@ -140,7 +140,7 @@ def train_enhanced_assists_model():
     
     # Initialize feature engine
     historical_data = load_historical_data('../raw/parsed_gw.csv')
-    teams_data = load_teams_data('../database/teams.json')
+    teams_data = load_teams_data()
     feature_engine = PlayerFeatureEngine(teams_data)    # Prepare encoders
     position_encoder = LabelEncoder()
     team_encoder = LabelEncoder()

@@ -1,6 +1,7 @@
 # Player Feature Engineering - Shared Logic for Training and Prediction
 import pandas as pd
 import numpy as np
+import os
 from typing import Dict, List, Optional, Tuple, Union
 import json
 
@@ -998,19 +999,29 @@ def load_historical_data(filepath: str) -> pd.DataFrame:
     return df
 
 
-def load_teams_data(filepath: str) -> List[Dict]:
-    """Load teams data"""
-    with open(filepath, 'r') as f:
-        teams_data = json.load(f)
-    print(f"✅ Loaded {len(teams_data)} teams")
-    return teams_data
+def load_teams_data(filepath: str = None) -> List[Dict]:
+    """Load teams data - now using MongoDB with JSON fallback for compatibility"""
+    try:
+        from database.mongo.mongo_data_loader import load_teams_data as mongo_load_teams
+        teams_data = mongo_load_teams()
+        print(f"✅ Loaded {len(teams_data)} teams from MongoDB")
+        return teams_data
+    except Exception:
+        # Fallback to JSON file if MongoDB is not available
+        if filepath and os.path.exists(filepath):
+            with open(filepath, 'r') as f:
+                teams_data = json.load(f)
+            print(f"✅ Loaded {len(teams_data)} teams from JSON fallback")
+            return teams_data
+        else:
+            raise RuntimeError("Cannot load teams data: MongoDB unavailable and no JSON file provided")
 
 
 # Example usage:
 if __name__ == "__main__":
     # Load data
     historical_df = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv')
-    teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
+    teams_data = load_teams_data()
     
     # Initialize feature engine
     feature_engine = PlayerFeatureEngine(teams_data)

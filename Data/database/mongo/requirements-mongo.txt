@@ -1,0 +1,4 @@
+# MongoDB dependencies for FPL Team Picker
+pymongo>=4.6.0
+motor>=3.3.0  # Async MongoDB driver if needed
+python-dotenv>=1.0.0  # For environment variables

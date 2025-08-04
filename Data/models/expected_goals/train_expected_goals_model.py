@@ -36,7 +36,7 @@ def load_data():
     
     # Load ENHANCED data with opponent strength features
     historical_df = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv')
-    teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
+    teams_data = load_teams_data()
     
     # Convert data types safely
     def convert_was_home(val):
@@ -50,9 +50,9 @@ def load_data():
     historical_df['was_home'] = historical_df['was_home'].apply(convert_was_home)
     historical_df['GW'] = pd.to_numeric(historical_df['GW'], errors='coerce').fillna(1).astype(int)
     
-    # Load current players
-    with open('/Users/owen/src/Personal/fpl-team-picker/Data/database/players.json', 'r') as f:
-        players_data = json.load(f)
+    # Load current players from MongoDB
+    from database.mongo.mongo_data_loader import load_players_data
+    players_data = load_players_data()
     print(f"✅ Current players: {len(players_data)}")
     
     return historical_df, players_data, teams_data

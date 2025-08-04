@@ -28,10 +28,10 @@ print("🚀 Starting Minutes Model Training Pipeline\n")
 # Load data using shared utilities
 print("📊 Loading data...")
 historical_data = load_historical_data('/Users/owen/src/Personal/fpl-team-picker/Data/raw/parsed_gw_2425.csv')
-teams_data = load_teams_data('/Users/owen/src/Personal/fpl-team-picker/Data/database/teams.json')
+from database.mongo.mongo_data_loader import load_teams_data, load_players_data
+teams_data = load_teams_data()
 
-with open('/Users/owen/src/Personal/fpl-team-picker/Data/database/players.json', 'r') as f:
-    players_data = json.load(f)
+players_data = load_players_data()
 
 print(f"✅ Current players: {len(players_data):,}")
 print(f"✅ Historical data: {len(historical_data):,} records with opponent strength features")

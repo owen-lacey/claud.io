@@ -52,6 +52,7 @@ class ModelNotLoadedError(Exception):
 class PlayerExpectedPoints:
     """Complete expected points prediction for a player"""
     player_id: str
+    code: str  # Player's unique code for historical matching
     name: str
     team: str
     position: str
@@ -63,6 +64,7 @@ class PlayerExpectedPoints:
     expected_assists: float
     expected_saves: float
     clean_sheet_prob: float
+    predicted_goals_conceded: float  # Expected goals conceded for GK/DEF players
     
     # Playing time predictions
     expected_minutes: float
@@ -110,9 +112,12 @@ class FPLPredictionEngine:
         self.data_dir = Path(data_dir)
         self.models_dir = Path(models_dir)
         
-        # Load core data
-        self.players_data = self._load_json_data("players.json")
-        self.teams_data = self._load_json_data("teams.json")
+        # Load core data from MongoDB (with JSON fallback)
+        sys.path.append(str(Path(__file__).parent.parent / "database" / "mongo"))
+        from mongo_data_loader import load_players_data, load_teams_data
+        
+        self.players_data = load_players_data()
+        self.teams_data = load_teams_data()
         
         # Load historical data for proper rolling averages (enhanced with opponent strength)
         historical_path = str(Path(__file__).parent.parent / "raw" / "parsed_gw_2425.csv")
@@ -262,18 +267,23 @@ class FPLPredictionEngine:
         Returns:
             True if player has sufficient data, False otherwise
         """
-        # Require minimum playing time (equivalent to ~5 games)
-        total_minutes = player_data.get('minutes', 0)
-        if total_minutes < 450:
+        # Require basic FPL stats
+        required_fields = ['web_name', 'now_cost', 'element_type', 'team']
+        if not all(player_data.get(field) for field in required_fields):
             return False
             
         # Require player code for historical matching
         if not player_data.get('code'):
             return False
+        
+        # For start of season (all players have 0 minutes), skip minutes requirement
+        total_minutes = player_data.get('minutes', 0)
+        if total_minutes == 0:
+            # Start of season - basic data + player code is sufficient
+            return True
             
-        # Require basic FPL stats
-        required_fields = ['web_name', 'now_cost', 'element_type', 'team']
-        if not all(player_data.get(field) for field in required_fields):
+        # During season - require minimum playing time (equivalent to ~5 games)
+        if total_minutes < 450:
             return False
             
         return True
@@ -378,6 +388,7 @@ class FPLPredictionEngine:
         
         return PlayerExpectedPoints(
             player_id=player_id,
+            code=player_code,
             name=name,
             team=team_name,
             position=position,
@@ -388,6 +399,7 @@ class FPLPredictionEngine:
             expected_assists=round(expected_assists, 3),
             expected_saves=round(expected_saves, 1),
             clean_sheet_prob=round(clean_sheet_prob, 3),
+            predicted_goals_conceded=round(predicted_goals_conceded, 3) if predicted_goals_conceded is not None else None,
             
             # Playing time predictions
             expected_minutes=round(expected_minutes, 1),
@@ -927,7 +939,8 @@ class FPLPredictionEngine:
                                        name: str,
                                        team_name: str,
                                        position: str,
-                                       price: float) -> PlayerExpectedPoints:
+                                       price: float,
+                                       player_code: str = None) -> PlayerExpectedPoints:
         """
         Calculate simplified prediction for players with insufficient playing time
         
@@ -952,6 +965,7 @@ class FPLPredictionEngine:
             # Return zero prediction immediately for no_minutes players
             return PlayerExpectedPoints(
                 player_id=player_id,
+                code=player_code or "0",
                 name=name,
                 team=team_name,
                 position=position,
@@ -1071,6 +1085,7 @@ class FPLPredictionEngine:
         
         return PlayerExpectedPoints(
             player_id=player_id,
+            code=player_code or "0",
             name=name,
             team=team_name,
             position=position,
@@ -1265,13 +1280,16 @@ class FPLPredictionEngine:
     def _get_fixture_info(self, team_id: int, gameweek: int) -> Dict[str, Any]:
         """Get fixture information for a team in a specific gameweek with opponent strength data"""
         
-        # Load fixtures data if not already loaded
+        # Load fixtures data if not already loaded from MongoDB
         if not hasattr(self, '_fixtures_data'):
-            fixtures_file = self.data_dir / "fixtures.json"
-            if fixtures_file.exists():
-                with open(fixtures_file, 'r') as f:
-                    self._fixtures_data = json.load(f)
-            else:
+            try:
+                from mongo_data_loader import load_fixtures_data
+                self._fixtures_data = load_fixtures_data()
+            except Exception as e:
+                # Fallback to defaults if no fixtures data
+                self._fixtures_data = []
+            
+            if not self._fixtures_data:
                 # Fallback to defaults if no fixtures data
                 return {
                     'difficulty': 'Medium',

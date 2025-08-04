@@ -40,9 +40,9 @@ class PredictionRealityAnalyzer:
         """Load all necessary data"""
         print("📊 Loading data...")
         
-        # Load current season players (2025/26)
-        with open(self.data_dir / "players.json", 'r') as f:
-            self.current_players = json.load(f)
+        # Load current season players (2025/26) from MongoDB
+        from database.mongo.mongo_data_loader import load_players_data
+        self.current_players = load_players_data()
         print(f"   ✅ Loaded {len(self.current_players)} current players")
         
         # Load historical gameweek data (2024/25 season)

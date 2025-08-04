@@ -16,12 +16,8 @@ import SmallScreen from '../components/utils/SmallScreen';
 import { ApiResult } from '../models/api-result';
 import { MyTeam as ApiMyTeam, League, Player, Team, User } from '../helpers/api';
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { ThreadList } from '../components/assistant-ui/thread-list';
-import { Thread } from '../components/assistant-ui/thread';
 import { useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { DataContext, RivalTeamsContext } from '../lib/contexts';
-import { FloatingChat } from '../components/FloatingChat';
-import DarkModeProvider from '../components/DarkModeProvider';
 
 const App = memo(function App() {
   // Temporarily comment out useLocalStorage to isolate the issue
@@ -93,7 +89,6 @@ const App = memo(function App() {
             <Players />
           </div>
         </div>
-        <FloatingChat />
       </AssistantRuntimeProvider>
     );
   }

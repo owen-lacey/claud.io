@@ -38,21 +38,53 @@ class PredictionGenerator:
     def __init__(self, output_dir: str = "./"):
         """Initialize the prediction generator"""
         self.output_dir = Path(output_dir)
-        self.engine = FPLPredictionEngine()
+        self.engine = FPLPredictionEngine(models_dir="../models")
         self.season = "2025_26"
         
     def generate_gameweek_predictions(self, gameweek: int) -> Dict[str, Any]:
-        """Generate predictions for a specific gameweek"""
-        
+        """Generate predictions for a specific gameweek and save to MongoDB"""
         print(f"\n🎯 Generating predictions for Gameweek {gameweek}")
         print("=" * 50)
-        
+
         # Generate predictions using our engine
         predictions = self.engine.generate_gameweek_predictions(
             gameweek=gameweek,
             include_bonus=True
         )
-        
+
+        # Add gameweek and clean up prediction data for each player
+        for player in predictions['players']:
+            # Ensure 'id' field exists for MongoDB upsert (use 'code' if present)
+            if 'id' not in player:
+                if 'code' in player:
+                    player['id'] = player['code']
+                elif 'player_id' in player:
+                    player['id'] = player['player_id']
+                else:
+                    raise ValueError(f"Player missing unique identifier: {player}")
+
+            # Add gameweek to prediction data for proper storage
+            player['gameweek'] = gameweek
+
+            # Add xp property (alias for expected_points) for convenience
+            player['xp'] = player.get('expected_points', None)
+
+        # Save all predictions to MongoDB
+        try:
+            # Ensure the Data directory is in sys.path for import
+            import sys
+            from pathlib import Path
+            data_dir = Path(__file__).resolve().parent.parent
+            if str(data_dir) not in sys.path:
+                sys.path.insert(0, str(data_dir))
+            from database.mongo.fpl_mongo_client import FPLMongoClient
+            mongo_client = FPLMongoClient()
+            mongo_client.bulk_upsert_players(predictions['players'])
+            mongo_client.disconnect()
+            print(f"✅ Saved {len(predictions['players'])} player predictions to MongoDB for GW{gameweek}")
+        except Exception as e:
+            print(f"❌ Failed to save predictions to MongoDB: {e}")
+
         # Add metadata
         predictions['metadata'] = {
             'season': self.season,
@@ -61,7 +93,6 @@ class PredictionGenerator:
             'generator_version': '1.0.0',
             'total_players': len(predictions['players'])
         }
-        
         return predictions
     
     def save_predictions(self, predictions: Dict[str, Any], gameweek: int) -> Dict[str, str]:
