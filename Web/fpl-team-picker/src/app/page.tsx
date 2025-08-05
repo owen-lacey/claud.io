@@ -8,6 +8,7 @@ import Header from "../components/Header";
 import { memo, useEffect } from "react";
 import MyTeam from '../components/MyTeam';
 import Players from '../components/Players';
+import Chat from '../components/Chat';
 import { FplApi } from '../helpers/fpl-api';
 import { AllData } from '../models/all-data';
 import Leagues from '../components/Leagues';
@@ -15,8 +16,6 @@ import { RivalTeam } from '../models/rival-league';
 import SmallScreen from '../components/utils/SmallScreen';
 import { ApiResult } from '../models/api-result';
 import { MyTeam as ApiMyTeam, League, Player, Team, User } from '../helpers/api';
-import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { DataContext, RivalTeamsContext } from '../lib/contexts';
 
 const App = memo(function App() {
@@ -36,10 +35,6 @@ const App = memo(function App() {
 
   const [data, setData] = useState<AllData | null>(null);
   const [rivalTeams, setRivalTeams] = useState<RivalTeam[]>([]);
-  
-  const runtime = useChatRuntime({
-    api: "/api/chat",
-  });
 
   const loadData = async () => {
     const [myTeam, players, teams, leagues, myDetails] = await Promise.all([
@@ -74,10 +69,12 @@ const App = memo(function App() {
     content = <AuthGuard onDone={(cookie) => savePlProfile(cookie)} />;
   } else {
     content = (
-      <AssistantRuntimeProvider runtime={runtime}>
         <div className={`app-container`}>
           <div className="header">
             <Header />
+          </div>
+          <div className="chat">
+            <Chat />
           </div>
           <div className="my-team">
             <MyTeam />
@@ -89,7 +86,6 @@ const App = memo(function App() {
             <Players />
           </div>
         </div>
-      </AssistantRuntimeProvider>
     );
   }
 

@@ -2,13 +2,13 @@
   min-height: 100vh;
   padding: 1rem;
   display: grid;
-  grid-template-columns: 13fr 8fr;
+  grid-template-columns: 8fr 13fr 8fr;
   grid-gap: 1rem;
   grid-template-rows: 66px auto;
-  grid-template-areas: "header header" "my-team my-team" "leagues leagues" "players players";
+  grid-template-areas: "header header header" "chat chat chat" "my-team my-team my-team" "leagues leagues leagues" "players players players";
 
   @media (min-width: 48rem) {
-    grid-template-areas: "header header" "my-team leagues" "players players";
+    grid-template-areas: "header header header" "chat my-team leagues" "players players players";
   }
 
   >div {
@@ -17,6 +17,10 @@
 
   .header {
     grid-area: header;
+  }
+
+  .chat {
+    grid-area: chat;
   }
 
   .my-team {
