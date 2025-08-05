@@ -10,6 +10,31 @@
  * ---------------------------------------------------------------
  */
 
+export interface DateOnly {
+  /** @format int32 */
+  year?: number;
+  /** @format int32 */
+  month?: number;
+  /** @format int32 */
+  day?: number;
+  dayOfWeek?: DayOfWeek;
+  /** @format int32 */
+  dayOfYear?: number;
+  /** @format int32 */
+  dayNumber?: number;
+}
+
+/** @format int32 */
+export enum DayOfWeek {
+  Value0 = 0,
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+  Value5 = 5,
+  Value6 = 6,
+}
+
 export interface League {
   /** @format int32 */
   id?: number;
@@ -30,22 +55,6 @@ export interface LeagueParticipant {
   position?: number;
   /** @format int32 */
   total?: number;
-}
-
-export interface Manager {
-  /** @format int32 */
-  id?: number;
-  /** @format int32 */
-  cost?: number;
-  firstName?: string | null;
-  secondName?: string | null;
-  /** @format double */
-  xpNext?: number;
-  /** @format double */
-  xpThis?: number;
-  /** @format int32 */
-  team?: number;
-  name?: string | null;
 }
 
 export interface MyTeam {
@@ -69,15 +78,23 @@ export interface Player {
   firstName?: string | null;
   secondName?: string | null;
   /** @format double */
-  xpNext?: number;
+  xp?: number | null;
   /** @format double */
-  xpThis?: number;
+  selectedByPercent?: number;
   /** @format int32 */
   team?: number;
   /** @format int32 */
   seasonPoints?: number;
+  /** @format int32 */
+  yellowCards?: number;
+  birthDate?: DateOnly;
+  /** @format int32 */
+  redCards?: number;
+  /** @format int32 */
+  transfersOut?: number;
   name?: string | null;
   isAvailable?: boolean;
+  predictions?: Record<string, number>;
 }
 
 /** @format int32 */
@@ -411,22 +428,6 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     playersList: (params: RequestParams = {}) =>
       this.request<Player[], any>({
         path: `/players`,
-        method: "GET",
-        format: "json",
-        ...params,
-      }),
-  };
-  managers = {
-    /**
-     * No description
-     *
-     * @tags FplTeamPicker.Api
-     * @name ManagersList
-     * @request GET:/managers
-     */
-    managersList: (params: RequestParams = {}) =>
-      this.request<Manager[], any>({
-        path: `/managers`,
         method: "GET",
         format: "json",
         ...params,

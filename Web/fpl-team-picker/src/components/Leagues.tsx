@@ -94,8 +94,8 @@ function Leagues({ rivalTeams, setRivalTeams }: LeaguesProps) {
                   {rivalTeams?.map((rt, i) => {
                     const startingXi = rt.team.startingXi || [];
                     const bench = rt.team.bench || [];
-                    const xp = startingXi.reduce((a, b) => a + (b.player?.xpNext || 0), 0);
-                    const xpBenchBoost = xp + bench.reduce((a, b) => a + (b.player?.xpNext || 0), 0);
+                    const xp = startingXi.reduce((a, b) => a + (b.player?.xp || 0), 0);
+                    const xpBenchBoost = xp + bench.reduce((a, b) => a + (b.player?.xp || 0), 0);
                     const isCurrentUser = rt.rival.userId == myDetails.output!.id;
 
                     return (

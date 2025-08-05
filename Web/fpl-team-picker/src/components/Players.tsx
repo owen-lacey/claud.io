@@ -34,7 +34,7 @@ function Players() {
             </td>
             <td className="text-sm">{lookupTeam(player.team!, teams.output!).shortName}</td>
             <td className="text-gray-500 font-mono text-sm text-right">£{(player.cost! / 10).toFixed(1)}</td>
-            <td className="text-blue-500 font-mono text-sm text-right">{player.xpNext!.toFixed(1)}</td>
+            <td className="text-blue-500 font-mono text-sm text-right">{player.xp?.toFixed(1)}</td>
           </tr>
         ))}
       </tbody>

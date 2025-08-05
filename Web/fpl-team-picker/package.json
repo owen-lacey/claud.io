@@ -10,10 +10,6 @@
     "api-schema": "npx swagger-typescript-api generate -p http://localhost:5079/swagger/v1/swagger.json -o ./src/helpers -n api.ts --api-class-name Api --axios"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.23",
-    "@assistant-ui/react": "^0.10.29",
-    "@assistant-ui/react-ai-sdk": "^0.10.16",
-    "@assistant-ui/react-markdown": "^0.10.6",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@radix-ui/react-slot": "^1.2.3",

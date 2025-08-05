@@ -98,19 +98,19 @@ public class Player
   public decimal ExpectedGoalsConceded { get; set; }
 
   [BsonElement("predictions")]
-  public Dictionary<int, PlayerPrediction> Predictions { get; set; }
+  public Dictionary<int, PlayerPrediction> Predictions { get; set; } = new ();
 
   public FplTeamPicker.Domain.Models.Player ToPlayer(int currentGameweek)
   {
     return new FplTeamPicker.Domain.Models.Player
     {
       Id = Code,
-      Position = (Position)ElementType,
+      Position = ElementType,
       Cost = NowCost,
       ChanceOfPlayingNextRound = null, // Not available in entity
       FirstName = FirstName,
       SecondName = SecondName,
-      Xp = null, // Not available at root level in entity
+      Xp = Predictions.TryGetValue(currentGameweek, out var prediction) ? prediction.Xp : null,
       SelectedByPercent = SelectedByPercent,
       Team = Team,
       SeasonPoints = TotalPoints,

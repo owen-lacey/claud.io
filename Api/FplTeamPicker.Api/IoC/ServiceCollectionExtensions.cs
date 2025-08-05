@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient<IReferenceDataRepository, ReferenceDataRepository>((serviceProvider, client) =>
         {
-            // pass through the cookie from the client to the FPL API
+            // pass through the token from the client to the FPL API
             var httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
             if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(FplApiConstants.HeaderName,
                     out var token) == true)

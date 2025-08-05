@@ -10,7 +10,7 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
   const onSubmit = useCallback(() => {
     onDone(value);
     setOpen(false);
-  }, [value])
+  }, [onDone, value])
 
 
   return (
@@ -36,7 +36,7 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
                     Auto FPL is a read-only view of your FPL profile. It uses optimisation algorithms to help you pick* the best FPL team.
                     <br />
                     <br />
-                    Let's get started:
+                    Let&apos;s get started:
                     <div className="flex flex-col gap-2 mt-2">
                       <div className="flex">
                         <span className="w-6 h-6 bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full flex items-center justify-center">1</span>
@@ -70,7 +70,7 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
                 onClick={onSubmit}
                 className="border text-sm border-border p-2 bg-gradient-to-r from-[rgb(10,229,255)] to-[rgb(66,162,255)] text-white rounded-md hover:opacity-90"
               >
-                Let's go! &#128640;
+                Let&apos;s go! &#128640;
               </button>
             </div>
           </DialogPanel>

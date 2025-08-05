@@ -44,7 +44,7 @@ function MyTeam() {
             </td>
             <td className="text-sm">{lookupTeam(player.player!.team!, teams.output!).shortName}</td>
             <td className="text-gray-500 font-mono text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
-            <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xpNext!.toFixed(1)}</td>
+            <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xp?.toFixed(1)}</td>
           </tr>
         ))}
         <tr className="font-mono text-sm text-gray-400 uppercase text-center"><td className="p-2" key={0} colSpan={99}>bench</td></tr>
@@ -56,7 +56,7 @@ function MyTeam() {
             </td>
             <td className="text-sm">{lookupTeam(player.player!.team!, teams.output!).shortName}</td>
             <td className="text-gray-500 font-mono text-sm text-right">£{(player.player!.cost! / 10).toFixed(1)}</td>
-            <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xpNext!.toFixed(1)}</td>
+            <td className="text-blue-500 font-mono text-sm text-right">{player.player!.xp?.toFixed(1)}</td>
           </tr>
         ))}
       </tbody>

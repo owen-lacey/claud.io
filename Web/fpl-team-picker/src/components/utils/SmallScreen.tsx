@@ -4,8 +4,8 @@ function SmallScreen() {
     <h1 className="mb-3 text-lg font-semibold">
       &#128075; Hi there!
     </h1>
-    <p>It looks like you're trying to access this page from a mobile, or at least on a small screen. Unfortunately, due to a necessity for messing around with cookies, this only works on a desktop - sorry about that.</p>
-    <p>Come back on a laptop, and I'll see you soon! &#128187; </p>
+    <p>It looks like you&apos;re trying to access this page from a mobile, or at least on a small screen. Unfortunately, due to a necessity for messing around with cookies, this only works on a desktop - sorry about that.</p>
+    <p>Come back on a laptop, and I&apos;ll see you soon! &#128187; </p>
   </div>
 }
 
