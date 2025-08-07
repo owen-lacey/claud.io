@@ -47,7 +47,7 @@ function AuthGuard({ onDone }: { onDone: (cookie: string) => void }) {
                         <p>Open dev tools (<span className="font-normal text-xs font-mono bg-muted p-1 rounded-md">F12</span>) and run the following:</p>
                       </div>
                       <pre className="py-4 px-2 text-xs bg-muted p-1 rounded-md overflow-auto">
-                        document.cookie.match(/pl_profile=(?&lt;plProfileValue&gt;[^;]+)/).groups.plProfileValue
+                        localStorage.getItem(&apos;oidc.user:https://account.premierleague.com/as:bfcbaf69-aade-4c1b-8f00-c1cb8a193030&apos;).match(/&quot;access_token&quot;:&quot;([^&quot;]+)&quot;/)[1]
                       </pre>
                       <div className="flex">
                         <span className="w-6 h-6 bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full flex items-center justify-center">3</span>
