@@ -37,8 +37,10 @@ describe('/api/chat', () => {
       expect(value).toBeDefined()
       
       const chunk = new TextDecoder().decode(value)
-      // The streaming format can be either numbered chunks or other formats like "f:{...}"
-      expect(chunk).toMatch(/(\d+:".*"|f:\{.*\})/) // Should match streaming format
+      // Fail if the chunk is an error
+      expect(chunk).not.toMatch(/3:"An error occurred."/)
+      // Should match a valid streaming format
+      expect(chunk).toMatch(/(0:.*|f:\{.*\}|e:\{.*\}|d:\{.*\})/)
     }
   }, 15000)
 
@@ -66,8 +68,10 @@ describe('/api/chat', () => {
       expect(value).toBeDefined()
       
       const chunk = new TextDecoder().decode(value)
-      // The streaming format can be either numbered chunks or other formats like "f:{...}"
-      expect(chunk).toMatch(/(\d+:".*"|f:\{.*\})/) // Should match streaming format
+      // Fail if the chunk is an error
+      expect(chunk).not.toMatch(/3:"An error occurred."/)
+      // Should match a valid streaming format
+      expect(chunk).toMatch(/(0:.*|f:\{.*\}|e:\{.*\}|d:\{.*\})/)
     }
   }, 10000)
 

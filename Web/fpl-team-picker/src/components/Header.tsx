@@ -1,8 +1,9 @@
 "use client";
 
-import { memo, useCallback, useContext } from "react";
+import React, { memo, useCallback, useContext } from "react";
 import { ArrowPathRoundedSquareIcon } from '@heroicons/react/24/solid';
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import Link from "next/link";
 import { DataContext } from "@/lib/contexts";
 import { LoadingCard } from "./utils/Loading";
 
@@ -22,10 +23,16 @@ const Header = memo(function Header() {
   }
   
   const { myDetails } = allData;
+  const assistantEnabled = process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED === 'true';
 
   return <header className="bg-card border border-border shadow-lg rounded-lg py-4 px-6 flex justify-between items-center">
     <h1 className="text-2xl font-semibold text-foreground">Welcome, <span>{myDetails.output!.firstName}</span>!</h1>
     <div className="text-sm flex items-center gap-3 text-foreground">
+      {assistantEnabled && (
+        <Link href="/assistant" className="underline underline-offset-4 hover:text-accent-foreground">
+          Assistant (beta)
+        </Link>
+      )}
       <div className="flex items-center">
         <span>User ID: &nbsp;</span>
 
