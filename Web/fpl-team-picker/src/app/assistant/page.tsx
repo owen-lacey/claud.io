@@ -1,12 +1,43 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
 
 export default function AssistantPage() {
   const api = "/api/chat-tools";
+
+  // Attach auth headers for chat-tools calls
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : input instanceof URL ? input.toString() : "";
+      if (url.startsWith(api)) {
+        const token = (() => {
+          try {
+            return localStorage.getItem("pl_profile")?.replace(/"/g, "");
+          } catch {
+            return undefined;
+          }
+        })();
+        const nextInit: RequestInit = { ...(init || {}) };
+        const headers = new Headers(nextInit.headers || {});
+        if (token) {
+          headers.set("pl_profile", token);
+          // Optional: also send as Bearer for servers that expect Authorization
+          headers.set("Authorization", `Bearer ${token}`);
+        }
+        nextInit.headers = headers;
+        return originalFetch(input, nextInit);
+      }
+      return originalFetch(input, init);
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [api]);
+
   const runtime = useChatRuntime({ api });
 
   return (
@@ -32,8 +63,8 @@ export default function AssistantPage() {
           <pre className="text-muted-foreground">{api}</pre>
           <p className="font-medium mt-4 mb-2">Tip</p>
           <ul className="list-disc pl-5 text-muted-foreground">
-            <li>Ask: &quot;Call build_squad with budget 1000 and return only the result.&quot;</li>
-            <li>Look for f: (tool call) and d: (tool result) frames in the Network tab.</li>
+            <li>Ask: &quot;Call build_squad and return only the result.&quot;</li>
+            <li>Token attached from localStorage key pl_profile.</li>
           </ul>
         </div>
       </div>
