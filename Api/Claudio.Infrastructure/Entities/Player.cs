@@ -12,6 +12,9 @@ public class Player
 
   [BsonElement("id")]
   public int Id { get; set; }
+  
+  [BsonElement("fbref_id")]
+  public string FbrefId { get; set; }
 
   [BsonElement("code")]
   public int Code { get; set; }
@@ -99,6 +102,9 @@ public class Player
 
   [BsonElement("predictions")]
   public Dictionary<int, PlayerPrediction> Predictions { get; set; } = new ();
+
+  [BsonElement("predictions_fbref")]
+  public Dictionary<int, PlayerPrediction> PredictionsFbRef { get; set; } = new ();
 
   public FplTeamPicker.Domain.Models.Player ToPlayer(int currentGameweek)
   {

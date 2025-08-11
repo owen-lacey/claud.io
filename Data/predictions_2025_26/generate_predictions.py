@@ -26,32 +26,162 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Any
 
-# Add the final_assembly directory to path
+# Optional: keep path append for compatibility, though we will dynamic-load by file
 sys.path.append('../final_assembly')
 
-from fpl_assembly_pipeline import FPLPredictionEngine
+# Dynamic loader for engines to avoid static import issues
+from importlib.util import spec_from_file_location, module_from_spec
+
+def _load_class_from_file(module_filename: str, class_name: str):
+    base_dir = Path(__file__).resolve().parent.parent / "final_assembly"
+    module_path = base_dir / module_filename
+    if not module_path.exists():
+        return None
+    spec = spec_from_file_location(module_filename[:-3], module_path)
+    if not spec or not spec.loader:
+        return None
+    mod = module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, class_name, None)
+
+FBRefPredictionEngine = _load_class_from_file("fbref_assembly_pipeline.py", "FBRefPredictionEngine")
 
 
 class PredictionGenerator:
     """Generates and saves FPL predictions for the 2025/26 season"""
     
-    def __init__(self, output_dir: str = "./"):
+    def __init__(self, output_dir: str = "./", source: str = "fpl"):
         """Initialize the prediction generator"""
-        self.output_dir = Path(output_dir)
-        self.engine = FPLPredictionEngine(models_dir="../models")
-        self.season = "2025_26"
+        # Decide output directory
+        season = "2025_26"
+        if output_dir.strip() in ('.', './'):
+            # Default FBRef outputs into Data/predictions_fbref_2025_26
+            default_fbref_dir = Path(__file__).resolve().parent.parent / f"predictions_fbref_{season}"
+            default_fbref_dir.mkdir(parents=True, exist_ok=True)
+            self.output_dir = default_fbref_dir
+        else:
+            self.output_dir = Path(output_dir)
         
+        self.season = season
+        self.source = 'fbref'  # Always FBRef now
+        if FBRefPredictionEngine is None:
+            raise ImportError("FBRefPredictionEngine could not be loaded from final_assembly/fbref_assembly_pipeline.py")
+        self.engine = FBRefPredictionEngine(models_dir="../models_fbref")
+    
     def generate_gameweek_predictions(self, gameweek: int) -> Dict[str, Any]:
         """Generate predictions for a specific gameweek and save to MongoDB"""
-        print(f"\n🎯 Generating predictions for Gameweek {gameweek}")
+        print(f"\n🎯 Generating predictions for Gameweek {gameweek} [source={self.source}]")
         print("=" * 50)
+
+        # Load FPL players from MongoDB to get FBRef mapping
+        allowed_fbref_ids = None
+        element_type_map = None
+        name_map = None
+        price_map = None  # fbref_id -> price in millions
+        try:
+            # Ensure the Data directory is on sys.path for Mongo helpers
+            import sys as _sys
+            from pathlib import Path as _Path
+            data_dir = _Path(__file__).resolve().parent.parent
+            if str(data_dir) not in _sys.path:
+                _sys.path.insert(0, str(data_dir))
+            from database.mongo.mongo_data_loader import load_players_data
+            fpl_players = load_players_data()
+            # Prefer an explicit fbref_id on player docs if present
+            fbref_ids = {str(p.get('fbref_id')) for p in fpl_players if p.get('fbref_id')}
+            # Build fbref_id -> code/id maps
+            code_map = {str(p.get('fbref_id')): p.get('code') for p in fpl_players if p.get('fbref_id') and p.get('code') is not None}
+            id_map = {str(p.get('fbref_id')): p.get('id') for p in fpl_players if p.get('fbref_id') and p.get('id') is not None}
+            # Build element_type map (fbref_id -> element_type)
+            element_type_map = {str(p.get('fbref_id')): int(p.get('element_type')) for p in fpl_players if p.get('fbref_id') and p.get('element_type')}
+            # Build name map (fbref_id -> display name)
+            def display_name(p):
+                if p.get('web_name'):
+                    return p['web_name']
+                fn = p.get('first_name')
+                sn = p.get('second_name')
+                if fn or sn:
+                    return f"{fn or ''} {sn or ''}".strip()
+                return None
+            name_map = {str(p.get('fbref_id')): display_name(p) for p in fpl_players if p.get('fbref_id') and display_name(p)}
+            # Build price map (fbref_id -> price in millions from now_cost)
+            tmp_price_map = {}
+            for p in fpl_players:
+                fid = p.get('fbref_id')
+                now_cost = p.get('now_cost')
+                if fid and now_cost is not None:
+                    try:
+                        tmp_price_map[str(fid)] = float(now_cost) / 10.0
+                    except Exception:
+                        pass
+            price_map = tmp_price_map if tmp_price_map else None
+            if price_map:
+                print(f"💰 Loaded prices for {len(price_map)} players from Mongo")
+            # Fallback: try crosswalk CSV if available
+            if not fbref_ids:
+                from pathlib import Path
+                xwalk_csv = Path('Data/crosswalk/fbref_fpl_crosswalk.csv')
+                if xwalk_csv.exists():
+                    import csv
+                    with open(xwalk_csv, 'r') as f:
+                        reader = csv.DictReader(f)
+                        fbref_ids = {row['fbref_player_id'] for row in reader if row.get('fbref_player_id')}
+                        # No element_type in crosswalk; leave element_type_map as-is
+            allowed_fbref_ids = fbref_ids if fbref_ids else None
+            if allowed_fbref_ids:
+                print(f"🔗 Restricting to {len(allowed_fbref_ids)} FBRef players from MongoDB/crosswalk")
+            else:
+                print("⚠️ No FBRef IDs found in Mongo or crosswalk; predicting for all rows in features file")
+        except Exception as e:
+            print(f"⚠️ Could not derive allowed FBRef IDs from Mongo: {e}")
+            allowed_fbref_ids = None
+            code_map = {}
+            id_map = {}
 
         # Generate predictions using our engine
         predictions = self.engine.generate_gameweek_predictions(
             gameweek=gameweek,
-            include_bonus=True
+            include_bonus=True,
+            allowed_fbref_ids=allowed_fbref_ids,
+            element_type_map=element_type_map
         )
 
+        # Overwrite names for FBRef predictions using Mongo display names when available
+        # Update player names using FPL display names
+        if name_map:
+            for p in predictions['players']:
+                fbref_id = str(p.get('player_id') or p.get('code'))
+                if fbref_id in name_map:
+                    p['name'] = name_map[fbref_id]
+        
+        # Override prices using real FPL prices and recompute value
+        if price_map:
+            updated_prices = 0
+            for p in predictions['players']:
+                fbref_id = str(p.get('player_id') or p.get('code'))
+                price = price_map.get(fbref_id)
+                if price:
+                    p['current_price'] = price
+                    xp = p.get('expected_points')
+                    if isinstance(xp, (int, float)) and price > 0:
+                        p['points_per_million'] = xp / price
+                    updated_prices += 1
+            print(f"💹 Updated prices for {updated_prices} players using FPL now_cost")
+        
+        # Map fbref_id -> code/id and set identifiers
+        mapped_ids = 0
+        for p in predictions['players']:
+            fid = str(p.get('player_id') or p.get('code'))
+            code = code_map.get(fid) if 'code_map' in locals() else None
+            pid = id_map.get(fid) if 'id_map' in locals() else None
+            if code is not None:
+                p['code'] = code
+            if pid is not None:
+                p['id'] = pid
+            mapped_ids += 1 if (code is not None or pid is not None) else 0
+        if mapped_ids:
+            print(f"🆔 Mapped identifiers for {mapped_ids} players from Mongo")
+        
         # Add gameweek and clean up prediction data for each player
         for player in predictions['players']:
             # Ensure 'id' field exists for MongoDB upsert (use 'code' if present)
@@ -79,9 +209,12 @@ class PredictionGenerator:
                 sys.path.insert(0, str(data_dir))
             from database.mongo.fpl_mongo_client import FPLMongoClient
             mongo_client = FPLMongoClient()
+
+            # Save predictions to MongoDB (unified predictions field)
             mongo_client.bulk_upsert_players(predictions['players'])
+            print(f"✅ Saved {len(predictions['players'])} predictions to MongoDB for GW{gameweek}")
+            
             mongo_client.disconnect()
-            print(f"✅ Saved {len(predictions['players'])} player predictions to MongoDB for GW{gameweek}")
         except Exception as e:
             print(f"❌ Failed to save predictions to MongoDB: {e}")
 
@@ -91,6 +224,7 @@ class PredictionGenerator:
             'gameweek': gameweek,
             'generated_at': datetime.now().isoformat(),
             'generator_version': '1.0.0',
+            'source': self.source,
             'total_players': len(predictions['players'])
         }
         return predictions
@@ -307,6 +441,13 @@ Examples:
         default='./',
         help='Output directory for prediction files (default: current directory)'
     )
+
+    parser.add_argument(
+        '--source',
+        choices=['fbref'],
+        default='fbref',
+        help='Data/model source to use (default: fbref)'
+    )
     
     args = parser.parse_args()
     
@@ -323,10 +464,11 @@ Examples:
         print("=" * 55)
         print(f"📅 Generating predictions for: GW{gameweeks[0]}" + 
               (f" to GW{gameweeks[-1]}" if len(gameweeks) > 1 else ""))
-        print(f"📁 Output directory: {Path(args.output_dir).resolve()}")
         
         # Initialize generator
-        generator = PredictionGenerator(args.output_dir)
+        generator = PredictionGenerator(args.output_dir, source=args.source)
+        print(f"📁 Output directory: {generator.output_dir.resolve()}")
+        print(f"🧱 Source: {args.source}")
         
         # Generate predictions
         if len(gameweeks) == 1:

@@ -123,21 +123,29 @@ class FPLMongoClient:
             upsert=True
         )
     
-    def bulk_upsert_players(self, players_data: List[Dict[str, Any]]) -> None:
-        """Bulk insert or update players using 'code' field for matching"""
+    def bulk_upsert_players(self, players_data: List[Dict[str, Any]], source: Optional[str] = None) -> None:
+        """Bulk insert or update players.
+        - When handling prediction payloads (items with 'expected_points' and without 'element_type'),
+          store them nested by gameweek under the unified 'predictions' field.
+          All predictions now use the same storage location regardless of source.
+          Examples:
+            All sources -> predictions.{gw}
+        """
         if not players_data:
             return
             
         collection = self.get_collection(self.players_collection_name)
         operations = []
+
+        # All predictions now use the unified 'predictions' field
+        field_prefix = 'predictions'
         
         for player in players_data:
             # Use 'code' field for matching as it's consistent across seasons
-            # and matches with historical data player_code field
             
             # Check if this is prediction data (has expected_points) or base player data (has element_type)
             if 'expected_points' in player and 'element_type' not in player:
-                # This is prediction data - store in nested predictions object by gameweek
+                # This is prediction data - store in nested predictions object by gameweek and source
                 gameweek = player.get('gameweek', 1)  # Default to GW1 if not specified
                 
                 # Build the prediction data for this gameweek
@@ -146,12 +154,19 @@ class FPLMongoClient:
                     if k not in ['code', 'player_id', 'name', 'gameweek']:
                         prediction_data[k] = v
                 
-                # Store prediction data nested by gameweek: predictions.{gw}.{field}
-                update_fields = {f'predictions.{gameweek}': prediction_data}
+                # Store prediction data nested by gameweek: {field_prefix}.{gw}: { ... }
+                update_fields = {f'{field_prefix}.{gameweek}': prediction_data}
+                
+                # Only update existing player docs; do not upsert from predictions
+                try:
+                    code_int = int(player['code'])
+                except Exception:
+                    # Skip if code is missing or invalid
+                    continue
                 
                 operations.append(
                     UpdateOne(
-                        {'code': int(player['code'])},
+                        {'code': code_int},
                         {'$set': update_fields},
                         upsert=False  # Don't create new players from predictions
                     )

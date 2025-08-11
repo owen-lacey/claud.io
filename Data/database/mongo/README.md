@@ -265,6 +265,29 @@ client.disconnect()
 - **Data integrity**: Built-in validation and constraints
 - **Scalability**: Easy to add new data sources and collections
 
+## 🛠️ Podman on macOS: Restart & Start Containers
+
+If you are using Podman on macOS and encounter connection or startup issues, follow these steps to safely restart your MongoDB containers **without losing data**:
+
+### 1. Restart the Podman machine
+```bash
+podman machine stop
+podman machine start
+```
+
+### 2. Start your MongoDB containers (no data loss)
+```bash
+podman start fpl-mongodb fpl-mongo-express
+```
+
+### 3. Check container status
+```bash
+podman ps -a
+```
+
+If you still have issues, a full system reboot will clear any stuck Podman/VM processes and allow you to start cleanly.
+
+---
 ## 🔧 Troubleshooting
 
 ### Connection Issues
