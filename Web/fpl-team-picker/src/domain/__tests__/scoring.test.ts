@@ -3,7 +3,7 @@
  */
 import { scorePlayer, comparePlayers, defaultScoringOptions } from '../scoring';
 import { Position } from '@/models/position';
-import type { NormalizedPlayer } from '@/lib/data-service';
+import { NormalizedPlayer } from '@/lib/data-service';
 
 function mockP(id: number, xp: number, cost: number, chance = 100): NormalizedPlayer {
   return {

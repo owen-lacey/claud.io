@@ -1,9 +1,16 @@
 /**
  * @jest-environment node
  */
-import { Position } from '@/models/position';
 
 jest.mock('@/lib/data-service', () => {
+  // Define Position enum values directly in mock to avoid scope issues
+  const mockPosition = {
+    GK: 1,
+    DEF: 2, 
+    MID: 3,
+    FWD: 4
+  };
+  
   function mk(id: number, pos: any, team: number, cost: number, xp: number) {
     return {
       id,
@@ -18,10 +25,10 @@ jest.mock('@/lib/data-service', () => {
     };
   }
   const players = [
-    mk(1, Position.GK, 1, 45, 5), mk(2, Position.GK, 2, 45, 4),
-    mk(3, Position.DEF, 3, 45, 4), mk(4, Position.DEF, 4, 45, 4), mk(5, Position.DEF, 5, 45, 3), mk(6, Position.DEF, 6, 45, 3), mk(7, Position.DEF, 7, 45, 3),
-    mk(8, Position.MID, 3, 60, 5), mk(9, Position.MID, 4, 60, 5), mk(10, Position.MID, 5, 60, 4), mk(11, Position.MID, 6, 60, 4), mk(12, Position.MID, 7, 60, 4),
-    mk(13, Position.FWD, 3, 70, 5), mk(14, Position.FWD, 4, 70, 4), mk(15, Position.FWD, 5, 70, 4),
+    mk(1, mockPosition.GK, 1, 45, 5), mk(2, mockPosition.GK, 2, 45, 4),
+    mk(3, mockPosition.DEF, 3, 45, 4), mk(4, mockPosition.DEF, 4, 45, 4), mk(5, mockPosition.DEF, 5, 45, 3), mk(6, mockPosition.DEF, 6, 45, 3), mk(7, mockPosition.DEF, 7, 45, 3),
+    mk(8, mockPosition.MID, 3, 60, 5), mk(9, mockPosition.MID, 4, 60, 5), mk(10, mockPosition.MID, 5, 60, 4), mk(11, mockPosition.MID, 6, 60, 4), mk(12, mockPosition.MID, 7, 60, 4),
+    mk(13, mockPosition.FWD, 3, 70, 5), mk(14, mockPosition.FWD, 4, 70, 4), mk(15, mockPosition.FWD, 5, 70, 4),
   ];
   return {
     dataService: {
@@ -37,6 +44,7 @@ jest.mock('@/lib/data-service', () => {
   };
 });
 
+import { Position } from '@/models/position';
 import { POST } from './route';
 
 describe('/api/tools/build-squad', () => {

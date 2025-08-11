@@ -4,7 +4,7 @@
 
 import { addToCounts, emptyCounts, FPL_RULES, isValidFinalSquad, isValidPartialSquad, respectsMaxPerClub, respectsPositionQuotas, validCaptaincy, withinBudget } from '../constraints';
 import { Position } from '@/models/position';
-import type { NormalizedPlayer } from '@/lib/data-service';
+import { NormalizedPlayer } from '@/lib/data-service';
 
 function mockPlayer(id: number, position: Position, teamId: number): NormalizedPlayer {
   return {

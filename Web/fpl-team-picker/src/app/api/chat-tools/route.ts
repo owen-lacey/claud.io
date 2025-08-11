@@ -47,7 +47,7 @@ export async function POST(req: Request) {
 
   try {
     const result = streamText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.0-flash'),
       system: 'You are an FPL assistant. Use get_my_overview when the user asks about account or leagues; use build_squad for team building. Use list_players for quick lists. After any tool call completes, always produce a short final assistant message summarizing the results.',
       messages,
       maxSteps: 3,

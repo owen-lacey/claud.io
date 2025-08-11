@@ -3,7 +3,7 @@
  */
 import { buildSquad } from '../selection';
 import { Position } from '@/models/position';
-import type { NormalizedPlayer } from '@/lib/data-service';
+import { NormalizedPlayer } from '@/lib/data-service';
 import { FPL_RULES } from '../constraints';
 
 function mockP(id: number, pos: Position, team: number, cost: number, xp: number, chance = 100): NormalizedPlayer {
