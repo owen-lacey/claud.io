@@ -47,11 +47,6 @@ describe('Header Component', () => {
     );
   };
 
-  beforeEach(() => {
-    // Reset environment variable
-    process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'false';
-  });
-
   describe('Basic Rendering', () => {
     test('renders welcome message with user first name', () => {
       renderHeader();

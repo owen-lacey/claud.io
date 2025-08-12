@@ -51,8 +51,6 @@ describe('Header Component', () => {
   // Mock window globals in a Jest-friendly way
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset environment variable
-    process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'false';
   });
 
   describe('Rendering', () => {
