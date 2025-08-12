@@ -11,7 +11,11 @@
     "test:watch": "jest --watch",
     "test:integration": "jest --testNamePattern=\"Integration Tests\"",
     "test:unit": "jest --testNamePattern=\"^(?!.*Integration Tests).*\"",
-    "api-schema": "npx swagger-typescript-api generate -p http://localhost:5079/swagger/v1/swagger.json -o ./src/helpers -n api.ts --api-class-name Api --axios"
+    "api-schema": "npx swagger-typescript-api generate -p http://localhost:5079/swagger/v1/swagger.json -o ./src/helpers -n api.ts --api-class-name Api --axios",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "e2e:install": "playwright install"
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.22",
@@ -38,12 +42,18 @@
     "tailwindcss": "^3.4.7"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@playwright/test": "^1.47.0",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "babel-plugin-module-resolver": "^5.0.2",
     "dotenv": "^17.2.1",
     "eslint": "^8",
     "eslint-config-next": "^15.1.5",

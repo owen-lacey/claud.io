@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./styles/components/players/RivalSelectionCount.scss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));

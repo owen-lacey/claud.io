@@ -1,18 +1,19 @@
 "use client";
 
 import { useCallback, useContext, useEffect, useState } from "react";
-import { FplApi } from "../helpers/fpl-api";
-import { RivalTeam } from "../models/rival-league";
-import { LoadingCard } from "./utils/Loading";
+import { FplApi } from "../../helpers/fpl-api";
+import { RivalTeam } from "../../models/rival-league";
+import { LoadingCard } from "../utils/Loading";
 import { DataContext } from "@/lib/contexts";
-import { LeagueParticipant, SelectedSquad } from "../helpers/api";
+import { LeagueParticipant, SelectedSquad } from "../../helpers/api";
 
 interface LeaguesProps {
   rivalTeams: RivalTeam[];
   setRivalTeams: (teams: RivalTeam[]) => void;
+  plProfile?: string;
 }
 
-function Leagues({ rivalTeams, setRivalTeams }: LeaguesProps) {
+function Leagues({ rivalTeams, setRivalTeams, plProfile }: LeaguesProps) {
   const allData = useContext(DataContext);
   const [selectedLeagueIdx, setSelectedLeagueIdx] = useState(-1);
 
@@ -43,7 +44,7 @@ function Leagues({ rivalTeams, setRivalTeams }: LeaguesProps) {
     // Fetch team data for each participant
     const fetchRivalTeams = async () => {
       try {
-        const api = new FplApi();
+        const api = new FplApi(plProfile || undefined);
         const teamPromises = selectedLeague.participants!.map(async (participant: LeagueParticipant) => {
           try {
             const teamResponse = await api.users.currentTeamList(participant.userId!);
@@ -64,7 +65,7 @@ function Leagues({ rivalTeams, setRivalTeams }: LeaguesProps) {
     };
 
     fetchRivalTeams();
-  }, [selectedLeagueIdx, allData?.leagues.output, allData?.myDetails.output, setRivalTeams]);
+  }, [selectedLeagueIdx, allData?.leagues.output, allData?.myDetails.output, setRivalTeams, plProfile]);
 
   if (!allData?.myDetails.output || !allData?.leagues.output) {
     return <LoadingCard />;

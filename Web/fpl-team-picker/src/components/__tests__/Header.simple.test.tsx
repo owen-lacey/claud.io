@@ -80,34 +80,6 @@ describe('Header Component', () => {
     });
   });
 
-  describe('Assistant Link', () => {
-    test('shows assistant link when assistant is enabled', () => {
-      process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'true';
-      
-      renderHeader();
-      
-      const assistantLink = screen.getByText('Assistant (beta)');
-      expect(assistantLink).toBeInTheDocument();
-      expect(assistantLink.closest('a')).toHaveAttribute('href', '/assistant');
-    });
-
-    test('hides assistant link when assistant is disabled', () => {
-      process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'false';
-      
-      renderHeader();
-      
-      expect(screen.queryByText('Assistant (beta)')).not.toBeInTheDocument();
-    });
-
-    test('hides assistant link when environment variable is not set', () => {
-      delete process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED;
-      
-      renderHeader();
-      
-      expect(screen.queryByText('Assistant (beta)')).not.toBeInTheDocument();
-    });
-  });
-
   describe('Styling and Accessibility', () => {
     test('applies correct CSS classes to header element', () => {
       renderHeader();

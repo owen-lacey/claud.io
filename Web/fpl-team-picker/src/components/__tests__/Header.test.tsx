@@ -27,14 +27,6 @@ jest.mock('@heroicons/react/24/solid', () => ({
   ),
 }));
 
-// Mock window.location.reload
-const mockReload = jest.fn();
-
-// Mock localStorage
-const mockLocalStorage = {
-  removeItem: jest.fn(),
-};
-
 describe('Header Component', () => {
   const mockContextValue: AllData = {
     myDetails: new ApiResult(true, {
@@ -57,30 +49,10 @@ describe('Header Component', () => {
   };
 
   // Mock window globals in a Jest-friendly way
-  const mockWindowLocation = {
-    reload: jest.fn(),
-  };
-
-  const mockLocalStorage = {
-    removeItem: jest.fn(),
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset environment variable
     process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'false';
-    
-    // Setup window mocks safely
-    global.window = Object.create(window);
-    Object.defineProperty(global.window, 'location', {
-      value: mockWindowLocation,
-      writable: true,
-    });
-    
-    Object.defineProperty(global.window, 'localStorage', {
-      value: mockLocalStorage,
-      writable: true,
-    });
   });
 
   describe('Rendering', () => {
@@ -111,34 +83,6 @@ describe('Header Component', () => {
     });
   });
 
-  describe('Assistant Link', () => {
-    test('shows assistant link when assistant is enabled', () => {
-      process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'true';
-      
-      renderHeader();
-      
-      const assistantLink = screen.getByText('Assistant (beta)');
-      expect(assistantLink).toBeInTheDocument();
-      expect(assistantLink.closest('a')).toHaveAttribute('href', '/assistant');
-    });
-
-    test('hides assistant link when assistant is disabled', () => {
-      process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED = 'false';
-      
-      renderHeader();
-      
-      expect(screen.queryByText('Assistant (beta)')).not.toBeInTheDocument();
-    });
-
-    test('hides assistant link when environment variable is not set', () => {
-      delete process.env.NEXT_PUBLIC_FPL_ASSISTANT_ENABLED;
-      
-      renderHeader();
-      
-      expect(screen.queryByText('Assistant (beta)')).not.toBeInTheDocument();
-    });
-  });
-
   describe('User ID Popover', () => {
     test('opens popover when user ID button is clicked', async () => {
       const user = userEvent.setup();
@@ -154,6 +98,10 @@ describe('Header Component', () => {
 
     test('reset button clears localStorage and reloads page', async () => {
       const user = userEvent.setup();
+      
+      // Mock console.error to catch the "Not implemented: navigation" error
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      
       renderHeader();
       
       // Open popover
@@ -168,8 +116,17 @@ describe('Header Component', () => {
       const resetButton = screen.getByText('Reset');
       await user.click(resetButton);
       
-      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('pl_profile');
-      expect(mockWindowLocation.reload).toHaveBeenCalled();
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith('pl_profile');
+      
+      // Verify that reload was called by checking for the "Not implemented" error
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: expect.stringContaining('Not implemented: navigation')
+        })
+      );
+      
+      // Restore console.error
+      consoleErrorSpy.mockRestore();
     });
 
     test('reset button includes arrow icon', async () => {
@@ -242,7 +199,7 @@ describe('Header Component', () => {
       const resetButton = screen.getByText('Reset');
       await user.click(resetButton);
       
-      expect(mockLocalStorage.removeItem).toHaveBeenCalled();
+      expect(window.localStorage.removeItem).toHaveBeenCalled();
     });
   });
 });

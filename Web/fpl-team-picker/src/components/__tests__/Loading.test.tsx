@@ -25,7 +25,8 @@ describe('LoadingCard Component', () => {
   test('applies correct CSS classes', () => {
     render(<LoadingCard />);
     
-    const cardElement = screen.getByRole('status').closest('div');
+    const statusElement = screen.getByRole('status');
+    const cardElement = statusElement.parentElement;
     expect(cardElement).toHaveClass('bg-card', 'border', 'border-border');
   });
 });
