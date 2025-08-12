@@ -66,7 +66,10 @@ class PredictionGenerator:
         self.source = 'fbref'  # Always FBRef now
         if FBRefPredictionEngine is None:
             raise ImportError("FBRefPredictionEngine could not be loaded from final_assembly/fbref_assembly_pipeline.py")
-        self.engine = FBRefPredictionEngine(models_dir="../models_fbref")
+        
+        # Use absolute path for models directory
+        models_dir = Path(__file__).resolve().parent.parent / "models_fbref"
+        self.engine = FBRefPredictionEngine(models_dir=str(models_dir))
     
     def generate_gameweek_predictions(self, gameweek: int) -> Dict[str, Any]:
         """Generate predictions for a specific gameweek and save to MongoDB"""

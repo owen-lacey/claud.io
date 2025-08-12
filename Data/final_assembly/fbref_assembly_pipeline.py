@@ -302,23 +302,9 @@ class FBRefPredictionEngine:
             saves_pred.loc[is_gk] = self.models['saves'].predict(saves_X.loc[is_gk])
         preds['saves'] = saves_pred.values
 
-        # Goals conceded (team-level)
-        team_df = self._load_team_features()
-        gc_feats = self.FEATURES['goals_conceded']
-        # Use latest date in team_df
-        if 'match_date' in team_df.columns:
-            latest_team_date = team_df['match_date'].max()
-            team_latest = team_df[team_df['match_date'] == latest_team_date].copy()
-        else:
-            team_latest = team_df.copy()
-        team_X = team_latest.reindex(columns=gc_feats, fill_value=0)
-        team_pred = self.models['goals_conceded'].predict(team_X)
-        # Map by team id
-        team_id_col = 'fbref_team_id' if 'fbref_team_id' in team_latest.columns else None
-        team_map = {}
-        if team_id_col:
-            team_map = dict(zip(team_latest[team_id_col], team_pred))
-        gc_player = df['fbref_team_id'].map(team_map) if 'fbref_team_id' in df.columns else pd.Series(0.0, index=df.index)
+        # Goals conceded (team-level) - USE CURRENT FPL TEAM ASSIGNMENTS
+        # Load FPL team assignments from MongoDB for current season
+        gc_player = self._get_goals_conceded_with_fpl_teams(df, gameweek)
 
         # --- Fixture-aware override for goals_conceded ---
         if self.gc_use_fixtures and 'fbref_team_id' in df.columns:
@@ -431,3 +417,117 @@ class FBRefPredictionEngine:
             summary = {'total_players': 0, 'average_expected_points': 0.0, 'max_expected_points': 0.0}
 
         return { 'players': players, 'summary': summary, 'gameweek': gameweek }
+
+    def _get_goals_conceded_with_fpl_teams(self, df, gameweek: int):
+        """
+        Calculate goals conceded predictions using CURRENT FPL team assignments
+        instead of historical FBRef team assignments to fix the new signing bug.
+        """
+        import pandas as pd
+        from typing import Optional
+        
+        # Load team-level defensive predictions
+        team_df = self._load_team_features()
+        gc_feats = self.FEATURES['goals_conceded']
+        
+        # Use latest date in team_df
+        if 'match_date' in team_df.columns:
+            latest_team_date = team_df['match_date'].max()
+            team_latest = team_df[team_df['match_date'] == latest_team_date].copy()
+        else:
+            team_latest = team_df.copy()
+            
+        team_X = team_latest.reindex(columns=gc_feats, fill_value=0)
+        team_pred = self.models['goals_conceded'].predict(team_X)
+        
+        # Create mapping from FBRef team ID to predicted goals conceded
+        team_id_col = 'fbref_team_id' if 'fbref_team_id' in team_latest.columns else None
+        fbref_team_to_gc = {}
+        if team_id_col:
+            fbref_team_to_gc = dict(zip(team_latest[team_id_col], team_pred))
+        
+        # Now load FPL player data to get current team assignments
+        try:
+            # Import MongoDB loader
+            import sys as _sys
+            from pathlib import Path as _Path
+            data_dir = _Path(__file__).resolve().parent.parent
+            if str(data_dir) not in _sys.path:
+                _sys.path.insert(0, str(data_dir))
+            from database.mongo.mongo_data_loader import load_players_data, load_teams_data
+            
+            # Load current FPL data
+            fpl_players = load_players_data()
+            fpl_teams = load_teams_data()
+            
+            # Create mappings
+            # FBRef player ID -> current FPL team ID
+            fbref_to_fpl_team = {}
+            for player in fpl_players:
+                fbref_id = player.get('fbref_id')
+                fpl_team_id = player.get('team')
+                if fbref_id and fpl_team_id:
+                    fbref_to_fpl_team[str(fbref_id)] = fpl_team_id
+            
+            # FPL team ID -> FBRef team ID (for mapping to Premier League teams)
+            fpl_team_to_fbref_team = {
+                1: 'Arsenal',
+                2: 'Aston Villa', 
+                3: 'Burnley',
+                4: 'Bournemouth',
+                5: 'Brentford',
+                6: 'Brighton',
+                7: 'Chelsea',
+                8: 'Crystal Palace',
+                9: 'Everton',
+                10: 'Fulham',
+                11: 'Leeds',
+                12: 'Liverpool',
+                13: 'Manchester City',
+                14: 'Manchester Utd',
+                15: 'Newcastle',
+                16: "Nott'm Forest",
+                17: 'Sunderland',
+                18: 'Tottenham',
+                19: 'West Ham',
+                20: 'Wolves'
+            }
+            
+            # Apply the mapping to get goals conceded for each player
+            gc_values = []
+            for _, row in df.iterrows():
+                fbref_player_id = str(row.get('fbref_player_id', ''))
+                
+                # Get current FPL team for this player
+                fpl_team_id = fbref_to_fpl_team.get(fbref_player_id)
+                
+                if fpl_team_id:
+                    # Get the FBRef team equivalent for this FPL team
+                    fbref_team_name = fpl_team_to_fbref_team.get(fpl_team_id)
+                    
+                    if fbref_team_name and fbref_team_name in fbref_team_to_gc:
+                        # Use the Premier League team's defensive prediction
+                        gc_values.append(fbref_team_to_gc[fbref_team_name])
+                    else:
+                        # Fallback to average Premier League defensive prediction
+                        avg_gc = sum(fbref_team_to_gc.values()) / len(fbref_team_to_gc) if fbref_team_to_gc else 1.2
+                        gc_values.append(avg_gc)
+                else:
+                    # No FPL team mapping found - fallback to historical FBRef team
+                    historical_team = row.get('fbref_team_id', '')
+                    if historical_team in fbref_team_to_gc:
+                        gc_values.append(fbref_team_to_gc[historical_team])
+                    else:
+                        # Ultimate fallback - league average
+                        avg_gc = sum(fbref_team_to_gc.values()) / len(fbref_team_to_gc) if fbref_team_to_gc else 1.2
+                        gc_values.append(avg_gc)
+            
+            return pd.Series(gc_values, index=df.index)
+            
+        except Exception as e:
+            print(f"⚠️ Warning: Could not load FPL team mappings for goals conceded: {e}")
+            print("Falling back to historical FBRef team assignments...")
+            
+            # Fallback to original logic if MongoDB unavailable
+            gc_player = df['fbref_team_id'].map(fbref_team_to_gc) if 'fbref_team_id' in df.columns else pd.Series(0.0, index=df.index)
+            return gc_player.fillna(0.0)
