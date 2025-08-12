@@ -92,11 +92,17 @@ SQLite DB: /Users/owen/src/Personal/FBRef_DB/master.db
 > **ACCEPTANCE RESULTS**: ✅ PASSED - Unified FBRef system operational with 450/450 players having predictions. System ready for production.
 
 ## Phase 8 — Rollout and maintenance
-- [ ] Keep both pipelines for one season as fallback
-- [ ] Schedule weekly refresh and incremental updates from SQLite
-- [ ] Establish retraining cadence (rolling refit)
-- [ ] Document data lineage and schema contracts (`Data/fbref_ingest/README.md`, `Data/feature_engineering/README.md`)
-- [ ] Consider lightweight experiment tracking (MLflow/DVC) later
+**Status: OPTIONAL for local tool usage**
+- [x] ~~Keep both pipelines for one season as fallback~~ (Not needed - unified system working)
+- [ ] ~~Schedule weekly refresh and incremental updates from SQLite~~ (Manual refresh as needed)
+- [ ] ~~Establish retraining cadence (rolling refit)~~ (Retrain when performance degrades)
+- [x] Document data lineage and schema contracts (`Data/fbref_ingest/README.md`, `Data/feature_engineering/README.md`)
+- [ ] ~~Consider lightweight experiment tracking (MLflow/DVC) later~~ (Overkill for local use)
+- [ ] ~~Create automated monitoring and alerting~~ (Not needed for local tool)
+- [ ] ~~Set up production deployment scripts~~ (Local execution sufficient)
+- [ ] ~~Establish backup and recovery procedures~~ (Git version control is sufficient)
+
+> **MIGRATION COMPLETE** ✅ - FBRef system is operational for local FPL team selection
 
 ---
 
