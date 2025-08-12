@@ -13,7 +13,10 @@ from typing import Optional, Set
 from typing import Dict
 
 class FBRefPredictionEngine:
-    def __init__(self, models_dir: str = "Data/models_fbref"):
+    def __init__(self, models_dir: str = None):
+        if models_dir is None:
+            # Use absolute path relative to this file
+            models_dir = Path(__file__).resolve().parent.parent / "models_fbref"
         self.models_dir = Path(models_dir)
         self.target_names = [
             "minutes",
@@ -87,10 +90,12 @@ class FBRefPredictionEngine:
             pkl_path = joblib_path.with_suffix('.pkl')
             if joblib_path.exists():
                 models[target] = joblib.load(joblib_path)
+                print(f"✅ Loaded {target} model: {model_filenames[target]}")
             elif pkl_path.exists():
                 models[target] = joblib.load(pkl_path)
+                print(f"✅ Loaded {target} model: {pkl_path.name}")
             else:
-                raise FileNotFoundError(f"Model file not found: {joblib_path} or {pkl_path}")
+                raise FileNotFoundError(f"❌ Model file not found: {joblib_path} or {pkl_path}")
         return models
 
     def _load_features(self, gameweek: int):
@@ -545,12 +550,53 @@ class FBRefPredictionEngine:
             code_val = row.get(pid_col, None)
             player_team_fbref = row.get(team_col, None)
 
-            # Get fixture information for this player's team
-            fixture_info = fixture_difficulty_map.get(player_team_fbref, {})
+            # Get fixture information using CURRENT FPL team (not historical FBRef team)
+            # This fixes the issue where transferred players like Gyökeres show "Unknown" opponents
+            current_fpl_team_id = None
+            try:
+                # Get current FPL team from MongoDB player data
+                import sys as _sys_fix
+                from pathlib import Path as _Path_fix
+                data_dir_fix = _Path_fix(__file__).resolve().parent.parent.parent / 'Data'
+                if str(data_dir_fix) not in _sys_fix.path:
+                    _sys_fix.path.insert(0, str(data_dir_fix))
+                from database.mongo.mongo_data_loader import load_players_data as load_players_fix
+                
+                # Use cached player data if available, otherwise load fresh
+                if not hasattr(self, '_cached_fpl_players'):
+                    self._cached_fpl_players = load_players_fix()
+                
+                # Find current FPL team for this player
+                player_fbref_id = str(code_val)
+                for fpl_player in self._cached_fpl_players:
+                    if str(fpl_player.get('fbref_id', '')) == player_fbref_id:
+                        current_fpl_team_id = fpl_player.get('team')
+                        break
+            except Exception:
+                pass
+            
+            # Look up fixture info using current FPL team, not historical FBRef team
+            if current_fpl_team_id:
+                # Convert FPL team ID to FBRef team ID for fixture lookup
+                fpl_to_fbref_teams = {
+                    1: 'Arsenal', 2: 'Aston Villa', 3: 'Burnley', 4: 'Bournemouth',
+                    5: 'Brentford', 6: 'Brighton', 7: 'Chelsea', 8: 'Crystal Palace',
+                    9: 'Everton', 10: 'Fulham', 11: 'Leeds', 12: 'Liverpool',
+                    13: 'Manchester City', 14: 'Manchester Utd', 15: 'Newcastle',
+                    16: "Nott'm Forest", 17: 'Sunderland', 18: 'Tottenham',
+                    19: 'West Ham', 20: 'Wolves'
+                }
+                current_fbref_team = fpl_to_fbref_teams.get(current_fpl_team_id)
+                if current_fbref_team:
+                    fixture_info = fixture_difficulty_map.get(current_fbref_team, {})
+                else:
+                    fixture_info = {}
+            else:
+                # Fallback to historical FBRef team
+                fixture_info = fixture_difficulty_map.get(player_team_fbref, {})
+            
             opponent_name = fixture_info.get('opponent_name', 'Unknown')
-            opponent_short = fixture_info.get('opponent_short', 'UNK')
             venue = fixture_info.get('venue', '?')
-            venue_full = fixture_info.get('venue_full', 'Unknown')
             difficulty = fixture_info.get('difficulty', 3)
             kickoff_time = fixture_info.get('kickoff_time', '')
 
@@ -558,9 +604,6 @@ class FBRefPredictionEngine:
                 'player_id': code_val,
                 'code': code_val,  # Use FBRef id as a stand-in code for compatibility
                 'name': row.get(name_col, str(row.get(pid_col, 'unknown'))),
-                'team': row.get(team_col, None),
-                'team_name': team_name_map.get(player_team_fbref, row.get(team_col, 'Unknown')),
-                'position': norm_pos,
                 'expected_minutes': exp_minutes,
                 'expected_goals': exp_xg,
                 'expected_assists': exp_xa,
@@ -574,12 +617,9 @@ class FBRefPredictionEngine:
                 'floor': round(floor, 2),
                 # Fixture information
                 'opponent': opponent_name,
-                'opponent_short': opponent_short,
                 'venue': venue,
-                'venue_full': venue_full,
                 'fixture_difficulty': difficulty,
-                'kickoff_time': kickoff_time,
-                'fixture_display': f"{venue_full} vs {opponent_name}"
+                'kickoff_time': kickoff_time
             })
 
         # Sort players by expected points desc for downstream CSV/top-N selection
