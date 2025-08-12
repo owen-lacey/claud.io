@@ -430,6 +430,64 @@ class FBRefPredictionEngine:
 
         preds['goals_conceded'] = gc_player.fillna(0).values
 
+        # Load fixture information for this gameweek (for display in predictions)
+        fixture_map = {}
+        team_name_map = {}
+        fixture_difficulty_map = {}
+        try:
+            fixture_map = self._build_fixture_map_fbref(gameweek)
+            # Also load team name mapping for display
+            import sys as _sys
+            from pathlib import Path as _Path
+            data_dir = _Path(__file__).resolve().parent.parent.parent / 'Data'
+            if str(data_dir) not in _sys.path:
+                _sys.path.insert(0, str(data_dir))
+            from database.mongo.mongo_data_loader import load_teams_data, get_fixtures_by_gameweek
+            
+            teams = load_teams_data()
+            fixtures = get_fixtures_by_gameweek(gameweek)
+            
+            # Build team ID mappings
+            fpl_id_to_name = {t.get('id'): t.get('short_name', t.get('name', '')) for t in teams if t.get('id')}
+            fpl_id_to_fbref = {t.get('id'): t.get('fbref_id') for t in teams if t.get('id') and t.get('fbref_id')}
+            fbref_to_fpl_id = {v: k for k, v in fpl_id_to_fbref.items()}
+            
+            # Build team name map (fbref_id -> display name)
+            for fbref_id, fpl_id in fbref_to_fpl_id.items():
+                if fpl_id in fpl_id_to_name:
+                    team_name_map[fbref_id] = fpl_id_to_name[fpl_id]
+            
+            # Build fixture difficulty map (fbref_id -> {'opponent_name': str, 'venue': str, 'difficulty': int})
+            for fx in fixtures or []:
+                team_h_id, team_a_id = fx.get('team_h'), fx.get('team_a')
+                h_difficulty, a_difficulty = fx.get('team_h_difficulty', 3), fx.get('team_a_difficulty', 3)
+                
+                if team_h_id in fpl_id_to_fbref and team_a_id in fpl_id_to_fbref:
+                    h_fbref = fpl_id_to_fbref[team_h_id]
+                    a_fbref = fpl_id_to_fbref[team_a_id]
+                    
+                    # Home team fixture info
+                    fixture_difficulty_map[h_fbref] = {
+                        'opponent_name': fpl_id_to_name.get(team_a_id, 'Unknown'),
+                        'opponent_short': fpl_id_to_name.get(team_a_id, 'UNK')[:3].upper(),
+                        'venue': 'H',
+                        'venue_full': 'Home', 
+                        'difficulty': h_difficulty,
+                        'kickoff_time': fx.get('kickoff_time', '')
+                    }
+                    
+                    # Away team fixture info  
+                    fixture_difficulty_map[a_fbref] = {
+                        'opponent_name': fpl_id_to_name.get(team_h_id, 'Unknown'),
+                        'opponent_short': fpl_id_to_name.get(team_h_id, 'UNK')[:3].upper(),
+                        'venue': 'A',
+                        'venue_full': 'Away',
+                        'difficulty': a_difficulty,
+                        'kickoff_time': fx.get('kickoff_time', '')
+                    }
+        except Exception as e:
+            print(f"⚠️ Could not load fixture information: {e}")
+
         # Build players output
         DEFAULT_PRICE_BY_POS = {'GK': 4.5, 'DEF': 4.5, 'MID': 6.5, 'FWD': 7.0}
         GOAL_POINTS = {'GK': 6.0, 'DEF': 6.0, 'MID': 5.0, 'FWD': 4.0}
@@ -485,12 +543,23 @@ class FBRefPredictionEngine:
             ceiling = expected_points + 1.645 * math.sqrt(variance)
             floor = max(0.0, expected_points - 1.645 * math.sqrt(variance))
             code_val = row.get(pid_col, None)
+            player_team_fbref = row.get(team_col, None)
+
+            # Get fixture information for this player's team
+            fixture_info = fixture_difficulty_map.get(player_team_fbref, {})
+            opponent_name = fixture_info.get('opponent_name', 'Unknown')
+            opponent_short = fixture_info.get('opponent_short', 'UNK')
+            venue = fixture_info.get('venue', '?')
+            venue_full = fixture_info.get('venue_full', 'Unknown')
+            difficulty = fixture_info.get('difficulty', 3)
+            kickoff_time = fixture_info.get('kickoff_time', '')
 
             players.append({
                 'player_id': code_val,
                 'code': code_val,  # Use FBRef id as a stand-in code for compatibility
                 'name': row.get(name_col, str(row.get(pid_col, 'unknown'))),
                 'team': row.get(team_col, None),
+                'team_name': team_name_map.get(player_team_fbref, row.get(team_col, 'Unknown')),
                 'position': norm_pos,
                 'expected_minutes': exp_minutes,
                 'expected_goals': exp_xg,
@@ -503,6 +572,14 @@ class FBRefPredictionEngine:
                 'points_per_million': expected_points / price if price else 0.0,
                 'ceiling': round(ceiling, 2),
                 'floor': round(floor, 2),
+                # Fixture information
+                'opponent': opponent_name,
+                'opponent_short': opponent_short,
+                'venue': venue,
+                'venue_full': venue_full,
+                'fixture_difficulty': difficulty,
+                'kickoff_time': kickoff_time,
+                'fixture_display': f"{venue_full} vs {opponent_name}"
             })
 
         # Sort players by expected points desc for downstream CSV/top-N selection
