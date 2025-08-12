@@ -23,3 +23,4 @@
 
 ### DB
 - [x] include more team information in teams.json, including difficulty score?
+- [ ] Save strength info to teams so we can show it in the UI

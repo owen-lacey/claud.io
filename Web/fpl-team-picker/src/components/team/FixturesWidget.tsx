@@ -7,9 +7,9 @@ import { Fixture, Team } from '@/helpers/api';
 const getDifficultyColor = (difficulty: number) => {
   switch (difficulty) {
     case 1: return "bg-green-500";
-    case 2: return "bg-green-400";
-    case 3: return "bg-yellow-400";
-    case 4: return "bg-orange-400";
+    case 2: return "bg-green-600 text-white";
+    case 3: return "bg-white text-black";
+    case 4: return "bg-red-300 text-black";
     case 5: return "bg-red-500";
     default: return "bg-gray-400";
   }
@@ -18,9 +18,9 @@ const getDifficultyColor = (difficulty: number) => {
 const getDifficultyTextColor = (difficulty: number) => {
   switch (difficulty) {
     case 1: return "text-green-500";
-    case 2: return "text-green-400";
-    case 3: return "text-yellow-400";
-    case 4: return "text-orange-400";
+    case 2: return "text-green-300";
+    case 3: return "text-white";
+    case 4: return "text-orange-300";
     case 5: return "text-red-500";
     default: return "text-gray-400";
   }
@@ -71,13 +71,22 @@ export default function FixturesWidget() {
           };
         });
 
+      // Calculate average difficulty for sorting
+      const avgDifficulty = teamFixtureList.length > 0 
+        ? teamFixtureList.reduce((sum, f) => sum + f.difficulty, 0) / teamFixtureList.length
+        : 0;
+
       return {
         team,
-        fixtures: teamFixtureList
+        fixtures: teamFixtureList,
+        avgDifficulty
       };
     }).filter(Boolean);
 
-    return teamFixtures;
+    // Sort by average difficulty (easiest first)
+    const sortedTeamFixtures = teamFixtures.sort((a, b) => a!.avgDifficulty - b!.avgDifficulty);
+
+    return sortedTeamFixtures;
   }, [data]);
 
   if (!processedData) {
@@ -90,45 +99,41 @@ export default function FixturesWidget() {
   }
 
   return (
-    <div className="border border-border/50 rounded-xl p-4 bg-card">
+    <div className="border border-border/50 rounded-xl p-4 bg-card h-[80vh] flex flex-col">
       <h2 className="text-lg font-semibold text-foreground mb-4">Next 6 Fixtures</h2>
       
-      <div className="space-y-3 max-h-[70vh] overflow-y-auto">
+      <div className="space-y-2 flex-1 overflow-y-auto">
         {processedData.slice(0, 20).map((teamData) => {
           if (!teamData) return null;
           
           return (
-            <div key={teamData.team.id} className="border border-border/30 rounded-lg p-3 bg-background/50">
+            <div key={teamData.team.id} className="border border-border/30 rounded-lg p-2 bg-background/50">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-foreground">{teamData.team.name}</h3>
-                <span className="text-xs text-muted-foreground">({teamData.team.shortName})</span>
+                <h3 className="font-medium text-foreground text-sm">{teamData.team.name}</h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">({teamData.team.shortName})</span>
+                  <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground font-medium">
+                    Avg: {teamData.avgDifficulty.toFixed(1)}
+                  </span>
+                </div>
               </div>
               
               <div className="grid grid-cols-6 gap-1">
                 {teamData.fixtures.map((fixture, index) => (
                   <div key={index} className="text-center">
                     <div 
-                      className={`text-xs py-1 px-1 rounded text-white font-medium ${getDifficultyColor(fixture.difficulty)}`}
-                      title={`GW${fixture.gameweek}: ${fixture.isHome ? 'vs' : '@'} ${fixture.opponent} (Difficulty: ${fixture.difficulty}/5)`}
+                      className={`text-xs py-2 px-1 rounded font-medium ${getDifficultyColor(fixture.difficulty)}`}
+                      title={`${fixture.isHome ? 'Home vs' : 'Away @'} ${fixture.opponent} (Difficulty: ${fixture.difficulty}/5)`}
                     >
-                      {fixture.isHome ? 'vs' : '@'}
-                    </div>
-                    <div className="text-xs mt-1 font-mono text-foreground">
-                      {fixture.opponent}
-                    </div>
-                    <div className={`text-xs ${getDifficultyTextColor(fixture.difficulty)} font-semibold`}>
-                      GW{fixture.gameweek}
+                      <div>{fixture.opponent} {fixture.isHome ? '(H)' : '(A)'}</div>
                     </div>
                   </div>
                 ))}
                 {/* Fill empty slots if less than 6 fixtures */}
                 {Array.from({ length: 6 - teamData.fixtures.length }).map((_, index) => (
                   <div key={`empty-${index}`} className="text-center">
-                    <div className="text-xs py-1 px-1 rounded bg-gray-600 text-gray-400">
-                      -
-                    </div>
-                    <div className="text-xs mt-1 font-mono text-muted-foreground">
-                      TBD
+                    <div className="text-xs py-2 px-1 rounded bg-gray-600 text-gray-400 font-medium">
+                      <div>TBD</div>
                     </div>
                   </div>
                 ))}
@@ -143,14 +148,18 @@ export default function FixturesWidget() {
         <div className="flex gap-2 text-xs">
           <span className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            Easy (1-2)
+            Easy (1)
           </span>
           <span className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-yellow-400 rounded"></div>
+            <div className="w-3 h-3 bg-green-600 rounded"></div>
+            Good (2)
+          </span>
+          <span className="flex items-center gap-1">
+            <div className="w-3 h-3 bg-white border border-gray-300 rounded"></div>
             Medium (3)
           </span>
           <span className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-orange-400 rounded"></div>
+            <div className="w-3 h-3 bg-red-300 rounded"></div>
             Hard (4)
           </span>
           <span className="flex items-center gap-1">
