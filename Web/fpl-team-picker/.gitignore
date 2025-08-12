@@ -25,3 +25,8 @@ dist-ssr
 .next/*
 
 coverage/*
+
+# Data directory with large model files
+Data/
+
+**/*.joblib
