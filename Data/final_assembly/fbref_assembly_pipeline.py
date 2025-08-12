@@ -94,16 +94,113 @@ class FBRefPredictionEngine:
         return models
 
     def _load_features(self, gameweek: int):
-        # Always resolve from project root for robustness
+        """
+        Load features for prediction. Instead of using single-match data,
+        calculate proper rolling averages from recent matches for each player.
+        """
+        # Try to load pre-computed features first (for compatibility)
         base_dir = Path(__file__).resolve().parent.parent.parent / "Data" / "fbref_ingest" / "canonical"
         parquet_path = base_dir / f"features_gw{gameweek}.parquet"
         csv_path = base_dir / f"features_gw{gameweek}.csv"
-        if parquet_path.exists():
-            return pd.read_parquet(parquet_path)
-        elif csv_path.exists():
-            return pd.read_csv(csv_path)
+        
+        # Check if we have proper aggregated features file
+        if parquet_path.exists() or csv_path.exists():
+            # Load the existing file
+            if parquet_path.exists():
+                df = pd.read_parquet(parquet_path)
+            else:
+                df = pd.read_csv(csv_path)
+            
+            # Check if this has multiple matches per player (proper training-like data)
+            player_counts = df['fbref_player_id'].value_counts()
+            if player_counts.max() > 1:
+                # This looks like proper match-by-match data, use as-is
+                return df
+            else:
+                # This is single-match data, we need to generate proper features
+                print("⚠️ Single-match features detected, generating proper rolling averages...")
+                return self._generate_prediction_features_from_training_data()
         else:
-            raise FileNotFoundError(f"Features file not found for GW{gameweek}: {parquet_path} or {csv_path}")
+            # No features file found, generate from training data
+            print(f"📊 No features file found for GW{gameweek}, generating from training data...")
+            return self._generate_prediction_features_from_training_data()
+
+    def _generate_prediction_features_from_training_data(self):
+        """
+        Generate proper prediction features by calculating rolling averages 
+        from the most recent matches in the training data for each player.
+        """
+        # Load the full training data
+        training_data_path = Path(__file__).resolve().parent.parent / "fbref_ingest" / "canonical" / "player_game_stats_enhanced_full.parquet"
+        if not training_data_path.exists():
+            # Fallback to other training data files
+            alt_paths = [
+                "player_game_stats.parquet",
+                "player_game_stats.csv"
+            ]
+            base_dir = training_data_path.parent
+            for alt_file in alt_paths:
+                alt_path = base_dir / alt_file
+                if alt_path.exists():
+                    training_data_path = alt_path
+                    break
+            else:
+                raise FileNotFoundError("No training data found for feature generation")
+        
+        print(f"🔄 Loading training data from: {training_data_path}")
+        
+        if training_data_path.suffix == '.parquet':
+            full_data = pd.read_parquet(training_data_path)
+        else:
+            full_data = pd.read_csv(training_data_path)
+        
+        print(f"📈 Loaded {len(full_data)} training samples")
+        
+        # Sort by player and date to get chronological order
+        full_data = full_data.sort_values(['fbref_player_id', 'match_date']).copy()
+        
+        # For each player, calculate recent form (last 5-10 matches rolling averages)
+        print("🧮 Calculating rolling averages for prediction...")
+        
+        prediction_features = []
+        
+        for player_id, player_data in full_data.groupby('fbref_player_id'):
+            # Take the most recent data for this player
+            recent_matches = player_data.tail(10)  # Last 10 matches for rolling calculation
+            
+            if len(recent_matches) == 0:
+                continue
+                
+            # Use the most recent match as the base
+            latest_match = recent_matches.iloc[-1].copy()
+            
+            # Calculate rolling averages for key features (last 5 matches)
+            window_size = min(5, len(recent_matches))
+            if window_size > 1:
+                recent_window = recent_matches.tail(window_size)
+                
+                # Calculate rolling averages for prediction features
+                latest_match['assists'] = recent_window['assists'].mean()
+                latest_match['key_passes'] = recent_window['key_passes'].mean()
+                latest_match['key_passes_per90'] = recent_window['key_passes_per90'].mean()
+                latest_match['goals'] = recent_window['goals'].mean()
+                latest_match['shots'] = recent_window['shots'].mean()
+                latest_match['shots_per90'] = recent_window['shots_per90'].mean()
+                latest_match['xg'] = recent_window['xg'].mean()
+                latest_match['xa'] = recent_window['xa'].mean()
+                latest_match['minutes'] = recent_window['minutes'].mean()
+                
+                # Update per-90 stats to match the averages
+                if latest_match['minutes'] > 0:
+                    latest_match['xg_per90'] = latest_match['xg'] * 90 / latest_match['minutes']
+                    latest_match['xa_per90'] = latest_match['xa'] * 90 / latest_match['minutes']
+            
+            prediction_features.append(latest_match)
+        
+        result_df = pd.DataFrame(prediction_features)
+        print(f"✅ Generated prediction features for {len(result_df)} players")
+        
+        return result_df
 
     def _load_team_features(self):
         base_dir = Path(__file__).resolve().parent.parent.parent / "Data" / "fbref_ingest" / "canonical"

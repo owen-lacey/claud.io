@@ -368,3 +368,7 @@ coverage.xml
 /Source/tools/scripts/config.cmd
 
 *storybook.log
+
+# Large model files
+*.joblib
+Data/models_fbref/
