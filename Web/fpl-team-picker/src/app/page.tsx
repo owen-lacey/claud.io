@@ -7,7 +7,6 @@ import { Thread } from "@/components/assistant-ui/thread";
 import SquadPanel from "@/components/team/SquadPanel";
 import TransferSuggester from "@/components/team/TransferSuggester";
 import ExplainPicks from "@/components/team/ExplainPicks";
-import SavedSquadsPanel from "@/components/team/SavedSquadsPanel";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toastManager } from "@/components/ui/toast";
 import { persistenceService } from "@/lib/persistence";
@@ -243,16 +242,6 @@ export default function HomePage() {
     }
   };
 
-  const onLoadSquad = (squad: any) => {
-    const wrapped = wrapSquadIfNeeded(squad);
-    setToolSquad(wrapped);
-    toastManager.success("Squad loaded successfully!");
-  };
-
-  const onSaveCurrentSquad = () => {
-    toastManager.success("Squad saved successfully!");
-  };
-
   // Render logic
   if (!plProfile) {
     return (
@@ -276,40 +265,32 @@ export default function HomePage() {
           <SmallScreen />
         </div>
         <div className="hidden md:block">
-          <div className="p-6 space-y-4">
+          <div className="p-8 space-y-6 min-h-screen bg-background">
             <ToastContainer />
             
             {/* Header with user info */}
-            <div className="flex items-center justify-between">
-              <div>
-                <Header />
-              </div>
-            </div>
+            <Header />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="border rounded-md p-3 h-[70vh] lg:col-span-2">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="border border-border/50 rounded-xl p-4 h-[70vh] lg:col-span-2 bg-card">
                 <AssistantRuntimeProvider runtime={runtime}>
                   <Thread />
                 </AssistantRuntimeProvider>
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
                 {/* Quick actions */}
-                <div className="border rounded-md p-3 bg-card flex items-center gap-2">
-                  <Button size="sm" onClick={onBuildSquad} disabled={loadingBuild}>
-                    {loadingBuild ? "Building..." : "Build Squad"}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={onSuggestTransfers} disabled={loadingSuggest}>
-                    {loadingSuggest ? "Suggesting..." : "Suggest Transfers"}
-                  </Button>
+                <div className="border border-border/50 rounded-xl p-4 bg-card space-y-3">
+                  <h3 className="font-semibold text-foreground mb-3">Quick Actions</h3>
+                  <div className="flex flex-col gap-2">
+                    <Button size="sm" onClick={onBuildSquad} disabled={loadingBuild} className="w-full">
+                      {loadingBuild ? "Building..." : "Build Squad"}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={onSuggestTransfers} disabled={loadingSuggest} className="w-full">
+                      {loadingSuggest ? "Suggesting..." : "Suggest Transfers"}
+                    </Button>
+                  </div>
                 </div>
-
-                {/* Saved squads panel */}
-                <SavedSquadsPanel 
-                  currentSquad={toolSquad}
-                  onLoadSquad={onLoadSquad}
-                  onSaveCurrentSquad={onSaveCurrentSquad}
-                />
 
                 {/* Squad panel: show chat result when available */}
                 <SquadPanel toolSquad={toolSquad ?? undefined} header={toolSquad ? "Chat Squad" : "Wildcard Squad"} />
@@ -319,18 +300,18 @@ export default function HomePage() {
 
                 {/* Tool-based transfer suggestions */}
                 {toolTransfers && (
-                  <div className="border rounded-md p-3 bg-card">
-                    <h2 className="text-lg font-semibold mb-2">Tool Suggestions</h2>
+                  <div className="border border-border/50 rounded-xl p-4 bg-card">
+                    <h2 className="text-lg font-semibold mb-3 text-foreground">Tool Suggestions</h2>
                     {toolTransfers.length === 0 ? (
                       <div className="text-sm text-muted-foreground">No suggestions.</div>
                     ) : (
-                      <div className="grid gap-2 text-sm">
+                      <div className="grid gap-3 text-sm">
                         {toolTransfers.map((t: any, i: number) => (
-                          <div key={i} className="rounded-md border bg-background/50 p-2">
-                            <div className="font-medium">In: {t?.in?.name ?? t?.in?.id}</div>
-                            {t?.reason && <div className="text-muted-foreground">{t.reason}</div>}
+                          <div key={i} className="rounded-lg border border-border/50 bg-muted/30 p-3">
+                            <div className="font-medium text-foreground">In: {t?.in?.name ?? t?.in?.id}</div>
+                            {t?.reason && <div className="text-muted-foreground mt-1">{t.reason}</div>}
                             {typeof t?.estDeltaPoints === 'number' && (
-                              <div className="text-xs">Δ points: {t.estDeltaPoints.toFixed(2)}</div>
+                              <div className="text-xs text-primary mt-1">Δ points: {t.estDeltaPoints.toFixed(2)}</div>
                             )}
                           </div>
                         ))}
