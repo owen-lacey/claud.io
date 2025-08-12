@@ -9,10 +9,11 @@ import { persistenceService } from "@/lib/persistence";
 import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
 import SmallScreen from "@/components/utils/SmallScreen";
+import FixturesWidget from "@/components/team/FixturesWidget";
 import { FplApi } from '@/helpers/fpl-api';
 import { AllData } from '@/models/all-data';
 import { ApiResult } from '@/models/api-result';
-import { MyTeam as ApiMyTeam, League, Player, Team, User } from '@/helpers/api';
+import { MyTeam as ApiMyTeam, League, Player, Team, User, Fixture } from '@/helpers/api';
 import { DataContext, RivalTeamsContext } from '@/lib/contexts';
 import { RivalTeam } from '@/models/rival-league';
 import { dataCache } from '@/lib/data-cache';
@@ -40,14 +41,15 @@ export default function HomePage() {
 
   const loadData = useCallback(async () => {
     const api = new FplApi(plProfile || undefined);
-    const [myTeam, players, teams, leagues, myDetails] = await Promise.all([
+    const [myTeam, players, teams, leagues, myDetails, fixtures] = await Promise.all([
       api.myTeam.myTeamList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<ApiMyTeam>(false, err)),
       api.players.playersList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<Player[]>(false, err)),
       api.teams.teamsList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<Team[]>(false, err)),
       api.myLeagues.myLeaguesList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<League[]>(false, err)),
       api.myDetails.myDetailsList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<User>(false, err)),
+      api.fixtures.fixturesList().then(res => new ApiResult(true, res.data)).catch(err => new ApiResult<Fixture[]>(false, err)),
     ]);
-    const dataToSet = new AllData(myTeam, players, teams, leagues, myDetails);
+    const dataToSet = new AllData(myTeam, players, teams, leagues, myDetails, fixtures);
     setData(dataToSet);
   }, [plProfile]);
 
@@ -211,12 +213,20 @@ export default function HomePage() {
             {/* Header with user info */}
             <Header />
 
-            {/* Full-width chat window */}
-            <div className="mt-6">
-              <div className="border border-border/50 rounded-xl p-4 h-[80vh] bg-card">
-                <AssistantRuntimeProvider runtime={runtime}>
-                  <Thread />
-                </AssistantRuntimeProvider>
+            {/* Two-column layout: Chat + Fixtures */}
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Chat window - takes up 2/3 on large screens */}
+              <div className="lg:col-span-2">
+                <div className="border border-border/50 rounded-xl p-4 h-[80vh] bg-card">
+                  <AssistantRuntimeProvider runtime={runtime}>
+                    <Thread />
+                  </AssistantRuntimeProvider>
+                </div>
+              </div>
+
+              {/* Fixtures widget - takes up 1/3 on large screens */}
+              <div className="lg:col-span-1">
+                <FixturesWidget />
               </div>
             </div>
           </div>

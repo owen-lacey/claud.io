@@ -10,6 +10,26 @@
  * ---------------------------------------------------------------
  */
 
+/** @format int32 */
+export enum Position {
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+  Value5 = 5,
+}
+
+/** @format int32 */
+export enum DayOfWeek {
+  Value0 = 0,
+  Value1 = 1,
+  Value2 = 2,
+  Value3 = 3,
+  Value4 = 4,
+  Value5 = 5,
+  Value6 = 6,
+}
+
 export interface DateOnly {
   /** @format int32 */
   year?: number;
@@ -24,15 +44,27 @@ export interface DateOnly {
   dayNumber?: number;
 }
 
-/** @format int32 */
-export enum DayOfWeek {
-  Value0 = 0,
-  Value1 = 1,
-  Value2 = 2,
-  Value3 = 3,
-  Value4 = 4,
-  Value5 = 5,
-  Value6 = 6,
+export interface Fixture {
+  /** @format int32 */
+  id?: number;
+  /** @format int32 */
+  gameweek?: number;
+  season?: string | null;
+  /** @format int32 */
+  teamHome?: number;
+  /** @format int32 */
+  teamAway?: number;
+  /** @format int32 */
+  teamHomeDifficulty?: number;
+  /** @format int32 */
+  teamAwayDifficulty?: number;
+  /** @format date-time */
+  kickoffTime?: string;
+  finished?: boolean;
+  /** @format int32 */
+  teamHomeScore?: number | null;
+  /** @format int32 */
+  teamAwayScore?: number | null;
 }
 
 export interface League {
@@ -97,15 +129,6 @@ export interface Player {
   predictions?: Record<string, number>;
 }
 
-/** @format int32 */
-export enum Position {
-  Value1 = 1,
-  Value2 = 2,
-  Value3 = 3,
-  Value4 = 4,
-  Value5 = 5,
-}
-
 export interface SelectedPlayer {
   isViceCaptain?: boolean;
   isCaptain?: boolean;
@@ -166,12 +189,19 @@ export interface User {
   id?: number;
 }
 
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, HeadersDefaults, ResponseType } from "axios";
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
 import axios from "axios";
 
 export type QueryParamsType = Record<string | number, any>;
 
-export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
   /** set parameter to `true` for call `securityWorker` for this request */
   secure?: boolean;
   /** request path */
@@ -186,9 +216,13 @@ export interface FullRequestParams extends Omit<AxiosRequestConfig, "data" | "pa
   body?: unknown;
 }
 
-export type RequestParams = Omit<FullRequestParams, "body" | "method" | "query" | "path">;
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
 
-export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
   securityWorker?: (
     securityData: SecurityDataType | null,
   ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
@@ -198,6 +232,7 @@ export interface ApiConfig<SecurityDataType = unknown> extends Omit<AxiosRequest
 
 export enum ContentType {
   Json = "application/json",
+  JsonApi = "application/vnd.api+json",
   FormData = "multipart/form-data",
   UrlEncoded = "application/x-www-form-urlencoded",
   Text = "text/plain",
@@ -210,8 +245,16 @@ export class HttpClient<SecurityDataType = unknown> {
   private secure?: boolean;
   private format?: ResponseType;
 
-  constructor({ securityWorker, secure, format, ...axiosConfig }: ApiConfig<SecurityDataType> = {}) {
-    this.instance = axios.create({ ...axiosConfig, baseURL: axiosConfig.baseURL || "" });
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || "",
+    });
     this.secure = secure;
     this.format = format;
     this.securityWorker = securityWorker;
@@ -221,7 +264,10 @@ export class HttpClient<SecurityDataType = unknown> {
     this.securityData = data;
   };
 
-  protected mergeRequestParams(params1: AxiosRequestConfig, params2?: AxiosRequestConfig): AxiosRequestConfig {
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
     const method = params1.method || (params2 && params2.method);
 
     return {
@@ -229,7 +275,11 @@ export class HttpClient<SecurityDataType = unknown> {
       ...params1,
       ...(params2 || {}),
       headers: {
-        ...((method && this.instance.defaults.headers[method.toLowerCase() as keyof HeadersDefaults]) || {}),
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
         ...(params1.headers || {}),
         ...((params2 && params2.headers) || {}),
       },
@@ -250,11 +300,15 @@ export class HttpClient<SecurityDataType = unknown> {
     }
     return Object.keys(input || {}).reduce((formData, key) => {
       const property = input[key];
-      const propertyContent: any[] = property instanceof Array ? property : [property];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
 
       for (const formItem of propertyContent) {
         const isFileType = formItem instanceof Blob || formItem instanceof File;
-        formData.append(key, isFileType ? formItem : this.stringifyFormItem(formItem));
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
       }
 
       return formData;
@@ -278,11 +332,21 @@ export class HttpClient<SecurityDataType = unknown> {
     const requestParams = this.mergeRequestParams(params, secureParams);
     const responseFormat = format || this.format || undefined;
 
-    if (type === ContentType.FormData && body && body !== null && typeof body === "object") {
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
       body = this.createFormData(body as Record<string, unknown>);
     }
 
-    if (type === ContentType.Text && body && body !== null && typeof body !== "string") {
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
       body = JSON.stringify(body);
     }
 
@@ -304,7 +368,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @title FplTeamPicker.Api
  * @version 1.0
  */
-export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+export class Api<
+  SecurityDataType extends unknown,
+> extends HttpClient<SecurityDataType> {
   transfers = {
     /**
      * No description
@@ -428,6 +494,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
     playersList: (params: RequestParams = {}) =>
       this.request<Player[], any>({
         path: `/players`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+  };
+  fixtures = {
+    /**
+     * No description
+     *
+     * @tags FplTeamPicker.Api
+     * @name FixturesList
+     * @request GET:/fixtures
+     */
+    fixturesList: (params: RequestParams = {}) =>
+      this.request<Fixture[], any>({
+        path: `/fixtures`,
         method: "GET",
         format: "json",
         ...params,

@@ -1,4 +1,4 @@
-import { League, MyTeam, Player, Team, User } from "../helpers/api";
+import { Fixture, League, MyTeam, Player, Team, User } from "../helpers/api";
 import { ApiResult } from "./api-result";
 
 export class AllData {
@@ -7,6 +7,7 @@ export class AllData {
     public players: ApiResult<Player[]>,
     public teams: ApiResult<Team[]>,
     public leagues: ApiResult<League[]>,
-    public myDetails: ApiResult<User>) {
+    public myDetails: ApiResult<User>,
+    public fixtures: ApiResult<Fixture[]>) {
   }
 }
