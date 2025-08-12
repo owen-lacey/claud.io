@@ -375,7 +375,13 @@ class FBRefPredictionEngine:
             # Goals conceded penalty for GK/DEF: -1 per 2 conceded (approx -0.5 * E[GC])
             gc_penalty = (-0.5 * exp_gc) if norm_pos in {'GK', 'DEF'} else 0.0
 
-            expected_points = minutes_pts + att_pts + cs_pts + saves_pts + gc_penalty
+            # Calculate bonus points if requested
+            expected_bonus = 0.0
+            if include_bonus:
+                bonus_prediction = self._predict_bonus_points(norm_pos, exp_xg, exp_xa, exp_saves, exp_gc, exp_minutes)
+                expected_bonus = bonus_prediction['expected_bonus']
+
+            expected_points = minutes_pts + att_pts + cs_pts + saves_pts + gc_penalty + expected_bonus
 
             price = DEFAULT_PRICE_BY_POS.get(norm_pos, 6.0)
             variance = max(1.0, expected_points * 0.3)
@@ -394,7 +400,7 @@ class FBRefPredictionEngine:
                 'expected_assists': exp_xa,
                 'expected_saves': exp_saves,
                 'expected_goals_conceded': exp_gc,
-                'expected_bonus': 0.0,
+                'expected_bonus': expected_bonus,
                 'expected_points': expected_points,
                 'current_price': price,
                 'points_per_million': expected_points / price if price else 0.0,
@@ -531,3 +537,82 @@ class FBRefPredictionEngine:
             # Fallback to original logic if MongoDB unavailable
             gc_player = df['fbref_team_id'].map(fbref_team_to_gc) if 'fbref_team_id' in df.columns else pd.Series(0.0, index=df.index)
             return gc_player.fillna(0.0)
+
+    def _predict_bonus_points(self, position: str, expected_goals: float, expected_assists: float, 
+                            expected_saves: float, expected_goals_conceded: float, 
+                            expected_minutes: float) -> Dict[str, float]:
+        """
+        Predict bonus points using a simplified BPS-based model.
+        
+        FPL Bonus Point System (BPS) awards points based on performance statistics:
+        - Goals, assists, saves, clean sheets, etc.
+        - Top 3 BPS scorers in each match get 3, 2, 1 bonus points respectively
+        
+        This is a simplified estimation based on expected performance.
+        """
+        
+        # Base BPS calculation (simplified from FPL's complex system)
+        expected_bps = 0.0
+        
+        # Goals (18 BPS per goal for forwards, 24 for defenders/mids, 12 for GKs) 
+        if position == 'FWD':
+            expected_bps += expected_goals * 18
+        elif position in ['DEF', 'MID']:
+            expected_bps += expected_goals * 24
+        else:  # GK
+            expected_bps += expected_goals * 12
+            
+        # Assists (9 BPS each)
+        expected_bps += expected_assists * 9
+        
+        # Saves for goalkeepers (2 BPS per save)
+        if position == 'GK':
+            expected_bps += expected_saves * 2
+            
+        # Clean sheet bonus (12 BPS for GK/DEF, 6 for MID)
+        if position in ['GK', 'DEF']:
+            # Probability of clean sheet based on expected goals conceded
+            clean_sheet_prob = math.exp(-expected_goals_conceded) if expected_goals_conceded >= 0 else 0
+            expected_bps += clean_sheet_prob * 12
+        elif position == 'MID':
+            clean_sheet_prob = math.exp(-expected_goals_conceded) if expected_goals_conceded >= 0 else 0
+            expected_bps += clean_sheet_prob * 6
+            
+        # Minutes played bonus (2 BPS for 60+ minutes)
+        if expected_minutes >= 60:
+            expected_bps += 2
+            
+        # Additional position-based adjustments for typical contributions
+        if position == 'DEF':
+            # Defenders typically get additional BPS from defensive actions
+            expected_bps += 3  # Estimate for clearances, tackles, etc.
+        elif position == 'MID':
+            # Midfielders get BPS from all-round play
+            expected_bps += 2  # Estimate for passes, key passes, etc.
+        elif position == 'FWD':
+            # Forwards get some BPS from shots, etc.
+            expected_bps += 1
+            
+        # Convert BPS to bonus probability
+        # This is a simplified model - in reality, bonus depends on relative performance in each match
+        if expected_bps >= 25:
+            prob_3, prob_2, prob_1 = 0.35, 0.25, 0.15  # High performer
+        elif expected_bps >= 20:
+            prob_3, prob_2, prob_1 = 0.20, 0.30, 0.25  # Good performer
+        elif expected_bps >= 15:
+            prob_3, prob_2, prob_1 = 0.10, 0.25, 0.30  # Decent performer
+        elif expected_bps >= 10:
+            prob_3, prob_2, prob_1 = 0.05, 0.15, 0.25  # Average performer
+        else:
+            prob_3, prob_2, prob_1 = 0.02, 0.08, 0.15  # Below average
+            
+        # Calculate expected bonus points
+        expected_bonus = prob_3 * 3 + prob_2 * 2 + prob_1 * 1
+        
+        return {
+            'expected_bonus': expected_bonus,
+            'expected_bps': expected_bps,
+            'prob_3_bonus': prob_3,
+            'prob_2_bonus': prob_2,
+            'prob_1_bonus': prob_1
+        }
