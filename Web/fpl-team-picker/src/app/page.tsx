@@ -4,10 +4,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { Thread } from "@/components/assistant-ui/thread";
-import SquadPanel from "@/components/team/SquadPanel";
-import TransferSuggester from "@/components/team/TransferSuggester";
-import ExplainPicks from "@/components/team/ExplainPicks";
-import { Button } from "@/components/ui/button";
 import { ToastContainer, toastManager } from "@/components/ui/toast";
 import { persistenceService } from "@/lib/persistence";
 import AuthGuard from "@/components/AuthGuard";
@@ -25,8 +21,6 @@ export default function HomePage() {
   const api = "/api/chat-tools";
   const [toolSquad, setToolSquad] = useState<any | null>(null);
   const [toolTransfers, setToolTransfers] = useState<any[] | null>(null);
-  const [loadingBuild, setLoadingBuild] = useState(false);
-  const [loadingSuggest, setLoadingSuggest] = useState(false);
   
   // Authentication and data loading
   const [plProfile, setPlProfile] = useState<string | null>(null);
@@ -188,60 +182,6 @@ export default function HomePage() {
     return headers;
   };
 
-  const wrapSquadIfNeeded = (rawSquad: any) => {
-    const looksBackend = Array.isArray(rawSquad?.startingXi) && rawSquad.startingXi[0]?.player;
-    return looksBackend ? rawSquad : { selectedSquad: rawSquad };
-  };
-
-  const onBuildSquad = async () => {
-    setLoadingBuild(true);
-    try {
-      const headers = getAuthHeaders();
-      const res = await fetch("/api/tools/build-squad", {
-        method: "POST",
-        headers: { ...headers, "content-type": "application/json" },
-        body: JSON.stringify({ budget: 1000 }),
-      });
-      const data = await res.json();
-      if (data?.squad) {
-        const wrapped = wrapSquadIfNeeded(data.squad);
-        setToolSquad(wrapped);
-        toastManager.success("Squad built successfully!");
-      } else {
-        toastManager.error("Failed to build squad: " + (data?.error || "Unknown error"));
-      }
-    } catch (e) {
-      console.warn("Build squad failed:", e);
-      toastManager.error("Failed to build squad");
-    } finally {
-      setLoadingBuild(false);
-    }
-  };
-
-  const onSuggestTransfers = async () => {
-    setLoadingSuggest(true);
-    try {
-      const headers = getAuthHeaders();
-      const res = await fetch("/api/tools/suggest-transfers", {
-        method: "POST",
-        headers: { ...headers, "content-type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const data = await res.json();
-      if (data?.transfers) {
-        setToolTransfers(data.transfers);
-        toastManager.success(`Found ${data.transfers.length} transfer suggestions`);
-      } else {
-        toastManager.error("Failed to get transfer suggestions: " + (data?.error || "Unknown error"));
-      }
-    } catch (e) {
-      console.warn("Suggest transfers failed:", e);
-      toastManager.error("Failed to get transfer suggestions");
-    } finally {
-      setLoadingSuggest(false);
-    }
-  };
-
   // Render logic
   if (!plProfile) {
     return (
@@ -265,63 +205,18 @@ export default function HomePage() {
           <SmallScreen />
         </div>
         <div className="hidden md:block">
-          <div className="p-8 space-y-6 min-h-screen bg-background">
+          <div className="p-8 min-h-screen bg-background">
             <ToastContainer />
             
             {/* Header with user info */}
             <Header />
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="border border-border/50 rounded-xl p-4 h-[70vh] lg:col-span-2 bg-card">
+            {/* Full-width chat window */}
+            <div className="mt-6">
+              <div className="border border-border/50 rounded-xl p-4 h-[80vh] bg-card">
                 <AssistantRuntimeProvider runtime={runtime}>
                   <Thread />
                 </AssistantRuntimeProvider>
-              </div>
-
-              <div className="flex flex-col gap-6">
-                {/* Quick actions */}
-                <div className="border border-border/50 rounded-xl p-4 bg-card space-y-3">
-                  <h3 className="font-semibold text-foreground mb-3">Quick Actions</h3>
-                  <div className="flex flex-col gap-2">
-                    <Button size="sm" onClick={onBuildSquad} disabled={loadingBuild} className="w-full">
-                      {loadingBuild ? "Building..." : "Build Squad"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={onSuggestTransfers} disabled={loadingSuggest} className="w-full">
-                      {loadingSuggest ? "Suggesting..." : "Suggest Transfers"}
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Squad panel: show chat result when available */}
-                <SquadPanel toolSquad={toolSquad ?? undefined} header={toolSquad ? "Chat Squad" : "Wildcard Squad"} />
-
-                {/* Transfer suggester */}
-                <TransferSuggester />
-
-                {/* Tool-based transfer suggestions */}
-                {toolTransfers && (
-                  <div className="border border-border/50 rounded-xl p-4 bg-card">
-                    <h2 className="text-lg font-semibold mb-3 text-foreground">Tool Suggestions</h2>
-                    {toolTransfers.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">No suggestions.</div>
-                    ) : (
-                      <div className="grid gap-3 text-sm">
-                        {toolTransfers.map((t: any, i: number) => (
-                          <div key={i} className="rounded-lg border border-border/50 bg-muted/30 p-3">
-                            <div className="font-medium text-foreground">In: {t?.in?.name ?? t?.in?.id}</div>
-                            {t?.reason && <div className="text-muted-foreground mt-1">{t.reason}</div>}
-                            {typeof t?.estDeltaPoints === 'number' && (
-                              <div className="text-xs text-primary mt-1">Δ points: {t.estDeltaPoints.toFixed(2)}</div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Explain picks: show selected squad details when available */}
-                <ExplainPicks squad={toolSquad} />
               </div>
             </div>
           </div>
