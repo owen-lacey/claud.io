@@ -14,7 +14,7 @@ public class Player
   public int Id { get; set; }
   
   [BsonElement("fbref_id")]
-  public string FbrefId { get; set; }
+  public string? FbrefId { get; set; }
 
   [BsonElement("code")]
   public int Code { get; set; }

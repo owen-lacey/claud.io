@@ -88,10 +88,19 @@ public class WildcardSolver
 
     private void AddObjective(WildcardCpModel model)
     {
-        // Get the scale product of the selection booleans and multiply by each player's XI selection, maximizing the total.
-        var allPlayerPredictedPoints =
-            _input.Players.Select(p => (int)Math.Round((p.Xp ?? 0) * 1000)).ToList();
-        var allPlayerCosts = _input.Players.Select(p => p.Cost).ToList();
+        // Ensure the player data arrays match the order of model.Selections by using the same player IDs
+        var allPlayerPredictedPoints = model.Selections.Select(s => 
+        {
+            var player = _input.Players.Single(p => p.Id == s.Id);
+            return (int)Math.Round((player.Xp ?? 0) * 1000);
+        }).ToList();
+        
+        var allPlayerCosts = model.Selections.Select(s => 
+        {
+            var player = _input.Players.Single(p => p.Id == s.Id);
+            return player.Cost;
+        }).ToList();
+        
         var teamCost = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
         var budgetRemaining = _input.Budget - teamCost;
         
@@ -150,8 +159,12 @@ public class WildcardSolver
 
     private void AddCostConstraint(WildcardCpModel model)
     {
-        // Get the scale product of the selection booleans and multiply by each player's cost.
-        var allPlayerCosts = _input.Players.Select(p => p.Cost).ToList();
+        // Ensure the player costs array matches the order of model.Selections by using the same player IDs
+        var allPlayerCosts = model.Selections.Select(s => 
+        {
+            var player = _input.Players.Single(p => p.Id == s.Id);
+            return player.Cost;
+        }).ToList();
         var allPlayerSelections = LinearExpr.WeightedSum(model.Selections.Select(p => p.SquadSelected), allPlayerCosts);
         model.Add(allPlayerSelections <= _input.Budget);
     }
