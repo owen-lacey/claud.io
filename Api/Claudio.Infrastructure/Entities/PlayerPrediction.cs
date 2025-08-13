@@ -78,7 +78,7 @@ public class PlayerPrediction
   public double Floor { get; set; }
 
   [BsonElement("fixture_difficulty")]
-  public string FixtureDifficulty { get; set; }
+  public int FixtureDifficulty { get; set; }
 
   [BsonElement("home_away")]
   public string HomeAway { get; set; }
