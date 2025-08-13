@@ -225,7 +225,7 @@ export default function HomePage() {
               </div>
 
               {/* Fixtures widget - takes up 1/3 on large screens */}
-              <div className="lg:col-span-1">
+              <div className="lg:col-span-1 min-w-[430px]">
                 <FixturesWidget />
               </div>
             </div>

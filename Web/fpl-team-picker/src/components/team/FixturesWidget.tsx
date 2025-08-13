@@ -15,17 +15,6 @@ const getDifficultyColor = (difficulty: number) => {
   }
 };
 
-const getDifficultyTextColor = (difficulty: number) => {
-  switch (difficulty) {
-    case 1: return "text-green-500";
-    case 2: return "text-green-300";
-    case 3: return "text-white";
-    case 4: return "text-orange-300";
-    case 5: return "text-red-500";
-    default: return "text-gray-400";
-  }
-};
-
 export default function FixturesWidget() {
   const data = useContext(DataContext);
 
@@ -122,7 +111,7 @@ export default function FixturesWidget() {
                 {teamData.fixtures.map((fixture, index) => (
                   <div key={index} className="text-center">
                     <div 
-                      className={`text-xs py-2 px-1 rounded font-medium ${getDifficultyColor(fixture.difficulty)}`}
+                      className={`text-xs py-2 px-1 rounded font-medium min-w-[60px] ${getDifficultyColor(fixture.difficulty)}`}
                       title={`${fixture.isHome ? 'Home vs' : 'Away @'} ${fixture.opponent} (Difficulty: ${fixture.difficulty}/5)`}
                     >
                       <div>{fixture.opponent} {fixture.isHome ? '(H)' : '(A)'}</div>
@@ -132,7 +121,7 @@ export default function FixturesWidget() {
                 {/* Fill empty slots if less than 6 fixtures */}
                 {Array.from({ length: 6 - teamData.fixtures.length }).map((_, index) => (
                   <div key={`empty-${index}`} className="text-center">
-                    <div className="text-xs py-2 px-1 rounded bg-gray-600 text-gray-400 font-medium">
+                    <div className="text-xs py-2 px-1 rounded bg-gray-600 text-gray-400 font-medium min-w-[60px]">
                       <div>TBD</div>
                     </div>
                   </div>
