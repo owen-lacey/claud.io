@@ -59,6 +59,14 @@ public class ReferenceDataRepository : IReferenceDataRepository, IDisposable
         .ToListAsync(cancellationToken);
   }
 
+  public async Task<List<Fixture>> GetFixturesAsync(CancellationToken cancellationToken)
+  {
+    var fixtures = await _claudioContext.Fixtures.AsQueryable()
+        .ToListAsync(cancellationToken);
+
+    return fixtures.Select(f => f.ToFixture()).ToList();
+  }
+
   public async Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken)
   {
     if (!_memoryCache.TryGetValue(CacheKeys.CurrentGameweek, out _))

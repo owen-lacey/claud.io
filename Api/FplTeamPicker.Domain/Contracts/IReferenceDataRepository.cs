@@ -8,5 +8,7 @@ public interface IReferenceDataRepository
 
     Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken);
 
+    Task<List<Fixture>> GetFixturesAsync(CancellationToken cancellationToken);
+
     Task<int> GetCurrentGameweekAsync(CancellationToken cancellationToken);
 }

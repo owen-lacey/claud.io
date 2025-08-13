@@ -42,4 +42,22 @@ public class Fixture
     
     [BsonElement("team_a_score")]
     public int? TeamAwayScore { get; set; }
+
+    public FplTeamPicker.Domain.Models.Fixture ToFixture()
+    {
+        return new FplTeamPicker.Domain.Models.Fixture
+        {
+            Id = Id,
+            Gameweek = Gameweek,
+            Season = Season,
+            TeamHome = TeamHome,
+            TeamAway = TeamAway,
+            TeamHomeDifficulty = TeamHomeDifficulty,
+            TeamAwayDifficulty = TeamAwayDifficulty,
+            KickoffTime = KickoffTime,
+            Finished = Finished,
+            TeamHomeScore = TeamHomeScore,
+            TeamAwayScore = TeamAwayScore
+        };
+    }
 }
