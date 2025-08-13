@@ -553,6 +553,7 @@ class FBRefPredictionEngine:
             # Get fixture information using CURRENT FPL team (not historical FBRef team)
             # This fixes the issue where transferred players like Gyökeres show "Unknown" opponents
             current_fpl_team_id = None
+            fpl_player_name = None
             try:
                 # Get current FPL team from MongoDB player data
                 import sys as _sys_fix
@@ -566,29 +567,33 @@ class FBRefPredictionEngine:
                 if not hasattr(self, '_cached_fpl_players'):
                     self._cached_fpl_players = load_players_fix()
                 
-                # Find current FPL team for this player
+                # Find current FPL team for this player using FBRef ID
                 player_fbref_id = str(code_val)
                 for fpl_player in self._cached_fpl_players:
                     if str(fpl_player.get('fbref_id', '')) == player_fbref_id:
                         current_fpl_team_id = fpl_player.get('team')
+                        fpl_player_name = fpl_player.get('web_name')
+                        # Also update code_val to use FPL code for consistency
+                        code_val = fpl_player.get('code', code_val)
                         break
             except Exception:
                 pass
             
             # Look up fixture info using current FPL team, not historical FBRef team
             if current_fpl_team_id:
-                # Convert FPL team ID to FBRef team ID for fixture lookup
-                fpl_to_fbref_teams = {
-                    1: 'Arsenal', 2: 'Aston Villa', 3: 'Burnley', 4: 'Bournemouth',
-                    5: 'Brentford', 6: 'Brighton', 7: 'Chelsea', 8: 'Crystal Palace',
-                    9: 'Everton', 10: 'Fulham', 11: 'Leeds', 12: 'Liverpool',
-                    13: 'Manchester City', 14: 'Manchester Utd', 15: 'Newcastle',
-                    16: "Nott'm Forest", 17: 'Sunderland', 18: 'Tottenham',
-                    19: 'West Ham', 20: 'Wolves'
-                }
-                current_fbref_team = fpl_to_fbref_teams.get(current_fpl_team_id)
-                if current_fbref_team:
-                    fixture_info = fixture_difficulty_map.get(current_fbref_team, {})
+                # Get FBRef ID for current FPL team from cached team data
+                if not hasattr(self, '_cached_fpl_teams'):
+                    from database.mongo.mongo_data_loader import load_teams_data as load_teams_fix
+                    self._cached_fpl_teams = load_teams_fix()
+                
+                current_fbref_id = None
+                for team in self._cached_fpl_teams:
+                    if team.get('id') == current_fpl_team_id:
+                        current_fbref_id = team.get('fbref_id')
+                        break
+                
+                if current_fbref_id:
+                    fixture_info = fixture_difficulty_map.get(current_fbref_id, {})
                 else:
                     fixture_info = {}
             else:
@@ -603,7 +608,7 @@ class FBRefPredictionEngine:
             players.append({
                 'player_id': code_val,
                 'code': code_val,  # Use FBRef id as a stand-in code for compatibility
-                'name': row.get(name_col, str(row.get(pid_col, 'unknown'))),
+                'name': fpl_player_name or row.get(name_col, str(row.get(pid_col, 'unknown'))),
                 'expected_minutes': exp_minutes,
                 'expected_goals': exp_xg,
                 'expected_assists': exp_xa,
@@ -830,3 +835,57 @@ class FBRefPredictionEngine:
             'prob_2_bonus': prob_2,
             'prob_1_bonus': prob_1
         }
+
+
+def main():
+    """Main execution function for command line usage"""
+    import argparse
+    import json
+    from pathlib import Path
+    
+    parser = argparse.ArgumentParser(description='Generate FBRef-based FPL predictions')
+    parser.add_argument('--gameweek', type=int, required=True, help='Gameweek to generate predictions for')
+    parser.add_argument('--output-dir', type=str, default='predictions_fbref_2025_26', help='Output directory for predictions')
+    
+    args = parser.parse_args()
+    
+    # Initialize prediction engine
+    engine = FBRefPredictionEngine()
+    
+    # Generate predictions
+    print(f"🚀 Generating FBRef predictions for Gameweek {args.gameweek}...")
+    
+    try:
+        predictions = engine.generate_gameweek_predictions(
+            gameweek=args.gameweek,
+            include_bonus=True
+        )
+        
+        # Create output directory
+        output_dir = Path(args.output_dir)
+        output_dir.mkdir(exist_ok=True)
+        
+        # Save JSON predictions
+        json_file = output_dir / f"predictions_gw{args.gameweek}_2025_26.json"
+        with open(json_file, 'w') as f:
+            json.dump(predictions, f, indent=2)
+        
+        # Save CSV top predictions
+        csv_file = output_dir / f"top_predictions_gw{args.gameweek}_2025_26.csv"
+        with open(csv_file, 'w') as f:
+            f.write("rank,name,expected_points,expected_goals,expected_assists,expected_bonus,current_price,points_per_million,ceiling,floor,opponent,venue\n")
+            for i, player in enumerate(predictions['players'][:100]):  # Top 100
+                f.write(f"{i+1},{player['name']},{player['expected_points']},{player['expected_goals']},{player['expected_assists']},{player['expected_bonus']},{player['current_price']},{player['points_per_million']},{player['ceiling']},{player['floor']},{player['opponent']},{player['venue']}\n")
+        
+        print(f"✅ Predictions saved to {json_file}")
+        print(f"✅ Top 100 saved to {csv_file}")
+        print(f"📊 Total players: {predictions['summary']['total_players']}")
+        print(f"🎯 Top performer: {predictions['players'][0]['name']} ({predictions['players'][0]['expected_points']:.2f} pts)")
+        
+    except Exception as e:
+        print(f"❌ Error generating predictions: {e}")
+        raise
+
+
+if __name__ == "__main__":
+    main()
