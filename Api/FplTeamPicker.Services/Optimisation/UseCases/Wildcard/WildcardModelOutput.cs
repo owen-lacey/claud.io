@@ -8,5 +8,7 @@ public class WildcardModelOutput
 
     public List<SelectedPlayer> StartingXi { get; set; } = [];
 
+    public List<SelectedPlayer> Squad => Bench.Concat(StartingXi).ToList();
+
     public int SquadCost => Bench.Sum(p => p.Player.Cost) + StartingXi.Sum(p => p.Player.Cost);
 }

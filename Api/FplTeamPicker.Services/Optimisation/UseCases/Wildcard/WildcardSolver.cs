@@ -169,7 +169,7 @@ public class WildcardSolver
         model.Add(allPlayerSelections <= _input.Budget);
     }
 
-    private static SquadSelectionVar GetSelectionVar(WildcardCpModel model, Player player)
+    private SquadSelectionVar GetSelectionVar(WildcardCpModel model, Player player)
     {
         var selection = new SquadSelectionVar(model, player);
 
@@ -187,6 +187,11 @@ public class WildcardSolver
             case Position.Forward:
                 model.SelectedFwds.Add(selection);
                 break;
+        }
+
+        if (_input.Locks.Contains(player.Id))
+        {
+            model.Add(selection.SquadSelected == 1);
         }
 
         return selection;
