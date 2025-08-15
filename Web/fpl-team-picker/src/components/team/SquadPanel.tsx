@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 // Accept optional tool result via props
 export type SquadPanelProps = {
-  toolSquad?: any | null; // raw selectedSquad/squad from tool result
+  toolSquad?: any | null; // raw squad data from tool result (build_squad format)
   header?: string;
 };
 
@@ -32,9 +32,9 @@ function positionLabel(p: Position) {
   }
 }
 
-export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad" }: SquadPanelProps) {
+export default function SquadPanel({ toolSquad = null, header = "AI Squad Recommendation" }: SquadPanelProps) {
   const [data, setData] = useState<NormalizedMyTeam | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Record<Position, boolean>>({
     [Position.GK]: true,
@@ -57,24 +57,49 @@ export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad"
     try {
       let res: NormalizedMyTeam;
       if (toolSquad) {
+        // Handle tool squad data directly from build_squad tool
         res = await dataService.fromToolSquad(toolSquad);
       } else {
-        res = await dataService.getWildcardRecommendation();
+        // Fallback to current team (my-team)
+        const ctx = await dataService.getSelectionContext();
+        res = ctx.myTeam;
       }
       setData(res);
     } catch (e: any) {
-      setError(e?.message ?? "Failed to load recommendation");
+      setError(e?.message ?? "Failed to load squad data");
     } finally {
       setLoading(false);
     }
   }, [toolSquad]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  // On mount, load my-team if no toolSquad
+  useEffect(() => {
+    if (!toolSquad) {
+      setLoading(true);
+      dataService.getSelectionContext()
+        .then(ctx => setData(ctx.myTeam))
+        .catch(e => setError(e?.message ?? "Failed to load squad data"))
+        .finally(() => setLoading(false));
+    }
+  }, [toolSquad]);
+
+  // When toolSquad changes, update with toolSquad
+  useEffect(() => {
+    if (toolSquad) {
+      setLoading(true);
+      dataService.fromToolSquad(toolSquad)
+        .then(res => setData(res))
+        .catch(e => setError(e?.message ?? "Failed to load squad data"))
+        .finally(() => setLoading(false));
+    }
+  }, [toolSquad]);
 
   // When normalized data arrives, seed local editable state
   useEffect(() => {
     const squad = data?.squad;
     if (!squad) return;
+    
+    console.log('[SquadPanel] Updating local state with squad:', squad);
     setXi(squad.startingXi || []);
     setBench(squad.bench || []);
     setCaptainId(squad.captain?.id ?? (squad.startingXi?.[0]?.id ?? null));
@@ -137,7 +162,7 @@ export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad"
   };
 
   if (loading) return (
-        <div className="h-[70vh] border border-border/50 rounded-xl p-4 flex flex-col gap-4 bg-card animate-pulse" aria-busy="true" aria-live="polite">
+        <div className="h-[80vh] border border-border/50 rounded-xl p-4 flex flex-col gap-4 bg-card animate-pulse" aria-busy="true" aria-live="polite">
       <div className="flex items-center justify-between">
         <div>
           <div className="h-5 w-40 rounded-lg bg-muted/50" />
@@ -179,7 +204,7 @@ export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad"
     </div>
   );
   if (error) return (
-    <div className="h-[70vh] border border-border/50 rounded-xl p-4 flex flex-col gap-3 bg-card">
+    <div className="h-[80vh] border border-border/50 rounded-xl p-4 flex flex-col gap-3 bg-card">
       <div className="text-sm text-destructive">{error}</div>
       <div>
         <Button size="sm" onClick={refresh} disabled={loading}>Retry</Button>
@@ -187,8 +212,25 @@ export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad"
     </div>
   );
 
+  if (!data?.squad && !loading) return (
+    <div className="h-[80vh] border border-border/50 rounded-xl p-4 flex flex-col gap-3 bg-card justify-center items-center">
+      <div className="text-center">
+        <h3 className="text-lg font-semibold mb-2">No Squad Available</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          {toolSquad 
+            ? 'Ask the AI to build you a squad using the chat' 
+            : 'Use the build squad tool to get a recommendation'
+          }
+        </p>
+        <Button size="sm" onClick={refresh} disabled={loading}>
+          {toolSquad ? 'Refresh' : 'Get Recommendation'}
+        </Button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="h-[70vh] border border-border/50 rounded-xl p-4 flex flex-col gap-4 bg-card">
+    <div className="h-[80vh] border border-border/50 rounded-xl p-4 flex flex-col gap-4 bg-card">
       {/* Details modal */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -227,7 +269,9 @@ export default function SquadPanel({ toolSquad = null, header = "Wildcard Squad"
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">{header}</h2>
-          <p className="text-xs text-muted-foreground">{toolSquad ? 'From chat tool result' : 'Live recommendation from optimizer'}</p>
+          <p className="text-xs text-muted-foreground">
+            {toolSquad ? 'AI-generated squad from chat tools' : 'Live recommendation from optimizer'}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={refresh} disabled={loading}>Refresh</Button>

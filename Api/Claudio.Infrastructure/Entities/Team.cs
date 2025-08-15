@@ -1,3 +1,4 @@
+using FplTeamPicker.Domain.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -11,6 +12,9 @@ public class Team
     
     [BsonElement("id")]
     public int Id { get; set; }
+
+    [BsonElement("fbref_id")]
+    public string FbRefId { get; set; } = null!;
     
     [BsonElement("name")]
     public string Name { get; set; } = string.Empty;
@@ -59,4 +63,21 @@ public class Team
     
     [BsonElement("position")]
     public int Position { get; set; }
+
+    [BsonElement("strengths")]
+    public Dictionary<int, TeamStrength> Strengths { get; set; } = new();
+
+    public FplTeamPicker.Domain.Models.Team ToTeam(int currentGameweek)
+    {
+        return new FplTeamPicker.Domain.Models.Team
+        {
+            ShortName = ShortName,
+            Name = Name,
+            Code = Code,
+            Id = Id,
+            CurrentStrength = Strengths.TryGetValue(currentGameweek, out var strength)
+                ? strength.Overall
+                : null
+        };
+    }
 }

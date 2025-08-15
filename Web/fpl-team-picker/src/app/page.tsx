@@ -10,6 +10,7 @@ import AuthGuard from "@/components/AuthGuard";
 import Header from "@/components/Header";
 import SmallScreen from "@/components/utils/SmallScreen";
 import FixturesWidget from "@/components/team/FixturesWidget";
+import SquadPanel from "@/components/team/SquadPanel";
 import { FplApi } from '@/helpers/fpl-api';
 import { AllData } from '@/models/all-data';
 import { ApiResult } from '@/models/api-result';
@@ -131,11 +132,27 @@ export default function HomePage() {
                   while (idx >= 0) {
                     const line = buffer.slice(0, idx);
                     buffer = buffer.slice(idx + 1);
-                    // Frame parsing: only parse action/data frames
-                    if (line.startsWith("a:") || line.startsWith("d:")) {
+                    // Frame parsing: parse action/data frames and tool call frames
+                    if (line.startsWith("a:")) {
                       const payload = line.slice(2).trim();
                       try {
                         const obj = JSON.parse(payload);
+                        // Handle tool call results - build_squad returns the squad data directly
+                        if (obj?.result) {
+                          const squadData = obj.result;
+                          if (squadData?.startingXi || squadData?.bench) {
+                            console.log('[HomePage] Captured squad from tool result:', squadData);
+                            setToolSquad(squadData);
+                          }
+                        }
+                      } catch (error) {
+                        console.warn('[HomePage] Failed to parse action frame:', error);
+                      }
+                    } else if (line.startsWith("d:")) {
+                      const payload = line.slice(2).trim();
+                      try {
+                        const obj = JSON.parse(payload);
+                        // Legacy: also check for direct squad properties in data frames
                         const maybe = obj?.selectedSquad || obj?.squad;
                         if (maybe) setToolSquad(maybe);
                       } catch {
@@ -143,7 +160,7 @@ export default function HomePage() {
                       }
                     } else if (line.startsWith("3:")) {
                       // Error frame; optionally log for debugging
-                      // no-op for now
+                      console.warn('[HomePage] Error frame:', line.slice(2));
                     }
                     idx = buffer.indexOf("\n");
                   }
@@ -213,21 +230,29 @@ export default function HomePage() {
             {/* Header with user info */}
             <Header />
 
-            {/* Two-column layout: Chat + Fixtures */}
+            {/* Responsive layout: Chat, Squad, Fixtures */}
             <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Chat window - takes up 2/3 on large screens */}
-              <div className="lg:col-span-2">
-                <div className="border border-border/50 rounded-xl p-4 h-[80vh] bg-card">
+              {/* Chat window */}
+                <div className="lg:col-span-1">
+                  <div className="border border-border/50 rounded-xl p-4 h-[80vh] bg-card shadow-2xl">
                   <AssistantRuntimeProvider runtime={runtime}>
                     <Thread />
                   </AssistantRuntimeProvider>
                 </div>
               </div>
 
-              {/* Fixtures widget - takes up 1/3 on large screens */}
-              <div className="lg:col-span-1 min-w-[430px]">
-                <FixturesWidget />
-              </div>
+              {/* Squad Panel */}
+                <div className="lg:col-span-1 shadow-2xl rounded-xl">
+                  <SquadPanel 
+                    toolSquad={toolSquad} 
+                    header={toolSquad ? "AI Recommended Squad" : "Current Squad"} 
+                  />
+                </div>
+
+              {/* Fixtures widget: full width on small screens, equal width on large */}
+                <div className="col-span-1 w-full lg:col-span-1 lg:w-auto min-w-[320px] lg:min-w-0 shadow-2xl rounded-xl">
+                  <FixturesWidget />
+                </div>
             </div>
           </div>
         </div>

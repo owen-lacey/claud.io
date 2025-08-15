@@ -47,16 +47,9 @@ public class ReferenceDataRepository : IReferenceDataRepository, IDisposable
 
   public async Task<List<Team>> GetTeamsAsync(CancellationToken cancellationToken)
   {
-    return await _claudioContext.Teams.AsQueryable()
-        .Select(p => new Team
-        {
-          ShortName = p.ShortName,
-          Name = p.Name,
-          Code = p.Code,
-          Id = p.Id,
-
-        })
-        .ToListAsync(cancellationToken);
+    var teams = await _claudioContext.Teams.AsQueryable().ToListAsync();
+    var currentGameweek = await GetCurrentGameweekAsync(cancellationToken);
+    return teams.Select(t => t.ToTeam(currentGameweek)).ToList();
   }
 
   public async Task<List<Fixture>> GetFixturesAsync(CancellationToken cancellationToken)

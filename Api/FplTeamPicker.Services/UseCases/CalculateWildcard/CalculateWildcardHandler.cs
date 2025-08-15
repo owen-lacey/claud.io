@@ -25,7 +25,7 @@ public class CalculateWildcardHandler : IRequestHandler<CalculateWildcardRequest
         var players = await _repository.GetPlayersAsync(cancellationToken);
 
         players.PopulateCostsFrom(currentTeam);
-        var model = new WildcardModelInput(players, FplOptions.RealWorld, currentTeam.Budget, request.Locks);
+        var model = new WildcardModelInput(players, FplOptions.RealWorld, currentTeam.Budget - 50, request.Locks);
         var solver = new WildcardSolver(model);
 
         var team = solver.Solve();

@@ -1,13 +1,11 @@
 import { google } from "@ai-sdk/google";
 import { streamText } from "ai";
-import { z } from "zod";
 import { FplApi } from "@/helpers/fpl-api";
 import { buildSquadTool } from "./tools/build_squad";
 import { getMyOverviewTool } from "./tools/get_my_overview";
-import { queryDatabaseTool } from "./tools/query_database";
 import { listPlayersTool } from "./tools/list_players";
-import { suggestTransfersTool } from "./tools/suggest_transfers";
-import { explainSelectionTool } from "./tools/explain_selection";
+import { listTeamsTool } from "./tools/list_teams";
+import { listFixturesTool } from "./tools/list_fixtures";
 
 export const maxDuration = 30;
 
@@ -46,21 +44,22 @@ export async function POST(req: Request) {
   const api = new FplApi(token);
 
   try {
+    console.log('[chat-tools] Starting streamText with messages:', messages.length);
     const result = streamText({
       model: google('gemini-2.0-flash'),
-      system: 'You are an FPL assistant. Use get_my_overview when the user asks about account or leagues; use build_squad for team building. Use list_players for quick lists. After any tool call completes, always produce a short final assistant message summarizing the results.',
+      system: 'You are an FPL assistant. Use get_my_overview when the user asks about account or leagues; use build_squad for team building. Use list_players for quick lists of players. Use list_teams for team information. Use list_fixtures for fixture information and schedules. After any tool call completes, always produce a short final assistant message summarizing the results.',
       messages,
       maxSteps: 3,
       tools: {
         build_squad: buildSquadTool(api, token),
         get_my_overview: getMyOverviewTool(api, token),
         list_players: listPlayersTool(api),
-        suggest_transfers: suggestTransfersTool(api),
-        explain_selection: explainSelectionTool(),
-        queryDatabase: queryDatabaseTool(),
+        list_teams: listTeamsTool(api),
+        list_fixtures: listFixturesTool(api),
       }
     });
 
+    console.log('[chat-tools] streamText created, returning response');
     return result.toDataStreamResponse();
   } catch (err: any) {
     const status = err?.status ?? err?.response?.status;

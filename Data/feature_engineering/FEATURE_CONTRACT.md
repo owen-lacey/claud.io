@@ -43,7 +43,19 @@ required_columns = [
     'expected_goal_involvements', # xGI (float)
     'expected_goals_conceded', # xGC (float, GK/DEF)
     'creativity',     # FPL creativity index (float)
-    'bps'            # Bonus points system score (int)
+    'bps',           # Bonus points system score (int)
+    
+    # New defensive contribution features (2025/26 season)
+    'clearances',     # Clearances (int)
+    'blocks',         # Blocks (int)
+    'interceptions',  # Interceptions (int)
+    'tackles_won',    # Successful tackles (int)
+    'recoveries',     # Ball recoveries (int)
+    'cbit_score',     # CBIT total (clearances + blocks + interceptions + tackles_won)
+    'cbirt_score',    # CBIRT total (CBIT + recoveries)
+    'defensive_contribution_points', # FPL defensive contribution points (0 or 2)
+    'cbit_threshold_ratio',    # CBIT score / threshold (defenders: 10)
+    'cbirt_threshold_ratio'    # CBIRT score / threshold (mid/fwd: 12)
 ]
 ```
 
@@ -199,6 +211,53 @@ feature_columns = [
 - **Position Encoding**: GK=0, DEF=1, MID=2, FWD=3
 - **Team Encoding**: LabelEncoder fitted on team names
 - **Home/Away**: 1 for home, 0 for away
+
+### 6. Defensive Contributions Model (New for 2025/26)
+**Target**: Defensive contribution points probability (float, 0-1)
+**Features**: 30 features (enhanced with fixture difficulty)
+**Method**: `prepare_defensive_contributions_features()`
+
+```python
+feature_columns = [
+    # Core context - 3 features
+    'minutes', 'position_encoded', 'start',
+    
+    # Historical defensive stats (rolling averages) - 15 features
+    'clearances_avg_3gw', 'clearances_avg_5gw', 'clearances_avg_10gw',
+    'blocks_avg_3gw', 'blocks_avg_5gw', 'blocks_avg_10gw',
+    'interceptions_avg_3gw', 'interceptions_avg_5gw', 'interceptions_avg_10gw',
+    'tackles_won_avg_3gw', 'tackles_won_avg_5gw', 'tackles_won_avg_10gw',
+    'recoveries_avg_3gw', 'recoveries_avg_5gw', 'recoveries_avg_10gw',
+    
+    # Historical performance scores - 10 features
+    'cbit_score_avg_3gw', 'cbit_score_avg_5gw', 'cbit_score_avg_10gw',
+    'cbirt_score_avg_3gw', 'cbirt_score_avg_5gw', 'cbirt_score_avg_10gw',
+    'cbit_threshold_ratio_avg_3gw', 'cbit_threshold_ratio_avg_5gw',
+    'cbirt_threshold_ratio_avg_3gw', 'cbirt_threshold_ratio_avg_5gw',
+    
+    # General performance context - 4 features
+    'goals_avg_3gw', 'assists_avg_3gw', 'xG_avg_3gw', 'xA_avg_3gw',
+    
+    # Fixture difficulty features - 6 features (NEW)
+    'opponent_attack_strength',    # Opponent's attacking strength rating
+    'opponent_defense_strength',   # Opponent's defensive strength rating  
+    'opponent_overall_strength',   # Opponent's overall team strength
+    'home_away',                   # Home (1) vs Away (0) indicator
+    'fixture_difficulty_rating',   # FPL-style fixture difficulty (1-5)
+    'team_strength_differential'   # Own team strength - opponent strength
+]
+```
+
+**Null Policy**: Zero-fill defensive stats for players without FBRef history
+**Position-Specific Thresholds**: 
+- Defenders: 10+ CBIT (Clearances, Blocks, Interceptions, Tackles_won) = 2 points
+- Midfielders/Forwards: 12+ CBIRT (CBIT + Recoveries) = 2 points
+- Goalkeepers: Not eligible for defensive contribution points
+
+**Fixture Impact Logic**:
+- **Stronger opponents** → Higher likelihood of defensive contributions (more defensive actions required)
+- **Away games** → Higher likelihood of defensive contributions (less possession, more defending)
+- **Team strength differential** → Weaker teams vs stronger opponents have more defensive work
 
 ---
 

@@ -2,7 +2,7 @@
 FBRef Prediction Engine
 
 Loads FBRef-trained models from Data/models_fbref, loads canonical features for the requested gameweek,
-and generates predictions for all targets (minutes, xG, xA, saves, goals_conceded).
+and generates predictions for all targets (minutes, xG, xA, saves, goals_conceded, defensive_contributions).
 """
 from pathlib import Path
 import pandas as pd
@@ -11,6 +11,18 @@ import os
 import math
 from typing import Optional, Set
 from typing import Dict
+import sys
+
+# Add feature engineering path for defensive contributions
+feature_eng_path = Path(__file__).parent.parent / "feature_engineering"
+if str(feature_eng_path) not in sys.path:
+    sys.path.insert(0, str(feature_eng_path))
+
+try:
+    from defensive_contributions import DefensiveContributionCalculator
+except ImportError:
+    print("⚠️ DefensiveContributionCalculator not available - defensive contributions predictions disabled")
+    DefensiveContributionCalculator = None
 
 class FBRefPredictionEngine:
     def __init__(self, models_dir: str = None):
@@ -23,9 +35,25 @@ class FBRefPredictionEngine:
             "xg",
             "xa",
             "saves",
-            "goals_conceded"
+            "goals_conceded",
+            "defensive_contributions"  # New for 2025/26 season
         ]
         self.models = self._load_models()
+        # Defensive contributions model: load scaler and encoder
+        dc_model_dir = self.models_dir / "defensive_contributions"
+        self.dc_scaler = None
+        self.dc_position_encoder = None
+        try:
+            scaler_path = dc_model_dir / "scaler.joblib"
+            encoder_path = dc_model_dir / "position_encoder.joblib"
+            if scaler_path.exists():
+                self.dc_scaler = joblib.load(scaler_path)
+                print(f"✅ Loaded defensive contributions scaler: {scaler_path.name}")
+            if encoder_path.exists():
+                self.dc_position_encoder = joblib.load(encoder_path)
+                print(f"✅ Loaded defensive contributions position encoder: {encoder_path.name}")
+        except Exception as e:
+            print(f"⚠️ Could not load defensive contributions scaler/encoder: {e}")
         # Per-target feature columns (enhanced with team strength features)
         self.FEATURES = {
             "xg": [
@@ -60,6 +88,26 @@ class FBRefPredictionEngine:
             # Team-level model; loaded from team_game_stats
             "goals_conceded": [
                 'shots_allowed', 'xg_allowed'
+            ],
+            # New for 2025/26 season - Defensive Contributions
+            "defensive_contributions": [
+                'minutes', 'position', 'start',
+                # Historical defensive stats (rolling averages)
+                'clearances_avg_3gw', 'clearances_avg_5gw', 'clearances_avg_10gw',
+                'blocks_avg_3gw', 'blocks_avg_5gw', 'blocks_avg_10gw',
+                'interceptions_avg_3gw', 'interceptions_avg_5gw', 'interceptions_avg_10gw',
+                'tackles_won_avg_3gw', 'tackles_won_avg_5gw', 'tackles_won_avg_10gw',
+                'recoveries_avg_3gw', 'recoveries_avg_5gw', 'recoveries_avg_10gw',
+                # Historical performance
+                'cbit_score_avg_3gw', 'cbit_score_avg_5gw', 'cbit_score_avg_10gw',
+                'cbirt_score_avg_3gw', 'cbirt_score_avg_5gw', 'cbirt_score_avg_10gw',
+                'cbit_threshold_ratio_avg_3gw', 'cbit_threshold_ratio_avg_5gw',
+                'cbirt_threshold_ratio_avg_3gw', 'cbirt_threshold_ratio_avg_5gw',
+                # General performance context
+                'goals_avg_3gw', 'assists_avg_3gw', 'xG_avg_3gw', 'xA_avg_3gw',
+                # Fixture difficulty features (NEW)
+                'opponent_attack_strength', 'opponent_defense_strength', 'opponent_overall_strength',
+                'home_away', 'fixture_difficulty_rating', 'team_strength_differential'
             ]
         }
         # --- Fixture-aware GC settings (configurable via env) ---
@@ -83,7 +131,8 @@ class FBRefPredictionEngine:
             "xg": "xg_model.joblib", 
             "xa": "xa_model.joblib",
             "saves": "saves_model.joblib",
-            "goals_conceded": "goals_conceded_model.joblib"
+            "goals_conceded": "goals_conceded_model.joblib",
+            "defensive_contributions": "defensive_contributions_model.joblib"  # New for 2025/26
         }
         for target in self.target_names:
             joblib_path = self.models_dir / target / model_filenames[target]
@@ -105,28 +154,26 @@ class FBRefPredictionEngine:
         """
         # Try to load pre-computed features first (for compatibility)
         base_dir = Path(__file__).resolve().parent.parent.parent / "Data" / "fbref_ingest" / "canonical"
+        csv_path = base_dir / "features_gw1_with_strength.csv"
+        if csv_path.exists():
+            df = pd.read_csv(csv_path)
+            print(f"✅ Loaded enhanced features for GW1: {csv_path}")
+            return df
+        # Fallback to default logic for other gameweeks
         parquet_path = base_dir / f"features_gw{gameweek}.parquet"
         csv_path = base_dir / f"features_gw{gameweek}.csv"
-        
-        # Check if we have proper aggregated features file
         if parquet_path.exists() or csv_path.exists():
-            # Load the existing file
             if parquet_path.exists():
                 df = pd.read_parquet(parquet_path)
             else:
                 df = pd.read_csv(csv_path)
-            
-            # Check if this has multiple matches per player (proper training-like data)
             player_counts = df['fbref_player_id'].value_counts()
             if player_counts.max() > 1:
-                # This looks like proper match-by-match data, use as-is
                 return df
             else:
-                # This is single-match data, we need to generate proper features
                 print("⚠️ Single-match features detected, generating proper rolling averages...")
                 return self._generate_prediction_features_from_training_data()
         else:
-            # No features file found, generate from training data
             print(f"📊 No features file found for GW{gameweek}, generating from training data...")
             return self._generate_prediction_features_from_training_data()
 
@@ -163,27 +210,27 @@ class FBRefPredictionEngine:
         
         # Sort by player and date to get chronological order
         full_data = full_data.sort_values(['fbref_player_id', 'match_date']).copy()
-        
+
         # For each player, calculate recent form (last 5-10 matches rolling averages)
         print("🧮 Calculating rolling averages for prediction...")
-        
+
         prediction_features = []
-        
+
         for player_id, player_data in full_data.groupby('fbref_player_id'):
             # Take the most recent data for this player
             recent_matches = player_data.tail(10)  # Last 10 matches for rolling calculation
-            
+
             if len(recent_matches) == 0:
                 continue
-                
+
             # Use the most recent match as the base
             latest_match = recent_matches.iloc[-1].copy()
-            
+
             # Calculate rolling averages for key features (last 5 matches)
             window_size = min(5, len(recent_matches))
             if window_size > 1:
                 recent_window = recent_matches.tail(window_size)
-                
+
                 # Calculate rolling averages for prediction features
                 latest_match['assists'] = recent_window['assists'].mean()
                 latest_match['key_passes'] = recent_window['key_passes'].mean()
@@ -194,17 +241,29 @@ class FBRefPredictionEngine:
                 latest_match['xg'] = recent_window['xg'].mean()
                 latest_match['xa'] = recent_window['xa'].mean()
                 latest_match['minutes'] = recent_window['minutes'].mean()
-                
+
                 # Update per-90 stats to match the averages
                 if latest_match['minutes'] > 0:
                     latest_match['xg_per90'] = latest_match['xg'] * 90 / latest_match['minutes']
                     latest_match['xa_per90'] = latest_match['xa'] * 90 / latest_match['minutes']
-            
+
             prediction_features.append(latest_match)
-        
+
         result_df = pd.DataFrame(prediction_features)
         print(f"✅ Generated prediction features for {len(result_df)} players")
-        
+
+        # Save both Parquet and CSV for compatibility
+        output_dir = Path(__file__).resolve().parent.parent / "fbref_ingest" / "canonical"
+        parquet_path = output_dir / "player_game_stats_enhanced_full.parquet"
+        csv_path = output_dir / "player_game_stats_enhanced_full.csv"
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+            result_df.to_parquet(parquet_path, index=False)
+            result_df.to_csv(csv_path, index=False)
+            print(f"✅ Saved enhanced player game stats to {parquet_path} and {csv_path}")
+        except Exception as e:
+            print(f"❌ Error saving enhanced player game stats: {e}")
+
         return result_df
 
     def _load_team_features(self):
@@ -334,6 +393,32 @@ class FBRefPredictionEngine:
             return 'FWD'
         return str(pos_val)
 
+    def _prepare_dc_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Prepare features for defensive contributions model prediction:
+        - Fill missing columns with 0
+        - Encode 'position' using the trained encoder
+        - Apply scaler if available
+        """
+        feats = self.FEATURES['defensive_contributions']
+        X = df.reindex(columns=feats, fill_value=0).copy()
+        # Encode position
+        if 'position' in X.columns and self.dc_position_encoder is not None:
+            X['position_encoded'] = self.dc_position_encoder.transform(X['position'].fillna('Unknown'))
+            X = X.drop('position', axis=1)
+        # Encode home_away (H=1, A=0)
+        if 'home_away' in X.columns:
+            X['home_away'] = X['home_away'].map({'H': 1, 'A': 0}).fillna(0)
+        # Encode start as numeric
+        if 'start' in X.columns:
+            X['start'] = pd.to_numeric(X['start'], errors='coerce').fillna(0)
+        # Fill any remaining NaNs
+        X = X.fillna(0)
+        # Apply scaler if available
+        if self.dc_scaler is not None:
+            X = pd.DataFrame(self.dc_scaler.transform(X), columns=X.columns, index=X.index)
+        return X
+
     def generate_gameweek_predictions(self, gameweek: int, include_bonus: bool = True, allowed_fbref_ids: Optional[Set[str]] = None, element_type_map: Optional[Dict[str, int]] = None):
         # Load base player-level features (latest matches already materialized in features_gw{n}.*)
         base_df = self._load_features(gameweek)
@@ -372,40 +457,47 @@ class FBRefPredictionEngine:
         # Prepare predictions containers
         preds = {t: None for t in self.target_names}
 
+        # Helper for strict feature matching and encoding
+        def prepare_features(df, feats, categoricals):
+            X = df.reindex(columns=feats, fill_value=0).copy()
+            for c in categoricals:
+                if c in X.columns:
+                    X[c] = X[c].astype('category').cat.codes
+            return X
+
         # XG
         xg_feats = self.FEATURES['xg']
-        xg_X = df.reindex(columns=xg_feats, fill_value=0).copy()
-        xg_X = self._encode_categoricals(xg_X, ['position', 'fbref_team_id'])
+        xg_X = prepare_features(df, xg_feats, ['position', 'fbref_team_id'])
         preds['xg'] = self.models['xg'].predict(xg_X)
 
         # XA
         xa_feats = self.FEATURES['xa']
-        xa_X = df.reindex(columns=xa_feats, fill_value=0).copy()
-        xa_X = self._encode_categoricals(xa_X, ['position', 'fbref_team_id'])
+        xa_X = prepare_features(df, xa_feats, ['position', 'fbref_team_id'])
         preds['xa'] = self.models['xa'].predict(xa_X)
 
         # Minutes
         min_feats = self.FEATURES['minutes']
-        min_X = df.reindex(columns=min_feats, fill_value=0).copy()
-        min_X = self._encode_categoricals(min_X, ['position', 'fbref_team_id'])
+        min_X = prepare_features(df, min_feats, ['position', 'fbref_team_id'])
         preds['minutes'] = self.models['minutes'].predict(min_X)
 
-        # Saves (GK only) — predict for GKs and set others to 0
+        # Defensive Contributions
+        dc_feats = self.FEATURES['defensive_contributions']
+        dc_X = self._prepare_dc_features(df)
+        preds['defensive_contributions'] = self.models['defensive_contributions'].predict(dc_X)
+
+        # Saves (GK only)
         saves_feats = self.FEATURES['saves']
-        saves_X = df.reindex(columns=saves_feats, fill_value=0).copy()
-        saves_X = self._encode_categoricals(saves_X, ['fbref_team_id'])
+        saves_X = prepare_features(df, saves_feats, ['fbref_team_id'])
         if pos_col and df[pos_col].dtype.name == 'object':
             is_gk = df[pos_col] == 'GK'
         else:
-            # If already encoded or missing, approximate no-filter
             is_gk = pd.Series([False] * len(df), index=df.index)
         saves_pred = pd.Series(0.0, index=df.index)
         if is_gk.any():
             saves_pred.loc[is_gk] = self.models['saves'].predict(saves_X.loc[is_gk])
         preds['saves'] = saves_pred.values
 
-        # Goals conceded (team-level) - USE CURRENT FPL TEAM ASSIGNMENTS
-        # Load FPL team assignments from MongoDB for current season
+        # Goals conceded (team-level)
         gc_player = self._get_goals_conceded_with_fpl_teams(df, gameweek)
 
         # --- Fixture-aware override for goals_conceded ---
@@ -514,6 +606,7 @@ class FBRefPredictionEngine:
             exp_xa = float(preds['xa'][i]) if preds['xa'] is not None else 0.0
             exp_saves = float(preds['saves'][i]) if preds['saves'] is not None else 0.0
             exp_gc = float(preds['goals_conceded'][i]) if preds['goals_conceded'] is not None else 0.0
+            exp_dc = float(preds['defensive_contributions'][i]) if preds.get('defensive_contributions') is not None else 0.0
 
             pos_val = row.get(pos_col, None)
             norm_pos = self._normalize_position(pos_val)
@@ -524,6 +617,15 @@ class FBRefPredictionEngine:
             # Attacking points (position-aware goal points)
             g_pts = GOAL_POINTS.get(norm_pos, 4.0)
             att_pts = exp_xg * g_pts + exp_xa * ASSIST_POINTS
+
+            # Defensive contribution points (FPL 2025/26 rules)
+            # Defensive contribution points (scaled like saves)
+            dc_pts = 0.0
+            if norm_pos == 'DEF':
+                dc_pts = (exp_dc / 10.0) * 2.0  # 2 points per 10 DCs
+            elif norm_pos in {'MID', 'FWD'}:
+                dc_pts = (exp_dc / 12.0) * 2.0  # 2 points per 12 DCs
+            dc_pts = max(0.0, dc_pts)
 
             # Clean sheet points via Poisson(lambda = exp_gc)
             cs_w = CS_POINTS.get(norm_pos, 0.0)
@@ -541,9 +643,9 @@ class FBRefPredictionEngine:
                 bonus_prediction = self._predict_bonus_points(norm_pos, exp_xg, exp_xa, exp_saves, exp_gc, exp_minutes)
                 expected_bonus = bonus_prediction['expected_bonus']
 
-            expected_points = minutes_pts + att_pts + cs_pts + saves_pts + gc_penalty + expected_bonus
+            # Include defensive contribution points in total
+            expected_points = minutes_pts + att_pts + dc_pts + cs_pts + saves_pts + gc_penalty + expected_bonus
 
-            price = DEFAULT_PRICE_BY_POS.get(norm_pos, 6.0)
             variance = max(1.0, expected_points * 0.3)
             ceiling = expected_points + 1.645 * math.sqrt(variance)
             floor = max(0.0, expected_points - 1.645 * math.sqrt(variance))
@@ -551,55 +653,43 @@ class FBRefPredictionEngine:
             player_team_fbref = row.get(team_col, None)
 
             # Get fixture information using CURRENT FPL team (not historical FBRef team)
-            # This fixes the issue where transferred players like Gyökeres show "Unknown" opponents
             current_fpl_team_id = None
             fpl_player_name = None
             try:
-                # Get current FPL team from MongoDB player data
                 import sys as _sys_fix
                 from pathlib import Path as _Path_fix
                 data_dir_fix = _Path_fix(__file__).resolve().parent.parent.parent / 'Data'
                 if str(data_dir_fix) not in _sys_fix.path:
                     _sys_fix.path.insert(0, str(data_dir_fix))
                 from database.mongo.mongo_data_loader import load_players_data as load_players_fix
-                
-                # Use cached player data if available, otherwise load fresh
                 if not hasattr(self, '_cached_fpl_players'):
                     self._cached_fpl_players = load_players_fix()
-                
-                # Find current FPL team for this player using FBRef ID
                 player_fbref_id = str(code_val)
                 for fpl_player in self._cached_fpl_players:
                     if str(fpl_player.get('fbref_id', '')) == player_fbref_id:
                         current_fpl_team_id = fpl_player.get('team')
                         fpl_player_name = fpl_player.get('web_name')
-                        # Also update code_val to use FPL code for consistency
                         code_val = fpl_player.get('code', code_val)
                         break
             except Exception:
                 pass
-            
-            # Look up fixture info using current FPL team, not historical FBRef team
+
             if current_fpl_team_id:
-                # Get FBRef ID for current FPL team from cached team data
                 if not hasattr(self, '_cached_fpl_teams'):
                     from database.mongo.mongo_data_loader import load_teams_data as load_teams_fix
                     self._cached_fpl_teams = load_teams_fix()
-                
                 current_fbref_id = None
                 for team in self._cached_fpl_teams:
                     if team.get('id') == current_fpl_team_id:
                         current_fbref_id = team.get('fbref_id')
                         break
-                
                 if current_fbref_id:
                     fixture_info = fixture_difficulty_map.get(current_fbref_id, {})
                 else:
                     fixture_info = {}
             else:
-                # Fallback to historical FBRef team
                 fixture_info = fixture_difficulty_map.get(player_team_fbref, {})
-            
+
             opponent_name = fixture_info.get('opponent_name', 'Unknown')
             venue = fixture_info.get('venue', '?')
             difficulty = fixture_info.get('difficulty', 3)
@@ -607,20 +697,18 @@ class FBRefPredictionEngine:
 
             players.append({
                 'player_id': code_val,
-                'code': code_val,  # Use FBRef id as a stand-in code for compatibility
+                'code': code_val,
                 'name': fpl_player_name or row.get(name_col, str(row.get(pid_col, 'unknown'))),
                 'expected_minutes': exp_minutes,
                 'expected_goals': exp_xg,
                 'expected_assists': exp_xa,
                 'expected_saves': exp_saves,
                 'expected_goals_conceded': exp_gc,
+                'expected_defensive_contributions': exp_dc,
                 'expected_bonus': expected_bonus,
                 'expected_points': expected_points,
-                'current_price': price,
-                'points_per_million': expected_points / price if price else 0.0,
                 'ceiling': round(ceiling, 2),
                 'floor': round(floor, 2),
-                # Fixture information
                 'opponent': opponent_name,
                 'venue': venue,
                 'fixture_difficulty': difficulty,
@@ -629,6 +717,40 @@ class FBRefPredictionEngine:
 
         # Sort players by expected points desc for downstream CSV/top-N selection
         players.sort(key=lambda p: p['expected_points'], reverse=True)
+
+        # --- Persist team strengths to MongoDB for this GW ---
+        try:
+            from database.mongo.mongo_data_loader import load_teams_data, update_teams_data
+        except ImportError:
+            print("MongoDB loader not available, skipping team strengths update.")
+            update_teams_data = None
+
+        # Compute strengths for each team in df
+        # Use the indices from the feature columns (already calculated for this GW)
+        team_strengths = {}
+        for _, row in df.iterrows():
+            team_id = row.get('fbref_team_id')
+            if not team_id:
+                continue
+            attack = row.get('team_attack_index', 0.0)
+            defence = row.get('team_defense_index', 0.0)
+            overall = (attack + defence) / 2.0
+            if team_id not in team_strengths:
+                team_strengths[team_id] = {'attack': attack, 'defence': defence, 'overall': overall}
+
+        if update_teams_data:
+            # Load teams from Mongo
+            teams = load_teams_data()
+            fbref_to_team = {t.get('fbref_id'): t for t in teams if t.get('fbref_id')}
+            gw = str(gameweek)
+            for fbref_id, strengths in team_strengths.items():
+                team = fbref_to_team.get(fbref_id)
+                if team:
+                    if 'strengths' not in team:
+                        team['strengths'] = {}
+                    team['strengths'][gw] = strengths
+            update_teams_data(list(fbref_to_team.values()))
+            print(f"✅ Updated team strengths for GW{gw} in MongoDB.")
 
         # Minimal summary compatible with downstream usage
         if players:

@@ -9,4 +9,6 @@ public class Team
     public int Code { get; set; }
 
     public int Id { get; set; }
+
+    public double? CurrentStrength { get; set; }
 }

@@ -60,9 +60,9 @@ app.MapPost("/transfers", async ([FromServices] IMediator mediator, Cancellation
     return TypedResults.Ok(result);
 });
 
-app.MapPost("/wildcard", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+app.MapPost("/wildcard", async ([FromBody] CalculateWildcardRequest request, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
-    var team = await mediator.Send(new CalculateWildcardRequest(), cancellationToken);
+    var team = await mediator.Send(request, cancellationToken);
     return TypedResults.Ok(team);
 });
 
@@ -100,9 +100,10 @@ app.MapGet("/teams", async ([FromServices] IMediator mediator, CancellationToken
     return TypedResults.Ok(result);
 });
 
-app.MapGet("/players", async ([FromServices] IMediator mediator, CancellationToken cancellationToken) =>
+app.MapGet("/players", async (int? playerId, int? teamId, string? position, int? limit, [FromServices] IMediator mediator, CancellationToken cancellationToken) =>
 {
-    var result = await mediator.Send(new GetPlayersRequest(), cancellationToken);
+    var request = new GetPlayersRequest(playerId, teamId, position, limit);
+    var result = await mediator.Send(request, cancellationToken);
 
     return TypedResults.Ok(result);
 });

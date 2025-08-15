@@ -36,7 +36,7 @@ public class WildcardSolverTests
             StartingTeamCount = 4
         };
         const int budget = 10;
-        var model = new WildcardModelInput(players, options, budget);
+        var model = new WildcardModelInput(players, options, budget, []);
         var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
@@ -68,7 +68,7 @@ public class WildcardSolverTests
             StartingTeamCount = 3
         };
         const int budget = 10;
-        var model = new WildcardModelInput(players, options, budget);
+        var model = new WildcardModelInput(players, options, budget, []);
         var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
@@ -106,7 +106,7 @@ public class WildcardSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new WildcardModelInput(players, options, budget);
+        var model = new WildcardModelInput(players, options, budget, []);
         var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
@@ -145,7 +145,7 @@ public class WildcardSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new WildcardModelInput(players, options, budget);
+        var model = new WildcardModelInput(players, options, budget, []);
         var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
@@ -191,7 +191,7 @@ public class WildcardSolverTests
             MaxPlayersPerTeam = players.Count,
             StartingTeamCount = 4
         };
-        var model = new WildcardModelInput(players, options, budget);
+        var model = new WildcardModelInput(players, options, budget, []);
         var solver = new WildcardSolver(model);
 
         var output = solver.Solve();
@@ -204,5 +204,47 @@ public class WildcardSolverTests
             benchDefender.Player.Id.Should().Be(cheaperBenchPlayer.Id, "the benched defender should be the cheapest");
             benchDefender.Player.Id.Should().NotBe(expensiveBenchPlayer.Id, "we should not pick expensive subs for the sake of it");
         }
+    }
+
+    [Fact]
+    public void BetterPlayerAvailableForLockedPlayer_DoesNotTransfer()
+    {
+        const int teamOne = 1;
+        const int teamTwo = 2;
+        var lockedPlayer = new FplPlayerBuilder(teamOne, Position.Defender)
+            .WithPredictedPoints(50)
+            .Build();
+        var betterPlayer = new FplPlayerBuilder(teamTwo, Position.Defender)
+            .WithPredictedPoints(100)
+            .Build();
+        var otherPlayers = new List<Player>
+        {
+            new FplPlayerBuilder(teamOne, Position.Goalkeeper).Build(),
+            new FplPlayerBuilder(teamOne, Position.Midfielder).Build(),
+            new FplPlayerBuilder(teamOne, Position.Forward).Build()
+        };
+        var players = new List<Player> { lockedPlayer, betterPlayer }
+            .Concat(otherPlayers)
+            .OrderBy(r => r.Id)
+            .ToList();
+        var options = new FplOptions
+        {
+            SquadGoalkeeperCount = 1,
+            SquadDefenderCount = 1,
+            SquadMidfielderCount = 1,
+            SquadForwardCount = 1,
+            MaxPlayersPerTeam = players.Count,
+            StartingTeamCount = 4
+        };
+        const int budget = 1000;
+        var model = new WildcardModelInput(players, options, budget, [lockedPlayer.Id]);
+        var solver = new WildcardSolver(model);
+
+        var output = solver.Solve();
+
+        output.Squad.Any(p => p.Player.Id == lockedPlayer.Id).Should().BeTrue(
+            "locked player should remain in the team even if a better player is available");
+        output.Squad.Any(p => p.Player.Id == betterPlayer.Id).Should().BeFalse(
+            "better player should not replace the locked player");
     }
 }

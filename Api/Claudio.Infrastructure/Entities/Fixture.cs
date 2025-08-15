@@ -24,12 +24,6 @@ public class Fixture
     [BsonElement("team_a")]
     public int TeamAway { get; set; }
     
-    [BsonElement("team_h_difficulty")]
-    public int TeamHomeDifficulty { get; set; }
-    
-    [BsonElement("team_a_difficulty")]
-    public int TeamAwayDifficulty { get; set; }
-    
     [BsonElement("kickoff_time")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
     public DateTime KickoffTime { get; set; }
@@ -52,8 +46,6 @@ public class Fixture
             Season = Season,
             TeamHome = TeamHome,
             TeamAway = TeamAway,
-            TeamHomeDifficulty = TeamHomeDifficulty,
-            TeamAwayDifficulty = TeamAwayDifficulty,
             KickoffTime = KickoffTime,
             Finished = Finished,
             TeamHomeScore = TeamHomeScore,

@@ -5,6 +5,12 @@ import os
 from typing import Dict, List, Optional, Tuple, Union
 import json
 
+# Import defensive contributions (handle both relative and absolute imports)
+try:
+    from .defensive_contributions import DefensiveContributionCalculator
+except ImportError:
+    from defensive_contributions import DefensiveContributionCalculator
+
 class PlayerFeatureEngine:
     """
     Shared feature engineering logic for both training and prediction.
@@ -53,7 +59,11 @@ class PlayerFeatureEngine:
                 'minutes', 'total_points', 'goals_scored', 'assists', 'clean_sheets',
                 'saves', 'goals_conceded', 'yellow_cards', 'starts', 'threat',
                 'expected_goals', 'expected_assists', 'expected_goal_involvements',
-                'expected_goals_conceded', 'creativity', 'bps'
+                'expected_goals_conceded', 'creativity', 'bps',
+                # New defensive contribution features (2025/26 season)
+                'clearances', 'blocks', 'interceptions', 'tackles_won', 'recoveries',
+                'cbit_score', 'cbirt_score', 'defensive_contribution_points',
+                'cbit_threshold_ratio', 'cbirt_threshold_ratio'
             ]
         window_sizes = [3, 5, 10]
         
@@ -92,6 +102,30 @@ class PlayerFeatureEngine:
             )
         
         return df_sorted
+    
+    def add_defensive_contributions(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add defensive contribution features to a DataFrame
+        
+        This method integrates the DefensiveContributionCalculator to add
+        defensive contribution points and related features based on FBRef data.
+        
+        Args:
+            df: DataFrame with defensive stats and position columns
+            
+        Returns:
+            DataFrame with defensive contribution features added
+        """
+        print("🛡️ Adding defensive contribution features...")
+        
+        calc = DefensiveContributionCalculator()
+        
+        # Add defensive contribution features
+        enhanced_df = calc.add_defensive_contribution_features(df)
+        
+        print(f"✅ Added defensive contribution features to {len(enhanced_df)} records")
+        
+        return enhanced_df
     
     def get_historical_context(self, player_identifier: str, 
                              historical_df: pd.DataFrame,
@@ -152,6 +186,17 @@ class PlayerFeatureEngine:
                     f'expected_assists_avg_{window}gw': window_games.get('expected_assists', pd.Series([0]*len(window_games))).mean(),
                     f'creativity_avg_{window}gw': window_games.get('creativity', pd.Series([0]*len(window_games))).mean(),
                     f'bps_avg_{window}gw': window_games.get('bps', pd.Series([0]*len(window_games))).mean(),
+                    # New defensive contribution features (2025/26 season)
+                    f'clearances_avg_{window}gw': window_games.get('clearances', pd.Series([0]*len(window_games))).mean(),
+                    f'blocks_avg_{window}gw': window_games.get('blocks', pd.Series([0]*len(window_games))).mean(),
+                    f'interceptions_avg_{window}gw': window_games.get('interceptions', pd.Series([0]*len(window_games))).mean(),
+                    f'tackles_won_avg_{window}gw': window_games.get('tackles_won', pd.Series([0]*len(window_games))).mean(),
+                    f'recoveries_avg_{window}gw': window_games.get('recoveries', pd.Series([0]*len(window_games))).mean(),
+                    f'cbit_score_avg_{window}gw': window_games.get('cbit_score', pd.Series([0]*len(window_games))).mean(),
+                    f'cbirt_score_avg_{window}gw': window_games.get('cbirt_score', pd.Series([0]*len(window_games))).mean(),
+                    f'defensive_contribution_points_avg_{window}gw': window_games.get('defensive_contribution_points', pd.Series([0]*len(window_games))).mean(),
+                    f'cbit_threshold_ratio_avg_{window}gw': window_games.get('cbit_threshold_ratio', pd.Series([0]*len(window_games))).mean(),
+                    f'cbirt_threshold_ratio_avg_{window}gw': window_games.get('cbirt_threshold_ratio', pd.Series([0]*len(window_games))).mean(),
                 })
         
         # Form = sum of last 3 games total points

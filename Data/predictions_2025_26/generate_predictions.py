@@ -451,6 +451,11 @@ Examples:
         default='fbref',
         help='Data/model source to use (default: fbref)'
     )
+    parser.add_argument(
+        '--debug',
+        action='store_true',
+        help='Enable verbose debug logging'
+    )
     
     args = parser.parse_args()
     
@@ -510,4 +515,6 @@ Examples:
 
 
 if __name__ == "__main__":
+    import logging
+    logging.basicConfig(level=logging.INFO)
     main()

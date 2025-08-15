@@ -176,7 +176,7 @@ def add_team_strength_features(features_df: pd.DataFrame, gameweek: int, attack_
     - opponent_team_id: FBRef team ID of opponent
     """
     df = features_df.copy()
-    
+
     # Initialize new columns
     df['team_attack_index'] = 0.0
     df['team_defense_index'] = 0.0
@@ -184,53 +184,66 @@ def add_team_strength_features(features_df: pd.DataFrame, gameweek: int, attack_
     df['opponent_defense_index'] = 0.0
     df['venue'] = 'N'  # Default to neutral
     df['opponent_team_id'] = ''
-    
+    # Defensive contribution features
+    df['fixture_difficulty_rating'] = 0.5
+    df['team_strength_differential'] = 0.0
+    df['opponent_overall_strength'] = 0.0
+
     # Add team strength indices
     if 'fbref_team_id' in df.columns:
         df['team_attack_index'] = df['fbref_team_id'].map(attack_indices).fillna(0.0)
         df['team_defense_index'] = df['fbref_team_id'].map(defense_indices).fillna(0.0)
-    
+
     # Load fixtures and team mapping for opponent features
     fixtures_df = get_fixtures_for_gameweek(gameweek)
     team_mapping = get_team_fbref_mapping()
-    
+
+    # Calculate overall strength for each team
+    overall_strength = {tid: (attack_indices.get(tid, 0.0) + defense_indices.get(tid, 0.0)) / 2.0 for tid in attack_indices.keys()}
+
     if not fixtures_df.empty and team_mapping:
         # Create fixture lookup: FBRef team -> (opponent, venue)
         fixture_lookup = {}
-        
+
         for _, fixture in fixtures_df.iterrows():
             team_h_id = fixture.get('team_h')
             team_a_id = fixture.get('team_a')
-            
+
             if team_h_id in team_mapping and team_a_id in team_mapping:
                 team_h_fbref = team_mapping[team_h_id]
                 team_a_fbref = team_mapping[team_a_id]
-                
+
                 # Home team perspective
                 fixture_lookup[team_h_fbref] = {
                     'opponent': team_a_fbref,
                     'venue': 'H'
                 }
-                
-                # Away team perspective  
+
+                # Away team perspective
                 fixture_lookup[team_a_fbref] = {
                     'opponent': team_h_fbref,
                     'venue': 'A'
                 }
-        
-        # Apply fixture-based opponent features
+
+        # Apply fixture-based opponent features and defensive features
         for idx, row in df.iterrows():
             team_id = row.get('fbref_team_id')
             if team_id in fixture_lookup:
                 fixture_info = fixture_lookup[team_id]
                 opponent = fixture_info['opponent']
                 venue = fixture_info['venue']
-                
+
                 df.at[idx, 'opponent_team_id'] = opponent
                 df.at[idx, 'venue'] = venue
                 df.at[idx, 'opponent_attack_index'] = attack_indices.get(opponent, 0.0)
                 df.at[idx, 'opponent_defense_index'] = defense_indices.get(opponent, 0.0)
-    
+                # Defensive contribution features
+                df.at[idx, 'opponent_overall_strength'] = overall_strength.get(opponent, 0.0)
+                df.at[idx, 'team_strength_differential'] = overall_strength.get(team_id, 0.0) - overall_strength.get(opponent, 0.0)
+                # Simple fixture difficulty rating: scale differential to [0,1]
+                diff = df.at[idx, 'team_strength_differential']
+                df.at[idx, 'fixture_difficulty_rating'] = 1.0 - (1.0 / (1.0 + abs(diff))) if diff != 0 else 0.5
+
     return df
 
 def main():
@@ -273,16 +286,47 @@ def main():
         print("Dry run - no files written")
         return
     
-    # Save output
+
+    # Save output CSV as before
     if args.output_file:
         output_path = args.output_file
     else:
         input_path = Path(args.features_file)
         output_path = input_path.parent / f"{input_path.stem}_with_strength{input_path.suffix}"
-    
     enhanced_df.to_csv(output_path, index=False)
     print(f"Saved enhanced features to {output_path}")
     print(f"Feature count: {len(features_df.columns)} -> {len(enhanced_df.columns)} (+{len(new_cols)})")
+
+    # --- Persist strengths to MongoDB ---
+    print("\nUpdating team strengths in MongoDB...")
+    try:
+        from database.mongo.mongo_data_loader import load_teams_data, update_teams_data
+    except ImportError:
+        print("MongoDB loader not available, skipping Mongo update.")
+        return
+
+    # Load teams from Mongo
+    teams = load_teams_data()
+    # Build a mapping from fbref_team_id to team dict
+    fbref_to_team = {t.get('fbref_id'): t for t in teams if t.get('fbref_id')}
+
+    # For each team, add/update strengths[GW]
+    gw = str(args.gameweek)
+    for fbref_id, team in fbref_to_team.items():
+        if 'strengths' not in team:
+            team['strengths'] = {}
+        attack = attack_indices.get(fbref_id, 0.0)
+        defence = defense_indices.get(fbref_id, 0.0)
+        overall = (attack + defence) / 2.0
+        team['strengths'][gw] = {
+            'attack': attack,
+            'defence': defence,
+            'overall': overall
+        }
+
+    # Write back to Mongo
+    update_teams_data(list(fbref_to_team.values()))
+    print(f"✅ Updated strengths for GW{gw} for {len(fbref_to_team)} teams in MongoDB.")
 
 if __name__ == '__main__':
     main()
