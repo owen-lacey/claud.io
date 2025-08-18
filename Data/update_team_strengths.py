@@ -1,28 +1,15 @@
 #!/usr/bin/env python3
 """
-Add Team Strength Features to Canonical Features
+Update team strengths in MongoDB for a given gameweek.
 
-Enhances the canonical features with team/opponent strength indices and fixture context
-for model retraining. These features replace inference-time multipliers with learnable
-team strength relationships.
-
-New features added:
-- team_attack_index: Team's rolling xG for per match (last N games)
-- team_defense_index: Team's rolling xG allowed per match (last N games) 
-- opponent_attack_index: Opponent's attack strength for this fixture
-- opponent_defense_index: Opponent's defense strength for this fixture
-- venue: Home/Away/Neutral (H/A/N)
-- opponent_team_id: FBRef team ID of opponent
+Computes rolling attack and defense indices for each team and updates the 'strengths' field in MongoDB.
 
 Usage:
-  python add_team_strength_features.py \
-    --features-file Data/fbref_ingest/canonical/features_gw1.csv \
-    --output-file Data/fbref_ingest/canonical/features_gw1_with_strength.csv \
-    --gameweek 1
+    python add_team_strength_features.py --gameweek 1
 
 Environment variables:
-  FBREF_STRENGTH_ROLLING_N=6    # Number of matches for rolling averages
-  FBREF_STRENGTH_MIN_MATCHES=3  # Minimum matches required for index
+    FBREF_STRENGTH_ROLLING_N=6    # Number of matches for rolling averages
+    FBREF_STRENGTH_MIN_MATCHES=3  # Minimum matches required for index
 """
 
 import os
@@ -246,58 +233,21 @@ def add_team_strength_features(features_df: pd.DataFrame, gameweek: int, attack_
 
     return df
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Add team strength features to canonical features')
-    parser.add_argument('--features-file', required=True, help='Path to canonical features file')
-    parser.add_argument('--output-file', help='Output file path (defaults to input with _with_strength suffix)')
-    parser.add_argument('--gameweek', type=int, required=True, help='Gameweek number for fixture lookup')
+    parser = argparse.ArgumentParser(description='Update team strengths in MongoDB for a given gameweek')
+    parser.add_argument('--gameweek', type=int, required=True, help='Gameweek number for updating strengths')
     parser.add_argument('--rolling-n', type=int, default=ROLLING_N, help='Number of matches for rolling averages')
-    parser.add_argument('--dry-run', action='store_true', help='Print feature summary without saving')
-    
     args = parser.parse_args()
-    
+
     print(f"Loading canonical data...")
     matches, team_stats = load_canonical_data()
-    
+
     print(f"Computing team strength indices (rolling {args.rolling_n} matches)...")
     attack_indices, defense_indices = compute_team_strength_indices(matches, team_stats, args.rolling_n)
-    
+
     print(f"Found strength indices for {len(attack_indices)} teams (attack), {len(defense_indices)} teams (defense)")
-    
-    # Load features
-    features_df = pd.read_csv(args.features_file)
-    print(f"Loaded {len(features_df)} player features from {args.features_file}")
-    
-    # Add strength features
-    enhanced_df = add_team_strength_features(features_df, args.gameweek, attack_indices, defense_indices)
-    
-    # Show feature summary
-    new_cols = ['team_attack_index', 'team_defense_index', 'opponent_attack_index', 'opponent_defense_index', 'venue', 'opponent_team_id']
-    print(f"\nAdded features summary:")
-    for col in new_cols:
-        if col in enhanced_df.columns:
-            if enhanced_df[col].dtype in ['float64', 'int64']:
-                print(f"  {col}: mean={enhanced_df[col].mean():.3f}, std={enhanced_df[col].std():.3f}")
-            else:
-                value_counts = enhanced_df[col].value_counts()
-                print(f"  {col}: {dict(value_counts.head(3))}")
-    
-    if args.dry_run:
-        print("Dry run - no files written")
-        return
-    
 
-    # Save output CSV as before
-    if args.output_file:
-        output_path = args.output_file
-    else:
-        input_path = Path(args.features_file)
-        output_path = input_path.parent / f"{input_path.stem}_with_strength{input_path.suffix}"
-    enhanced_df.to_csv(output_path, index=False)
-    print(f"Saved enhanced features to {output_path}")
-    print(f"Feature count: {len(features_df.columns)} -> {len(enhanced_df.columns)} (+{len(new_cols)})")
-
-    # --- Persist strengths to MongoDB ---
     print("\nUpdating team strengths in MongoDB...")
     try:
         from database.mongo.mongo_data_loader import load_teams_data, update_teams_data
@@ -305,26 +255,23 @@ def main():
         print("MongoDB loader not available, skipping Mongo update.")
         return
 
-    # Load teams from Mongo
     teams = load_teams_data()
-    # Build a mapping from fbref_team_id to team dict
     fbref_to_team = {t.get('fbref_id'): t for t in teams if t.get('fbref_id')}
-
-    # For each team, add/update strengths[GW]
     gw = str(args.gameweek)
     for fbref_id, team in fbref_to_team.items():
+        if fbref_id not in attack_indices or fbref_id not in defense_indices:
+            print(f"Skipping team {team.get('name', fbref_id)}: insufficient data for strengths.")
+            continue
         if 'strengths' not in team:
             team['strengths'] = {}
-        attack = attack_indices.get(fbref_id, 0.0)
-        defence = defense_indices.get(fbref_id, 0.0)
+        attack = attack_indices[fbref_id]
+        defence = defense_indices[fbref_id]
         overall = (attack + defence) / 2.0
         team['strengths'][gw] = {
             'attack': attack,
             'defence': defence,
             'overall': overall
         }
-
-    # Write back to Mongo
     update_teams_data(list(fbref_to_team.values()))
     print(f"✅ Updated strengths for GW{gw} for {len(fbref_to_team)} teams in MongoDB.")
 

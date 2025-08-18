@@ -20,7 +20,7 @@ from typing import Dict, List, Optional, Any, Union
 from pymongo import MongoClient
 from pymongo.database import Database
 from pymongo.collection import Collection
-from pymongo.operations import ReplaceOne, UpdateOne
+from pymongo.operations import UpdateOne
 from pymongo.errors import ConnectionFailure, DuplicateKeyError
 from dotenv import load_dotenv
 import logging
@@ -114,76 +114,57 @@ class FPLMongoClient:
         players = list(collection.find({'element_type': position_type}, {'_id': 0}).sort('id', 1))
         return players
     
-    def upsert_player(self, player_data: Dict[str, Any]) -> None:
-        """Insert or update a player using 'code' field for matching"""
-        collection = self.get_collection(self.players_collection_name)
-        collection.replace_one(
-            {'code': player_data['code']}, 
-            player_data, 
-            upsert=True
-        )
-    
-    def bulk_upsert_players(self, players_data: List[Dict[str, Any]], source: Optional[str] = None) -> None:
-        """Bulk insert or update players.
-        - When handling prediction payloads (items with 'expected_points' and without 'element_type'),
-          store them nested by gameweek under the unified 'predictions' field.
-          All predictions now use the same storage location regardless of source.
-          Examples:
-            All sources -> predictions.{gw}
+
+    def bulk_upsert_players(self, players_data: List[Dict[str, Any]]) -> None:
+        """
+        Bulk insert or update player properties (not predictions).
+        Only updates the player document fields, preserving existing predictions.
         """
         if not players_data:
             return
-            
         collection = self.get_collection(self.players_collection_name)
         operations = []
-
-        # All predictions now use the unified 'predictions' field
-        field_prefix = 'predictions'
-        
         for player in players_data:
-            # Use 'code' field for matching as it's consistent across seasons
-            
-            # Check if this is prediction data (has expected_points) or base player data (has element_type)
-            if 'expected_points' in player and 'element_type' not in player:
-                # This is prediction data - store in nested predictions object by gameweek and source
-                gameweek = player.get('gameweek', 1)  # Default to GW1 if not specified
-                
-                # Build the prediction data for this gameweek
-                prediction_data = {}
-                for k, v in player.items():
-                    if k not in ['code', 'player_id', 'name', 'gameweek']:
-                        prediction_data[k] = v
-                
-                # Store prediction data nested by gameweek: {field_prefix}.{gw}: { ... }
-                update_fields = {f'{field_prefix}.{gameweek}': prediction_data}
-                
-                # Only update existing player docs; do not upsert from predictions
-                try:
-                    code_int = int(player['code'])
-                except Exception:
-                    # Skip if code is missing or invalid
-                    continue
-                
-                operations.append(
-                    UpdateOne(
-                        {'code': code_int},
-                        {'$set': update_fields},
-                        upsert=False  # Don't create new players from predictions
-                    )
+            # Use $set to update only provided fields, preserving predictions
+            operations.append(
+                UpdateOne(
+                    {'code': player['code']},
+                    {'$set': player},
+                    upsert=True
                 )
-            else:
-                # This is base player data - replace entire document
-                operations.append(
-                    ReplaceOne(
-                        {'code': player['code']},
-                        player,
-                        upsert=True
-                    )
-                )
-        
+            )
         if operations:
             result = collection.bulk_write(operations)
-            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} players")
+            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} players (properties only)")
+
+    def bulk_upsert_player_predictions(self, predictions_data: List[Dict[str, Any]]) -> None:
+        """
+        Bulk upsert predictions for players for a specific gameweek.
+        Each prediction is added to the predictions object for the player, keyed by gameweek.
+        """
+        if not predictions_data:
+            return
+        collection = self.get_collection(self.players_collection_name)
+        operations = []
+        field_prefix = 'predictions'
+        for pred in predictions_data:
+            gameweek = pred.get('gameweek')
+            try:
+                code_int = int(pred['code'])
+            except Exception:
+                continue
+            prediction_data = {k: v for k, v in pred.items() if k not in ['code', 'player_id', 'name', 'gameweek']}
+            update_fields = {f'{field_prefix}.{gameweek}': prediction_data}
+            operations.append(
+                UpdateOne(
+                    {'code': code_int},
+                    {'$set': update_fields},
+                    upsert=False  # Don't create new players from predictions
+                )
+            )
+        if operations:
+            result = collection.bulk_write(operations)
+            logger.info(f"✅ Bulk upserted {result.modified_count} player predictions")
     
     # === TEAMS OPERATIONS ===
     
@@ -206,34 +187,31 @@ class FPLMongoClient:
         return {team['id']: team for team in teams}
     
     def upsert_team(self, team_data: Dict[str, Any]) -> None:
-        """Insert or update a team"""
+        """Update only provided fields for a team (does not replace the entire record)"""
         collection = self.get_collection(self.teams_collection_name)
-        collection.replace_one(
-            {'id': team_data['id']}, 
-            team_data, 
+        collection.update_one(
+            {'id': team_data['id']},
+            {'$set': team_data},
             upsert=True
         )
     
     def bulk_upsert_teams(self, teams_data: List[Dict[str, Any]]) -> None:
-        """Bulk insert or update teams"""
+        """Bulk update only provided fields for teams (does not replace entire records)"""
         if not teams_data:
             return
-            
         collection = self.get_collection(self.teams_collection_name)
         operations = []
-        
         for team in teams_data:
             operations.append(
-                ReplaceOne(
+                UpdateOne(
                     {'id': team['id']},
-                    team,
+                    {'$set': team},
                     upsert=True
                 )
             )
-        
         if operations:
             result = collection.bulk_write(operations)
-            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} teams")
+            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} teams (fields only)")
     
     # === FIXTURES OPERATIONS ===
     
@@ -282,35 +260,23 @@ class FPLMongoClient:
         ).sort([('gameweek', 1), ('id', 1)]).limit(count))
         return fixtures
     
-    def upsert_fixture(self, fixture_data: Dict[str, Any]) -> None:
-        """Insert or update a fixture"""
-        collection = self.get_collection(self.fixtures_collection_name)
-        collection.replace_one(
-            {'id': fixture_data['id']}, 
-            fixture_data, 
-            upsert=True
-        )
-    
     def bulk_upsert_fixtures(self, fixtures_data: List[Dict[str, Any]]) -> None:
-        """Bulk insert or update fixtures"""
+        """Bulk update only provided fields for fixtures (does not replace entire records)"""
         if not fixtures_data:
             return
-            
         collection = self.get_collection(self.fixtures_collection_name)
         operations = []
-        
         for fixture in fixtures_data:
             operations.append(
-                ReplaceOne(
+                UpdateOne(
                     {'id': fixture['id']},
-                    fixture,
+                    {'$set': fixture},
                     upsert=True
                 )
             )
-        
         if operations:
             result = collection.bulk_write(operations)
-            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} fixtures")
+            logger.info(f"✅ Bulk upserted {result.upserted_count + result.modified_count} fixtures (fields only)")
     
     # === DATABASE MANAGEMENT ===
     
@@ -361,32 +327,6 @@ class FPLMongoClient:
 
 
 # === UTILITY FUNCTIONS ===
-
-def load_teams_data(mongo_client: Optional[FPLMongoClient] = None) -> List[Dict[str, Any]]:
-    """
-    Load teams data - compatible replacement for JSON file loading
-    
-    Args:
-        mongo_client: Optional MongoDB client instance
-        
-    Returns:
-        List of team dictionaries
-    """
-    if mongo_client:
-        return mongo_client.get_all_teams()
-    else:
-        # Create temporary client for one-off operations
-        client = FPLMongoClient()
-        try:
-            return client.get_all_teams()
-        finally:
-            client.disconnect()
-
-
-def get_fpl_mongo_client() -> FPLMongoClient:
-    """Get a configured FPL MongoDB client instance"""
-    return FPLMongoClient()
-
 
 if __name__ == "__main__":
     # Test the MongoDB client

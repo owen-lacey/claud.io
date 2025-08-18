@@ -214,7 +214,7 @@ class PredictionGenerator:
             mongo_client = FPLMongoClient()
 
             # Save predictions to MongoDB (unified predictions field)
-            mongo_client.bulk_upsert_players(predictions['players'])
+            mongo_client.bulk_upsert_player_predictions(predictions['players'])
             print(f"✅ Saved {len(predictions['players'])} predictions to MongoDB for GW{gameweek}")
             
             mongo_client.disconnect()

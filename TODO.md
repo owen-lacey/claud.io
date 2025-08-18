@@ -11,3 +11,4 @@
   - [ ] Validate team strengths e.g arsenal is low?
 - [ ] Team information shows 'unknown' a lot
 - [ ] Logging: ⚠️ Single-match features detected, generating proper rolling averages...
+- [ ] Team strength shows Brighton/Brentford very high?

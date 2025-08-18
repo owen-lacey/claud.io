@@ -143,7 +143,10 @@ def main():
                 t["fbref_id"] = fb
                 updates.append(t)
             else:
-                missing.append(fpl_name)
+                # Fallback: set fbref_id to the team name and log
+                t["fbref_id"] = fpl_name
+                updates.append(t)
+                print(f"[Fallback] Team '{fpl_name}' not matched in FBRef names, setting fbref_id to team name.")
         if args.dry_run:
             print("--- Proposed updates ---")
             for t in updates:
